@@ -1,0 +1,184 @@
+<mxfile host="app.diagrams.net" agent="SwarmOps" version="24.0.0">
+  <diagram id="repo-map" name="1 - Repo Map">
+    <mxGraphModel dx="1400" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="g1" value="Frontend &amp; Gateway" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=12;fontStyle=1;spacingTop=6;" vertex="1" parent="1"><mxGeometry x="40" y="40" width="280" height="160" as="geometry"/></mxCell>
+        <mxCell id="r1" value="swarmops-frontend&#10;React + Vite SPA" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="60" y="80" width="240" height="45" as="geometry"/></mxCell>
+        <mxCell id="r2" value="swarmops-gateway&#10;NGINX" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="60" y="140" width="240" height="45" as="geometry"/></mxCell>
+
+        <mxCell id="g2" value="Core Data Services — Tony" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=12;fontStyle=1;spacingTop=6;" vertex="1" parent="1"><mxGeometry x="360" y="40" width="280" height="280" as="geometry"/></mxCell>
+        <mxCell id="r3" value="swarmops-auth-service&#10;Node/TS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="380" y="80" width="240" height="45" as="geometry"/></mxCell>
+        <mxCell id="r4" value="swarmops-fleet-service&#10;Node/TS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="380" y="140" width="240" height="45" as="geometry"/></mxCell>
+        <mxCell id="r5" value="swarmops-mission-service&#10;Node/TS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="380" y="200" width="240" height="45" as="geometry"/></mxCell>
+        <mxCell id="r6" value="swarmops-notification-service&#10;Node/TS · stateless" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="380" y="260" width="240" height="45" as="geometry"/></mxCell>
+
+        <mxCell id="g3" value="Algorithm &amp; Live Data — Guy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=12;fontStyle=1;spacingTop=6;" vertex="1" parent="1"><mxGeometry x="680" y="40" width="280" height="280" as="geometry"/></mxCell>
+        <mxCell id="r7" value="swarmops-planning-service&#10;Python + FastAPI · canary" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673a6;" vertex="1" parent="1"><mxGeometry x="700" y="80" width="240" height="45" as="geometry"/></mxCell>
+        <mxCell id="r8" value="swarmops-telemetry-service&#10;Node/TS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="700" y="140" width="240" height="45" as="geometry"/></mxCell>
+        <mxCell id="r9" value="swarmops-drone-simulator&#10;Node/TS · worker" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#d6b656;" vertex="1" parent="1"><mxGeometry x="700" y="200" width="240" height="45" as="geometry"/></mxCell>
+
+        <mxCell id="g4" value="Platform — Valfish" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=12;fontStyle=1;spacingTop=6;" vertex="1" parent="1"><mxGeometry x="1000" y="40" width="280" height="220" as="geometry"/></mxCell>
+        <mxCell id="r10" value="swarmops-deployments&#10;Helm + Argo CD + observability" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="1020" y="80" width="240" height="45" as="geometry"/></mxCell>
+        <mxCell id="r11" value="swarmops-infrastructure&#10;Terraform" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="1020" y="140" width="240" height="45" as="geometry"/></mxCell>
+
+        <mxCell id="g5" value="Dev &amp; Shared" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=12;fontStyle=1;spacingTop=6;" vertex="1" parent="1"><mxGeometry x="40" y="340" width="560" height="140" as="geometry"/></mxCell>
+        <mxCell id="r12" value="swarmops-local&#10;Docker Compose" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="60" y="380" width="240" height="45" as="geometry"/></mxCell>
+        <mxCell id="r13" value="swarmops-contracts&#10;shared types (npm + pip)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="320" y="380" width="240" height="45" as="geometry"/></mxCell>
+
+        <mxCell id="g6" value="Docs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=12;fontStyle=1;spacingTop=6;" vertex="1" parent="1"><mxGeometry x="680" y="340" width="280" height="140" as="geometry"/></mxCell>
+        <mxCell id="r14" value="swarmops&#10;PRD, plan, milestones, pitch site" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="700" y="380" width="240" height="45" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="runtime-arch" name="2 - Runtime Architecture">
+    <mxGraphModel dx="1400" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="fe" value="Frontend (SPA)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6c8ebf;fontSize=13;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="560" y="40" width="240" height="50" as="geometry"/></mxCell>
+        <mxCell id="gw" value="Gateway (NGINX)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82b366;fontSize=13;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="560" y="140" width="240" height="50" as="geometry"/></mxCell>
+
+        <mxCell id="auth" value="auth-service&#10;(MongoDB)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="40" y="260" width="180" height="55" as="geometry"/></mxCell>
+        <mxCell id="fleet" value="fleet-service&#10;(MongoDB)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="250" y="260" width="180" height="55" as="geometry"/></mxCell>
+        <mxCell id="mission" value="mission-service&#10;(MongoDB)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="460" y="260" width="180" height="55" as="geometry"/></mxCell>
+        <mxCell id="tele" value="telemetry-service&#10;(MongoDB)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="670" y="260" width="180" height="55" as="geometry"/></mxCell>
+        <mxCell id="plan" value="planning-service&#10;(MongoDB) · canary" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673a6;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="880" y="260" width="180" height="55" as="geometry"/></mxCell>
+        <mxCell id="notif" value="notification-service&#10;(stateless)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="1090" y="260" width="180" height="55" as="geometry"/></mxCell>
+
+        <mxCell id="bus" value="RabbitMQ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#b85450;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="880" y="400" width="180" height="50" as="geometry"/></mxCell>
+        <mxCell id="sim" value="drone-simulator&#10;(worker)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#d6b656;" vertex="1" parent="1"><mxGeometry x="670" y="400" width="180" height="50" as="geometry"/></mxCell>
+
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="fe" target="gw"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="gw" target="auth"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="gw" target="fleet"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="gw" target="mission"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="gw" target="tele"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="gw" target="plan"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="gw" target="notif"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="e8" value="ingest" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="sim" target="tele"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e9" value="publish" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;strokeColor=#b85450;fontSize=10;" edge="1" parent="1" source="tele" target="bus"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e10" value="consume" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;strokeColor=#b85450;fontSize=10;" edge="1" parent="1" source="bus" target="plan"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e11" value="publish alert" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;strokeColor=#b85450;fontSize=10;" edge="1" parent="1" source="plan" target="bus"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e12" value="consume" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;strokeColor=#b85450;fontSize=10;" edge="1" parent="1" source="bus" target="notif"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e13" value="WebSocket (live map)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;strokeColor=#6c8ebf;fontSize=10;" edge="1" parent="1" source="notif" target="fe"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="telemetry-flow" name="3 - Live Telemetry &amp; Re-planning Flow">
+    <mxGraphModel dx="1400" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="s1" value="1. drone-simulator&#10;emits position/battery on a timer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#d6b656;" vertex="1" parent="1"><mxGeometry x="40" y="160" width="200" height="70" as="geometry"/></mxCell>
+        <mxCell id="s2" value="2. telemetry-service&#10;ingests, stores history, publishes event" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="300" y="160" width="200" height="70" as="geometry"/></mxCell>
+        <mxCell id="s3" value="RabbitMQ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="560" y="160" width="140" height="70" as="geometry"/></mxCell>
+        <mxCell id="s4" value="3. planning-service&#10;consumes event, re-solves affected portion of schedule" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673a6;" vertex="1" parent="1"><mxGeometry x="760" y="160" width="220" height="70" as="geometry"/></mxCell>
+        <mxCell id="s5" value="4. notification-service&#10;consumes conflict/alert (if any)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="1040" y="40" width="200" height="70" as="geometry"/></mxCell>
+        <mxCell id="s6" value="5. frontend&#10;WebSocket push: map, plan, alerts update live" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="1300" y="160" width="200" height="70" as="geometry"/></mxCell>
+
+        <mxCell id="t1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="s1" target="s2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="t2" value="publish" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="s2" target="s3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="t3" value="consume" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="s3" target="s4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="t4" value="publish alert" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="s4" target="s5"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="t5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="s4" target="s6"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="t6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="s5" target="s6"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="ci-pipeline" name="4 - CI Pipeline">
+    <mxGraphModel dx="1400" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="c1" value="Dev pushes&#10;feature/ branch" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="40" y="160" width="160" height="60" as="geometry"/></mxCell>
+        <mxCell id="c2" value="Pull Request" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="260" y="160" width="160" height="60" as="geometry"/></mxCell>
+        <mxCell id="c3" value="GH Actions (PR)&#10;lint / test / build-validate&#10;never publishes, never touches cluster" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="480" y="140" width="220" height="80" as="geometry"/></mxCell>
+        <mxCell id="c4" value="1 approval&#10;→ merge to main" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="760" y="160" width="160" height="60" as="geometry"/></mxCell>
+        <mxCell id="c5" value="GH Actions (main)&#10;bump VERSION + git hash" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="980" y="40" width="200" height="60" as="geometry"/></mxCell>
+        <mxCell id="c6" value="OIDC → AWS&#10;no static keys" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="980" y="140" width="200" height="60" as="geometry"/></mxCell>
+        <mxCell id="c7" value="build + push image&#10;tag: semver-githash" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="980" y="240" width="200" height="60" as="geometry"/></mxCell>
+        <mxCell id="c8" value="ECR&#10;(this service's repo)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="1240" y="240" width="180" height="60" as="geometry"/></mxCell>
+        <mxCell id="c9" value="yq edit&#10;swarmops-deployments/.../&lt;service&gt;.yaml" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="1240" y="40" width="220" height="60" as="geometry"/></mxCell>
+        <mxCell id="c10" value="commit via bot identity&#10;→ see GitOps Deployment Flow" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1240" y="140" width="220" height="60" as="geometry"/></mxCell>
+
+        <mxCell id="cc1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="c1" target="c2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="cc2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="c2" target="c3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="cc3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="c3" target="c4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="cc4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="c4" target="c5"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="cc5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="c5" target="c6"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="cc6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="c6" target="c7"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="cc7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="c7" target="c8"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="cc8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="c7" target="c9"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="cc9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="c9" target="c10"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="gitops-flow" name="5 - GitOps Deployment Flow">
+    <mxGraphModel dx="1400" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="d1" value="swarmops-deployments&#10;(Git, main)&#10;— image files, Helm values, App/AppProject" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="40" y="180" width="240" height="90" as="geometry"/></mxCell>
+        <mxCell id="d2" value="Argo CD&#10;AppProject (scoped repos/destinations)&#10;Application (auto-sync, self-heal, prune)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="360" y="180" width="260" height="90" as="geometry"/></mxCell>
+        <mxCell id="d3" value="Helm chart render&#10;swarmops parent chart + values-aws.yaml" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673a6;" vertex="1" parent="1"><mxGeometry x="700" y="180" width="240" height="90" as="geometry"/></mxCell>
+        <mxCell id="d4" value="EKS cluster&#10;Deployments / Services / Rollout (planning)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="1020" y="180" width="240" height="90" as="geometry"/></mxCell>
+
+        <mxCell id="d5" value="Drift detected&#10;(manual kubectl edit, pod deleted, etc.)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="1020" y="360" width="240" height="60" as="geometry"/></mxCell>
+        <mxCell id="d6" value="git revert on&#10;swarmops-deployments" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="40" y="360" width="240" height="60" as="geometry"/></mxCell>
+
+        <mxCell id="dd1" value="watches" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="d1" target="d2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="dd2" value="renders" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="d2" target="d3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="dd3" value="applies" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="d3" target="d4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="dd4" value="self-heal: reverts drift" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;strokeColor=#b85450;fontSize=10;" edge="1" parent="1" source="d5" target="d2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="dd5" value="rollback: revert commit" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;fontSize=10;" edge="1" parent="1" source="d6" target="d1"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="observability-flow" name="6 - Observability Flow">
+    <mxGraphModel dx="1400" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="o1" value="Every service&#10;/metrics (internal-only)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="40" y="60" width="220" height="60" as="geometry"/></mxCell>
+        <mxCell id="o2" value="Every service&#10;structured JSON logs (stdout)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="40" y="220" width="220" height="60" as="geometry"/></mxCell>
+
+        <mxCell id="o3" value="ServiceMonitor&#10;discovery" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="340" y="60" width="180" height="60" as="geometry"/></mxCell>
+        <mxCell id="o4" value="Grafana Alloy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="340" y="220" width="180" height="60" as="geometry"/></mxCell>
+
+        <mxCell id="o5" value="Prometheus" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="600" y="60" width="180" height="60" as="geometry"/></mxCell>
+        <mxCell id="o6" value="Loki" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="600" y="220" width="180" height="60" as="geometry"/></mxCell>
+
+        <mxCell id="o7" value="Grafana&#10;&quot;SwarmOps Overview&quot; dashboard" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673a6;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="860" y="140" width="220" height="70" as="geometry"/></mxCell>
+
+        <mxCell id="o8" value="Alertmanager&#10;service down / replicas / crash-loop / error-rate" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="600" y="340" width="240" height="70" as="geometry"/></mxCell>
+        <mxCell id="o9" value="Team chat&#10;(Discord/Slack)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="900" y="340" width="180" height="70" as="geometry"/></mxCell>
+
+        <mxCell id="o10" value="Argo Rollouts&#10;AnalysisTemplate (canary, planning-service)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673a6;" vertex="1" parent="1"><mxGeometry x="1180" y="40" width="220" height="70" as="geometry"/></mxCell>
+
+        <mxCell id="oo1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="o1" target="o3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="oo2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="o3" target="o5"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="oo3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="o2" target="o4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="oo4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="o4" target="o6"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="oo5" value="data source" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="o5" target="o7"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="oo6" value="data source" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="o6" target="o7"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="oo7" value="rules" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="o5" target="o8"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="oo8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="o8" target="o9"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="oo9" value="queries" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="o5" target="o10"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
