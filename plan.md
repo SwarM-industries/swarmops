@@ -68,6 +68,10 @@ Repos to create:
   repos are private, so this is enforced by team discipline, not by GitHub, for now — nobody
   pushes directly to `main` regardless of whether GitHub would stop them. Revisit if the org
   ever goes public or upgrades.
+  **TEMPORARY OVERRIDE (2026-07-23, until said otherwise):** direct pushes to `main` are
+  allowed across all app repos — skip PR/approval for now. Does not apply to
+  `swarmops-deployments`'s GitOps bot-only exception below. Delete this note when the team
+  reinstates PR-required.
 - README describing the repo's purpose (one paragraph — what it deploys, how to run it standalone).
 - Appropriate `.gitignore` for its stack (Node vs. Python vs. Terraform vs. Helm).
 - Branching convention: `feature/`, `bugfix/`, `hotfix/`.

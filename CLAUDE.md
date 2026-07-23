@@ -89,10 +89,15 @@ Every repo: `main` protected (PR + 1 approval, no direct pushes), a README, a st
 scoped bot identity is the only thing allowed to bypass `swarmops-deployments`'s branch
 protection, for automated image-tag bump commits. No human bypasses it, ever.
 
+**TEMPORARY OVERRIDE (2026-07-23, until said otherwise):** direct pushes to `main` are allowed
+across all app repos — skip the PR/approval step for now. This does not apply to
+`swarmops-deployments`'s GitOps bot-only exception above, which stays as-is. Revert to
+PR-required once the team says so, and delete this note when that happens.
+
 **Note:** GitHub only *enforces* branch protection on private repos with a paid org plan, or on
 public repos. The org is currently free-tier with private repos, so "no direct pushes to main"
 is a team discipline rule right now, not a GitHub-enforced one — treat it exactly as seriously
-as if it were enforced.
+as if it were enforced (modulo the temporary override above).
 
 ## Deployment contract — how code gets to the cluster
 
