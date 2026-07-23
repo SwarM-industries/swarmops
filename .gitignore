@@ -4,3 +4,7 @@ dist/
 *.log
 .env
 .env.local
+
+# other org repos, cloned here for local convenience — each has its own
+# git history/remote and is not tracked as part of this (swarmops) repo
+swarmops-*/
