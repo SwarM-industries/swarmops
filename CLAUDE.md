@@ -63,12 +63,63 @@ See `plan.md` §0 for the full table and rationale. The short version:
 - `planning-service` → **Python 3.11 + FastAPI**, `scipy.optimize.linear_sum_assignment` for the
   Hungarian algorithm, `ortools` for per-drone routing. This is the one service that's a
   different language on purpose — don't "fix" it to match the others.
-- Message bus: **RabbitMQ**, not Kafka.
+- Message bus: **RabbitMQ** (Bitnami Helm chart dependency), not Kafka.
+- Database: **one Bitnami MongoDB chart dependency**, one logical database per service — not
+  five separate Mongo deployments.
 - Frontend map: **abstract SVG grid** (ported from `site/`), not a real Leaflet map.
-- Local dev: **docker-compose** brings up everything. If you're integration-testing against a
-  service, it should be a container in that compose file, not someone's laptop over a tunnel.
+- Local dev: **docker-compose** (in `swarmops-local`) brings up everything. If you're
+  integration-testing against a service, it should be a container in that compose file, not
+  someone's laptop over a tunnel.
 
 If you think one of these is wrong, say so to the team — don't silently build around it.
+
+## Repos — this is polyrepo, not monorepo
+
+This repo (`swarmops`) is docs + the pitch deck. It is **not** one of the app's deployable
+units. The actual app lives across these repos in the `SwarM-industries` GitHub org:
+`swarmops-frontend`, `swarmops-gateway`, `swarmops-auth-service`, `swarmops-fleet-service`,
+`swarmops-mission-service`, `swarmops-planning-service`, `swarmops-telemetry-service`,
+`swarmops-notification-service`, `swarmops-drone-simulator`, `swarmops-local`,
+`swarmops-deployments`, `swarmops-infrastructure`. If you're working in one of those repos, it
+should have its own copy of the relevant bits of this file — this file is the shared source, not
+a substitute for repo-local context.
+
+Every repo: `main` protected (PR + 1 approval, no direct pushes), a README, a stack-appropriate
+`.gitignore`, `feature/`/`bugfix/`/`hotfix/` branches. The one exception, once GitOps is live: a
+scoped bot identity is the only thing allowed to bypass `swarmops-deployments`'s branch
+protection, for automated image-tag bump commits. No human bypasses it, ever.
+
+**Note:** GitHub only *enforces* branch protection on private repos with a paid org plan, or on
+public repos. The org is currently free-tier with private repos, so "no direct pushes to main"
+is a team discipline rule right now, not a GitHub-enforced one — treat it exactly as seriously
+as if it were enforced.
+
+## Deployment contract — how code gets to the cluster
+
+This is fixed, not a suggestion, because the whole point of the project is that nobody deploys
+by hand:
+
+- **Images**: tagged `<semver>-<7-char-git-hash>` (e.g. `1.2.0-a1b2c3d`). `latest` is never used.
+- **CI** (GitHub Actions, one workflow per app repo): PRs only lint/test/build-validate — never
+  publish an image, never touch the cluster. Pushes to `main` version the build, authenticate to
+  AWS via **OIDC** (no static keys, ever), and push to that repo's ECR repository.
+- **CD**: a push to `main` also updates that service's own file at
+  `swarmops-deployments/environments/production/images/<service>.yaml` via `yq` — never a text
+  replace, never editing another service's file. Argo CD (watching `swarmops-deployments`,
+  auto-sync + self-heal + prune) reconciles the cluster to match. **Nobody runs `helm upgrade` or
+  `kubectl apply` by hand once this is live** — a deploy is a Git commit, full stop.
+- **Helm**: one parent chart at `swarmops-deployments/helm/swarmops/`, Bitnami MongoDB + Bitnami
+  RabbitMQ as dependencies, `range`/`_helpers.tpl` generating the near-identical services rather
+  than copy-pasted manifests per service.
+- **Observability**: every service exposes an internal-only `/metrics` (request count, status,
+  duration, process stats — no user/mission/drone IDs in labels), discovered via a
+  `ServiceMonitor`. Logs are structured JSON, no secrets, no PII. Both kube-prometheus-stack and
+  Loki/Alloy are installed as Argo CD Applications, not by hand.
+- **Required extension**: Argo Rollouts canary on `planning-service` — this is the one service
+  allowed progressive delivery instead of a plain rolling update, because it's explicitly the
+  highest-risk, most-iterated service (PRD §3.3).
+
+Full detail and per-person ownership of each piece: `plan.md` §3 (Phases 4–5).
 
 ## Data model & API — don't improvise field names
 

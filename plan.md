@@ -1,188 +1,252 @@
 # SwarmOps — Build Plan
 
-Source of truth for scope: `SwarmOps_PRD.md`. This doc splits that scope into three parallel
-tracks for a 3-person team (Tony, Guy, Valfish) and sequences them across the PRD's 5 build
-phases (§9).
+Source of truth for **what the app does**: `SwarmOps_PRD.md`.
+Source of truth for **how it's built, deployed, and graded**: the capstone brief this plan
+implements (polyrepo structure, Compose/local-k8s optional, Helm+EKS as the real focus,
+Terraform Cloud, GitHub Actions OIDC, Argo CD GitOps, kube-prometheus-stack/Loki observability,
+one required extension beyond the floor). This doc is SwarmOps's concrete answer to that brief —
+the tools and shape are fixed by the brief; the specifics below are us confirming how they map
+onto SwarmOps's actual services.
+
+Everything here is deliberately flexible in *how* (which exact Helm values, which exact alert
+thresholds) but not in *what's required* — Helm chart, Terraform on public modules, OIDC-only
+AWS auth, GitOps-only deploys, one dashboard, one required extension. If a decision below turns
+out to be wrong, change it and update this file — don't silently drift from it.
 
 ---
 
 ## 0. Decisions locked in before anyone writes code
 
-The PRD leaves a few things open (§10) or unspecified. Picking now so nobody blocks on it later.
-Revisit as a team if any of these are wrong — but don't leave them ambiguous during build.
-
 | Decision | Choice | Why |
 |---|---|---|
-| Language — auth/fleet/mission/telemetry/notification services | Node.js 20 + TypeScript + Express + Mongoose | CRUD-shaped services, fast to scaffold, one stack for 4 of 6 services keeps cross-service code (shared types, request helpers) reusable. |
-| Language — planning-service | Python 3.11 + FastAPI | This is the one service where the algorithm story matters. `scipy.optimize.linear_sum_assignment` gives the Hungarian algorithm for free; `ortools` has first-class Python support for the routing phase. Fighting Node bindings for OR-Tools isn't worth it. |
-| Message bus | RabbitMQ | Kafka is heavier to stand up correctly (ZK/KRaft, partitioning) for the throughput this system actually has. RabbitMQ gets telemetry → planning and planning → notification working fast. Swap later if someone wants the Kafka story for the defense. |
-| Gateway | NGINX, path-based routing per PRD §3.2 | As specified. |
-| Frontend | React + Vite, reusing the pitch site's map primitives | `site/` already has a working animated SVG fleet map (`site/src/components/LiveMap.jsx`, `site/src/lib/geometry.js`). Wire it to real WebSocket data instead of the loop-animation fake data — don't rebuild it from scratch. |
-| Live map rendering | Abstract SVG grid, not Leaflet | Matches the pitch site, faster to build, avoids a tile-provider dependency for a simulated fleet. |
-| Local dev orchestration | `docker-compose.yml` at repo root: Mongo, RabbitMQ, all 6 services, gateway | Needed before anyone can integration-test across services, and before Helm charts make sense in Phase 4. |
-| Repo layout | Polyrepo per PRD §3, one repo per service + one for frontend + one for infra/deployments (Argo CD GitOps repo) | As specified. A shared `swarmops-contracts` repo (or npm/pip package) holds the data model shapes from PRD §6 so all three tracks stay in sync without copy-pasting types. |
-| Auth | JWT issued by `auth-service`, verified by each service via shared middleware (shared secret or JWKS) | Simplest thing that satisfies RBAC (planner/operator/admin) without a session store. |
+| Language — auth/fleet/mission/telemetry/notification services | Node.js 20 + TypeScript + Express + Mongoose | CRUD-shaped services, fast to scaffold, one stack for 5 of 6 services keeps cross-service code reusable. |
+| Language — planning-service | Python 3.11 + FastAPI | The one service where the algorithm story matters. `scipy.optimize.linear_sum_assignment` gives Hungarian for free; `ortools` has first-class Python support for routing. |
+| Message bus | RabbitMQ, via the **Bitnami RabbitMQ Helm chart** as a chart dependency | Lighter than Kafka to stand up correctly; Bitnami chart means we're not hand-rolling a stateful broker. |
+| Database | **One Bitnami MongoDB chart dependency**, one logical database per service (auth_db, fleet_db, mission_db, planning_db, telemetry_db) on that single instance | Matches "each service owns its own database" without operating 5 separate stateful Mongo deployments. `notification-service` stays stateless. Revisit if per-service instances turn out cheap enough — not a hard requirement either way. |
+| Gateway | NGINX, path-based routing per PRD §3.2, fronted by an ALB via Ingress in the cloud | As specified; ALB/Ingress makes it the only externally reachable thing, matching the brief's "single entrypoint" requirement. |
+| Frontend | React + Vite, reusing the pitch site's map primitives (`site/src/components/LiveMap.jsx`, `site/src/lib/geometry.js`) wired to real data | Don't rebuild the animated map from scratch — port it, swap the data source. |
+| Live map rendering | Abstract SVG grid, not Leaflet | Faster to build, no tile-provider dependency, matches the pitch deck. |
+| Image tagging | `<semver>-<7-char-git-hash>` everywhere, e.g. `1.2.0-a1b2c3d`. **`latest` is never used, anywhere.** | Required by the brief; also just correct practice for GitOps — Argo CD needs a tag that actually changes to detect a new deploy. |
+| CI | GitHub Actions, one workflow per app repo. PRs: lint/test/build-validate only, never publish, never touch the cluster. Pushes to `main`: bump `VERSION` + short git hash, OIDC to AWS (no static keys), build, push to that repo's ECR repository. | Per brief. |
+| CD | Argo CD, its own Helm release, its own namespace, watching `swarmops-deployments`. Automated sync + self-heal + pruning. An `AppProject` scopes allowed repos/destinations. | Per brief. Nobody runs `helm upgrade` by hand once this is live. |
+| GitOps image updates | Per-service image files under `environments/production/images/<service>.yaml` in `swarmops-deployments`, edited only via `yq` by each app's own CI — never a text replace, never a human hand-editing someone else's file. The only identity allowed to bypass `swarmops-deployments`'s branch protection is a scoped bot (GitHub App installation token, not a personal token). | Per brief — this is what makes "every deploy is a Git commit" actually true instead of aspirational. |
+| Infra provisioning | Terraform on `terraform-aws-modules/vpc/aws` + `terraform-aws-modules/eks/aws`, connected to a **Terraform Cloud** workspace (VCS-driven runs, remote state with locking). State is never committed to Git. | Per brief. |
+| Observability | kube-prometheus-stack + Loki/Alloy, **both installed as Argo CD Applications**, not by hand. One Grafana dashboard ("SwarmOps Overview"). `ServiceMonitor` per service scraping an internal-only `/metrics`. Structured JSON logs, no PII, no user/mission/drone IDs in metric labels. | Per brief. |
+| Required extension | **Argo Rollouts, canary strategy on `planning-service`** | This is already load-bearing in the PRD (§3.3): planning-service is explicitly called out as the highest-risk, most-iterated service. The brief requires *some* extension beyond the floor (Argo CD alone) — Argo Rollouts is the natural, already-justified pick rather than bolting on something unrelated. |
+| Local dev orchestration | `docker-compose.yml` in `swarmops-local` | Practice milestone, not graded, but still the fastest way to integration-test across services before Phase 4. |
 
 ---
 
-## 1. Ownership tracks
+## 1. Repository & team structure
 
-Three tracks, one per person, designed so each person can work through all 5 PRD phases on
-their own slice without waiting on the others for day-to-day work. Cross-track dependencies are
-called out explicitly per phase below — that's where you sync.
+Polyrepo, one GitHub org (`SwarM-industries`, already created), one repo per deployable unit —
+**not** a monorepo. The existing `swarmops` repo (this plan, the PRD, the pitch site) is *not*
+one of these — it's project docs and the pitch deck, not a deployable unit.
+
+Repos to create:
+
+| Repo | Contents |
+|---|---|
+| `swarmops-frontend` | React/Vite SPA |
+| `swarmops-gateway` | NGINX config/image |
+| `swarmops-auth-service` | Node/TS |
+| `swarmops-fleet-service` | Node/TS |
+| `swarmops-mission-service` | Node/TS |
+| `swarmops-planning-service` | Python/FastAPI |
+| `swarmops-telemetry-service` | Node/TS |
+| `swarmops-notification-service` | Node/TS |
+| `swarmops-drone-simulator` | Node/TS worker — deployable unit in its own right (a long-running Job/Deployment, not request-driven), gets its own repo/image/Helm template |
+| `swarmops-local` | Docker Compose environment wiring all of the above together |
+| `swarmops-deployments` | K8s manifests (practice milestone), the Helm chart, Argo CD config (`AppProject`/`Application`), per-service `environments/production/images/*.yaml`, observability config (dashboards, alerts, ServiceMonitors) |
+| `swarmops-infrastructure` | Terraform |
+| `swarmops-contracts` *(recommended, not brief-mandated)* | Shared data model / event shapes from PRD §6 as actual importable types (npm package for the Node services, a small Python package for planning-service) so "contracts before code" isn't just a convention, it's a dependency |
+
+**Per-repo, non-negotiable, for every repo above:**
+- `main` protected: no direct pushes, PR required, at least one approval.
+  **Caveat:** GitHub only enforces branch protection on private repos with a paid org plan
+  (Team/Enterprise) or on public repos. `SwarM-industries` is currently the free org plan and
+  repos are private, so this is enforced by team discipline, not by GitHub, for now — nobody
+  pushes directly to `main` regardless of whether GitHub would stop them. Revisit if the org
+  ever goes public or upgrades.
+- README describing the repo's purpose (one paragraph — what it deploys, how to run it standalone).
+- Appropriate `.gitignore` for its stack (Node vs. Python vs. Terraform vs. Helm).
+- Branching convention: `feature/`, `bugfix/`, `hotfix/`.
+- Once `swarmops-deployments`' GitOps automation is live, its branch protection's one exception
+  (once/if actually enforced by GitHub) is the scoped bot identity making image-bump commits —
+  nobody else bypasses it, ever, enforced or not.
+
+**Process tooling (part of the deliverable, not optional):**
+- Project management: GitHub Projects (zero extra signup, already in the org) unless the team
+  prefers Linear/Jira.
+- Team chat: Discord or Slack — pick one, use it for real coordination, not just as a checkbox.
+
+---
+
+## 2. Ownership tracks
+
+Same three tracks as before — the brief's extra rigor changes *how much* is in Track C, not who
+owns what.
 
 ### Track A — Core Data Services — **Tony**
-`auth-service`, `fleet-service`, `mission-service`, gateway config.
+`swarmops-auth-service`, `swarmops-fleet-service`, `swarmops-mission-service`, gateway routing
+config (in `swarmops-gateway`).
 
 ### Track B — Algorithm & Live Data — **Guy**
-`planning-service` (the optimization core), `telemetry-service`, drone simulator, message bus,
-`notification-service`, Argo Rollouts canary (owns `planning-service` end to end, including its
-deploy story, since PRD §3.3 specifically ties the canary extension to this service).
+`swarmops-planning-service`, `swarmops-telemetry-service`, `swarmops-drone-simulator`,
+`swarmops-notification-service`, the message bus, and the Argo Rollouts canary extension (owns
+planning-service end to end including its progressive-delivery story).
 
 ### Track C — Frontend & Platform — **Valfish**
-React/Vite SPA (all views), Helm charts (all services), Terraform/EKS, GitHub Actions CI (OIDC),
-Argo CD, observability (kube-prometheus-stack, Loki/Alloy).
-
-This groups the two algorithmically/operationally "deep" pieces (planning-service's solver,
-the deploy pipeline) as full end-to-end ownership rather than splitting infra thinly across
-three people — infra work compounds badly when three people are half-context on it.
+`swarmops-frontend`, `swarmops-infrastructure` (Terraform), and the platform pieces of
+`swarmops-deployments` (Helm chart skeleton/conventions, Argo CD install + `AppProject`, CI
+workflow template, observability stack install). Tony and Guy chart/CI their *own* services
+against Valfish's conventions (see Phase 4/6) — Valfish doesn't write every service's Dockerfile.
 
 ---
 
-## 2. Phase-by-phase breakdown
+## 3. Phase-by-phase breakdown
 
-Each phase lists per-track tasks and an explicit **sync point** — the contract the other two
-tracks depend on. Do the sync-point work first within a phase; it unblocks the other two.
+Phases 1–3 are the application (PRD §9 phases 1–3). Phase 4 is where the brief's grading focus
+starts. Phase 5 is cloud + automation + observability + the required extension.
 
 ### Phase 1 — Foundation
+*(unchanged from the app-feature plan: greedy assignment, basic CRUD, all services scaffolded and talking through the gateway. See PRD §9 phase 1.)*
 
-**Goal:** all five services scaffolded, talking over the gateway; basic CRUD; greedy assignment;
-static map showing current state.
-
-- **Tony**
-  - Scaffold `auth-service`: JWT login/issuance, RBAC roles (planner/operator/admin), MongoDB user collection.
-  - Scaffold `fleet-service`: CRUD for Drone model (PRD §6), `GET /fleet/drones?status=`.
-  - Scaffold `mission-service`: CRUD for Mission model, `POST /missions`, `GET /missions?status=`.
-  - Write the shared JWT-verification middleware other services import.
-  - **Sync point:** publish the Drone and Mission JSON shapes (exact field names/types) to `swarmops-contracts` by end of week 1 — Guy's planning-service and Valfish's frontend both build against these immediately.
-- **Guy**
-  - Scaffold `planning-service` (FastAPI skeleton, health check, MongoDB connection for Plan model).
-  - Implement the greedy baseline (PRD §4.2 phase 1): nearest capable drone with sufficient battery, sorted by priority then deadline.
-  - `POST /planning/solve` wired to greedy solver, reading from fleet-service/mission-service over HTTP for now (message bus comes in Phase 3).
-  - Stand up RabbitMQ locally (docker-compose) even though nothing publishes to it yet — Phase 3 shouldn't start with infra work.
-- **Valfish**
-  - Scaffold the frontend app (new Vite app, separate from `site/` — that one stays the pitch deck).
-  - Static fleet map: port `LiveMap.jsx` + `mapData.js` + `geometry.js` from `site/` as a starting point, replace fake data with a fetch from `fleet-service`/`mission-service` (no live movement yet — Phase 3 adds WebSocket).
-  - Mission board (list view, create mission form) against `mission-service`.
-  - NGINX gateway config routing `/auth /fleet /missions /planning /telemetry /notifications`.
-  - Write `docker-compose.yml` at the root gateway/deployments repo wiring everything above together.
-
-**End-of-phase demo:** create a mission and a drone through the UI, hit "solve", see a greedy assignment appear on the map.
-
----
+- **Tony**: scaffold auth/fleet/mission services, JWT middleware, publish Drone/Mission shapes to `swarmops-contracts`.
+- **Guy**: scaffold planning-service, greedy baseline, stand up RabbitMQ locally even before anything publishes to it.
+- **Valfish**: port the pitch site's map into a real frontend app, mission board, gateway config, `swarmops-local` docker-compose.
 
 ### Phase 2 — Optimization core
+*(unchanged: Hungarian matching, OR-Tools routing, battery feasibility, conflict handling. PRD §9 phase 2.)*
 
-**Goal:** replace greedy with matching/OR-Tools; battery-aware feasibility.
-
-- **Guy**
-  - Bipartite matching (Hungarian, via `scipy.optimize.linear_sum_assignment`) minimizing distance + urgency penalty (PRD §4.2 phase 2).
-  - Per-drone routing for multi-stop missions via OR-Tools routing solver (phase 3 of the algorithm, same phase of the roadmap).
-  - Battery-drain simulation along candidate routes; reject/insert-charging-stop logic (phase 4 of the algorithm).
-  - Conflict handling (PRD §4.3): priority/deadline tie-break, flag unresolved missions.
-  - `POST /planning/simulate` (what-if, non-committing) — needed early since Valfish's what-if panel in Phase 5 depends on it existing.
-- **Tony**
-  - Add maintenance/offline status transitions to `fleet-service` (needed for feasibility checks and the fleet operator persona).
-  - Payload/sensor-type compatibility fields + filtering on `mission-service`/`fleet-service` so planning-service can match on required_payload_type.
-  - Start the `notification-service` skeleton (stateless, consumes from RabbitMQ once Guy's bus is live) — low-effort service, fits in Tony's track since it's simple CRUD-adjacent, not algorithm work.
-- **Valfish**
-  - Fleet inventory view (battery, maintenance status, take-drone-offline action).
-  - Surface feasibility/conflict results in the mission board (flag unresolved missions from planning-service's response).
-  - Start Helm chart skeletons for the 3 services that exist and are stable (auth, fleet, mission) — don't template services still in flux.
-
-**Sync point:** Guy's `/planning/solve` response shape (assignment + route + feasibility) gets locked and published to contracts before Valfish builds the UI around it.
-
-**End-of-phase demo:** solve produces near-optimal assignments vs. Phase 1's greedy, and a route that would strand a drone gets rejected or given a charging stop instead.
-
----
+- **Guy**: matching → routing → feasibility → conflict handling; lock and publish the `/planning/solve` response shape.
+- **Tony**: maintenance/offline states on fleet-service, payload-compatibility fields, notification-service skeleton.
+- **Valfish**: fleet inventory view, surface feasibility/conflict flags in the UI, first Helm chart drafts for the services that are stable.
 
 ### Phase 3 — Live system
+*(unchanged: telemetry-service, drone simulator, WebSocket map, event-driven re-planning. PRD §9 phase 3.)*
 
-**Goal:** drone simulator + telemetry-service + message bus; live WebSocket map; event-driven re-planning.
-
-- **Guy**
-  - `telemetry-service`: ingest endpoint (`POST /telemetry/ingest`), publish to RabbitMQ, recent-history store in MongoDB.
-  - Drone simulator worker: flies each drone along its assigned route at realistic speed, emits telemetry on a timer with configurable random variance.
-  - Wire `planning-service` to consume telemetry events and mission events off the bus; implement re-planning that re-solves only the affected portion of the schedule (PRD §4.2 phase 5).
-  - `notification-service` consumes planning-service's conflict/alert events off the bus and exposes them (WebSocket or polling endpoint) to the frontend.
-- **Tony**
-  - Harden auth/fleet/mission services for concurrent access now that telemetry is writing fleet state continuously (position/battery updates from telemetry-service, not from fleet-service's own CRUD — make sure ownership of "who writes drone position" is unambiguous: telemetry-service writes it, fleet-service's CRUD only edits static fields like name/capacity).
-  - Add integration tests across the gateway now that all 6 services exist.
-- **Valfish**
-  - WebSocket connection from frontend to telemetry/notification stream; wire the ported `LiveMap` component's drone markers to real positions instead of the loop-animation fake data (the animation *infrastructure* — `pointOnLoop`, marker rendering, no-fly zones — stays; only the data source changes).
-  - Status strip + legend already exist from Phase 1 — just confirm they reflect live state.
-  - Alerts UI fed by `notification-service`.
-
-**Sync point:** telemetry event schema (drone_id, timestamp, position, battery_pct, event_type — PRD §6) gets published to contracts before the simulator and the frontend both build against it.
-
-**End-of-phase demo:** start the simulator, watch drones move on the live map for real, kill one drone mid-route, watch planning-service re-solve and the map update without a page refresh.
+- **Guy**: telemetry ingest + publish, drone simulator, planning-service consumes events and re-solves incrementally, notification-service consumes alerts.
+- **Tony**: make drone-position ownership unambiguous (telemetry writes position/battery, fleet CRUD only edits static fields), cross-service integration tests now that all 6 services exist.
+- **Valfish**: WebSocket wiring, swap the ported `LiveMap`'s fake loop-data for real positions (the animation code itself doesn't change).
 
 ---
 
-### Phase 4 — Infrastructure
+### Phase 4 — Package it properly (this is where grading starts)
 
-**Goal:** Helm, Terraform/EKS, GitHub Actions CI with OIDC, Argo CD GitOps, observability.
+Practice sub-steps (optional, do them if you want the muscle memory, skip if you're already
+comfortable):
+- Docker Compose locally via `swarmops-local` — gateway is the only thing exposed to the host,
+  everything else talks by Compose service name, Mongo gets a named volume, seeding
+  (`seed/init-mongo.js`-equivalent) only runs against an empty data directory.
+- A local cluster (kind/minikube), raw Deployments/Services/ConfigMaps/Secrets in a dedicated
+  namespace, Bitnami MongoDB chart instead of hand-rolled Mongo, seed script as a read-only
+  ConfigMap mount, exposed only through the gateway.
 
-This phase is Valfish's track by ownership, but it's the one place where doing it solo doesn't
-scale — everyone needs their own service containerized and Helm-chartable. Split as:
+**The graded work:**
 
-- **Valfish**
-  - Terraform: VPC + EKS via public modules, state in Terraform Cloud.
-  - GitHub Actions: OIDC to AWS (no static keys), build+push to ECR — one reusable workflow, parameterized per service.
-  - Argo CD: GitOps deployments repo, app-of-apps pattern across all 6 services + gateway + frontend.
-  - kube-prometheus-stack + Loki/Alloy: cluster-wide install, base dashboards.
-- **Tony**
-  - Dockerfiles + Helm chart values for `auth-service`, `fleet-service`, `mission-service`, `notification-service` (his services from earlier phases — he knows their config surface best).
-- **Guy**
-  - Dockerfile + Helm chart for `planning-service` (needs the Python/OR-Tools base image, likely heavier than the Node services — worth owning directly) and `telemetry-service`.
-  - Helm chart / deployment config for the drone simulator worker (it's a long-running job, not a request-driven service — different Helm template shape from the rest).
+- **Valfish** — owns the parent Helm chart's *shape*, in `swarmops-deployments/helm/swarmops/`:
+  - Declares Bitnami MongoDB and Bitnami RabbitMQ as chart dependencies.
+  - Builds one working service template (start with `auth-service`) using `range`/`if`/
+    `_helpers.tpl` so it's a template that generates all near-identical services, not five
+    copy-pasted manifests — image, replicas, ports, env, and resources all come from
+    `values.yaml`.
+  - Confirms install/upgrade/rollback/uninstall all work and MongoDB's data survives every one
+    of them (this is the actual bar — not "helm install succeeded once").
+  - Publishes the `values.yaml` conventions (naming, resource shape) before Tony/Guy add their
+    services to it.
+- **Tony** — adds `auth-service`, `fleet-service`, `mission-service`, `notification-service` to
+  the chart's values (Dockerfiles for each live in their own repos; the chart just references
+  the images).
+- **Guy** — adds `planning-service` (heavier image — Python + OR-Tools base), `telemetry-service`,
+  and `drone-simulator` to the chart. The simulator is a long-running worker, not
+  request-driven — it needs a different Helm template shape (Deployment without a Service, or a
+  Job, not a ClusterIP-backed Deployment like the rest).
 
-**Sync point:** Valfish defines the Helm chart *template* (one working example, e.g. auth-service) and the values.yaml conventions before Tony/Guy chart their own services against it — otherwise you get 6 charts with 6 different conventions.
-
-**End-of-phase demo:** `git push` to a service repo → GitHub Actions builds/pushes → Argo CD syncs it into the EKS cluster → Grafana shows the new pod healthy.
-
----
-
-### Phase 5 — Extension & polish
-
-**Goal:** Argo Rollouts canary on planning-service, what-if simulator, algorithm dashboards, demo scenarios.
-
-- **Guy**
-  - Argo Rollouts canary strategy on `planning-service` specifically (PRD §3.3): traffic-split steps, automated analysis/rollback triggers.
-  - Algorithm performance dashboard: solve time, conflict rate, assignment quality vs. greedy baseline (PRD §8) — expose these as metrics planning-service emits, Valfish wires the Grafana panel.
-- **Tony**
-  - Final demo data: seed scripts for realistic drones/missions across all services for the live demo.
-  - Cross-service integration test pass + bug bash — Tony's track had the least algorithmically novel work through Phases 1-4, so he has the most slack here to own hardening.
-- **Valfish**
-  - What-if simulator panel: calls `/planning/simulate`, previews the re-solved schedule without committing, diff view against the current plan.
-  - Grafana dashboards: fleet utilization, avg battery efficiency, mission completion rate (PRD §5.2, §8) — plus the algorithm panel Guy's metrics feed.
-  - Final visual polish pass on the live app (separate from the `site/` pitch deck, which is already done).
-
-**End-of-phase demo:** ship a bad build of planning-service, watch the canary catch it and roll back automatically, on camera.
+**Sync point:** Valfish's one working template + values.yaml convention exists before Tony/Guy
+add their services — six independently-invented chart conventions is worse than one imposed
+late.
 
 ---
 
-## 3. Working in parallel without stepping on each other
+### Phase 5 — Cloud infrastructure, delivery automation, observability
 
-- **Contracts before code.** Every sync point above is a data shape. The moment two tracks need
-  the same shape, whoever owns the producing service writes it down (a `swarmops-contracts`
-  repo/package, or even just a shared markdown file with JSON examples) *before* the consuming
-  track builds against it. Don't let someone infer your API shape from a Slack message.
-- **docker-compose is the integration point until Phase 4.** Nobody should be integration-testing
-  against someone else's laptop. `docker-compose up` brings up all 6 services + Mongo + RabbitMQ
-  + gateway from Phase 1 onward.
-- **Each service repo is independently deployable from day one**, even if it's a stub. Don't
-  batch "finish the algorithm, then containerize" — that's how Phase 4 becomes a scramble.
-- **Weekly sync, not daily standup overhead** — the tracks are deliberately independent enough
-  that a 3-person team doesn't need heavyweight process. Sync when a phase's sync-point
-  contract changes, not on a schedule.
+- **Valfish**
+  - Terraform in `swarmops-infrastructure`: VPC + EKS via `terraform-aws-modules/vpc/aws` and
+    `terraform-aws-modules/eks/aws`. Connect to a Terraform Cloud workspace — VCS-driven runs,
+    remote state with locking, state never in Git. Provisions VPC (public/private subnets, NAT,
+    routing), EKS control plane + node group, one ECR repo per component (11 repos — one per
+    deployable unit above, minus `swarmops-local`/`swarmops-infrastructure`/`swarmops-contracts`
+    which don't ship images), IAM (cluster role, node role, EBS CSI permissions), core add-ons
+    (VPC CNI, CoreDNS, kube-proxy, EBS CSI driver). No application workload during this step.
+  - Installs AWS Load Balancer Controller; Ingress/ALB in front of the gateway is the only
+    externally reachable thing.
+  - Installs Argo CD as its own Helm release in its own namespace; writes the `AppProject`
+    (scoped repos/destinations) and the top-level `Application` (points at the chart + all
+    values files, automated sync/self-heal/prune).
+  - Installs kube-prometheus-stack and Loki/Alloy, **each as its own Argo CD Application**.
+    Builds the "SwarmOps Overview" Grafana dashboard (node/pod health, request rate, error rate,
+    latency) and the baseline Alertmanager alerts (service down, replicas unavailable,
+    crash-looping, high error rate) — provisioned from Git, not clicked together.
+  - Writes the reusable GitHub Actions workflow template (parameterized per service: lint/test/
+    build-validate on PRs; version+OIDC+build+push+`yq`-edit-the-image-file on `main`) that
+    Tony/Guy copy into their own service repos.
+- **Guy**
+  - Argo Rollouts install + canary `Rollout` resource for `planning-service` specifically:
+    traffic-split steps, analysis template, automated rollback trigger. This is the required
+    extension — be ready to explain at demo why it's planning-service specifically (highest
+    blast radius: it's the optimization core, and it's the service most likely to get iterated
+    on right up to the deadline).
+  - Instruments `planning-service`'s `/metrics` (solve time, conflict rate, assignment quality
+    vs. greedy baseline — PRD §8) and wires its own `ServiceMonitor`.
+  - CI workflows (from Valfish's template) for planning-service, telemetry-service,
+    drone-simulator, notification-service — each edits only its own image file in
+    `swarmops-deployments`.
+- **Tony**
+  - CI workflows for auth/fleet/mission-service from Valfish's template.
+  - `/metrics` instrumentation + `ServiceMonitor` for his four services.
+  - Seed data for the live demo across all services; cross-repo integration pass now that the
+    whole pipeline (build → ECR → Argo CD → cluster) is live.
+
+**End-of-project demo:** push a commit → CI builds/tags/pushes to ECR and `yq`-bumps the image
+file → Argo CD reconciles the cluster automatically → Grafana/Loki show it healthy → ship a bad
+`planning-service` build and watch the canary catch it and roll back, live.
+
+---
+
+## 4. Pre-demo checklist — think about these, be ready to answer them
+
+Not extra tasks, lenses on what's already built. Assign an owner for "can answer this cold" even
+if the work is shared:
+
+- **Security** — where do credentials actually live (K8s Secrets vs. Terraform Cloud vars vs. GH
+  Actions secrets)? Is anything sensitive ever committed or logged? Does every AWS auth path
+  (CI, Argo CD if it needs AWS access, the cluster itself) use OIDC/IRSA, never static keys? Do
+  IAM roles and K8s RBAC follow least privilege? Is anything more exposed than it needs to be —
+  Grafana open with no auth, a backend service reachable outside the cluster?
+- **Resources and cost** — do Deployments set requests/limits or run unbounded? What's actually
+  costing money (node types, EBS volumes, the ALB, NAT gateways) and could it be smaller for a
+  demo-only cluster? Is there a real `terraform destroy` teardown path? Would the setup survive
+  a node or pod dying, or is everything a single replica?
+- **Performance** — what's actually been measured (latency, throughput) vs. assumed? Where's the
+  slowest hop (likely: planning-service's solve time under load)? Do the Grafana dashboards say
+  anything beyond "is it up"?
+- **Caching** — is anything recomputed that doesn't need to be? Candidates specific to SwarmOps:
+  planning-service re-deriving a distance matrix every solve instead of caching it per fleet
+  snapshot; the frontend re-fetching fleet/mission state on a poll instead of relying on the
+  WebSocket push it already has. Worth a Redis/ElastiCache layer, or is it premature here?
+
+---
+
+## 5. Working in parallel without stepping on each other
+
+- **Contracts before code.** The moment two tracks need the same shape, the owning service
+  writes it down (ideally as an actual `swarmops-contracts` type, not just a comment) before the
+  consumer builds against it.
+- **`swarmops-local`'s docker-compose is the integration point through Phase 3.** Nobody
+  integration-tests against someone else's laptop.
+- **Every service is a Dockerfile from day one** in its own repo — Phase 4 is about Helm/Terraform/CD, not "finally containerize."
+- **PRs only, everywhere, always** — including `swarmops-deployments` once GitOps is live, where
+  the only exception is the scoped bot identity making image-bump commits.
+- **Weekly sync on contract changes, not a daily standup** — three people, deliberately
+  independent tracks, don't need process overhead beyond "sync point changed, tell the other two."
