@@ -207,8 +207,10 @@ Remaining (anyone):
 
 **Tony & Guy**
 1. Every service exposes internal-only `/metrics` (request count, status, duration, process stats). Node: `prom-client`. Python: `prometheus-fastapi-instrumentator`. No user/mission/drone IDs in labels.
+   - **Tony's 3 services done (2026-07-25, jumped ahead of M6-8 — no cluster dependency for the app-level piece):** `auth-service`, `fleet-service`, `mission-service` all expose `GET /metrics`, verified live.
 2. `planning-service` (Guy) also emits solve time, conflict rate, assignment quality vs. M1 greedy baseline.
 3. Structured JSON logs, no secrets, no PII.
+   - **Tony's 3 services done (2026-07-25)** alongside item 1 above.
 
 **Valfish**
 1. kube-prometheus-stack as its own Argo CD `Application`.
