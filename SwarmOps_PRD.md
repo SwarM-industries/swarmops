@@ -145,6 +145,16 @@ estimated_battery_at_completion, status
 drone_id, timestamp, position, battery_pct, event_type
 ```
 
+**No-fly zone**
+```
+id, name, region [ {lat,lng} points, min 3 ], active
+```
+
+**Charging station**
+```
+id, name, position {lat, lng}, capacity, status (operational | offline)
+```
+
 ---
 
 ## 7. API surface (representative)
@@ -158,6 +168,10 @@ drone_id, timestamp, position, battery_pct, event_type
 | GET | `/planning/plans/{drone_id}` | Current plan for a drone |
 | POST | `/planning/simulate` | What-if simulation (non-committing) |
 | POST | `/telemetry/ingest` | Simulated drone reports position/battery |
+| GET | `/fleet/no-fly-zones` | List active no-fly zones (planning-service route avoidance, frontend overlay) |
+| POST | `/fleet/no-fly-zones` | Define a no-fly zone (admin) |
+| GET | `/fleet/charging-stations` | List charging stations (planning-service feasibility/charging-stop insertion, frontend overlay) |
+| POST | `/fleet/charging-stations` | Define a charging station (admin) |
 
 ---
 
@@ -181,8 +195,15 @@ drone_id, timestamp, position, battery_pct, event_type
 
 ---
 
-## 10. Open questions
+## 10. Decisions (formerly "open questions")
 
-- Map rendering: real-world Leaflet map with lat/lng vs. a simplified abstract grid — trade-off between realism and build time.
-- Message bus choice: Kafka (heavier, more "production") vs. RabbitMQ (lighter, faster to stand up).
-- Solver choice: hand-rolled Hungarian algorithm vs. OR-Tools — affects both implementation time and how deep the "algorithm story" goes in the final defense.
+Resolved in `plan.md` §0 before build started — kept here for history, not live questions:
+
+- Map rendering: abstract SVG grid, not Leaflet (build-time/no tile-dependency won over realism).
+- Message bus: RabbitMQ, not Kafka (lighter to stand up correctly).
+- Solver: Hungarian (`scipy.optimize.linear_sum_assignment`) for assignment + OR-Tools for
+  per-drone routing — not hand-rolled, to keep the algorithm story deep without burning the
+  whole build on solver internals.
+
+If any of these get revisited, update `plan.md` §0 first — it's the source of truth for locked
+decisions, this section just mirrors it.

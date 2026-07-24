@@ -54,6 +54,7 @@ Final checklist from the capstone brief. Check off before demo.
 - [ ] Argo Rollouts canary on `planning-service` — installed, working, rehearsed (ship a bad build, watch it roll back)
 
 ## Demo day
+- [ ] Dev auth-bypass removed from frontend (real `auth-service` login only)
 - [ ] Every Argo CD Application shows `Synced` + `Healthy`
 - [ ] Traffic flows: ALB → gateway → services
 - [ ] Grafana dashboard shows live data, an alert fires on demand

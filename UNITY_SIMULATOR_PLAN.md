@@ -32,6 +32,9 @@ cross into real-drone territory. Keep it that way.
 ### Stage 0 — generic ingest endpoint (do this regardless of Unity)
 - Add `POST /telemetry/events` on `telemetry-service`: schema-validated HTTP route, alongside
   the existing RabbitMQ-consumer path.
+- Reached only through the gateway's existing `/telemetry` route — never a direct
+  Ingress/ALB rule to `telemetry-service`. Gateway stays the single externally reachable thing,
+  same as every other service; this endpoint doesn't get an exception.
 - Purpose: any external producer (Unity, a phone bridge, a real drone later) can feed telemetry
   in without needing a native AMQP client.
 - Owner note: this is Guy's repo — raise before touching it, even on a branch.
@@ -60,11 +63,13 @@ cross into real-drone territory. Keep it that way.
 ### Stage 4 — two-machine demo setup
 - Machine A (presenter): loads the SwarmOps frontend URL (served publicly via the Phase 4/5 AWS
   deployment) — this is the "real product" view.
-- Machine B (Unity): runs the simulator, POSTs telemetry over HTTPS to the public
-  `telemetry-service` ingest endpoint on AWS. No direct connection between A and B — both talk
-  to AWS independently, same as real users would.
+- Machine B (Unity): runs the simulator, POSTs telemetry over HTTPS to the public gateway's
+  `/telemetry/events` route on AWS (Stage 0's endpoint, reached through the same ALB → gateway
+  path everything else uses — not a separate ALB rule direct to `telemetry-service`). No direct
+  connection between A and B — both talk to AWS independently, same as real users would.
 - Requirements before demo day:
-  - Stage 0 endpoint must be reachable on the public ALB/ingress (not ClusterIP-only).
+  - Stage 0 endpoint reachable via the existing gateway route on the public ALB/Ingress — no new
+    Ingress rule, no ClusterIP-only exception.
   - Add lightweight auth (API key or short-lived token from `auth-service`) on that endpoint
     once it's open to the internet — it currently trusts the in-cluster simulator implicitly.
   - TLS reused from whatever cert already terminates the frontend's HTTPS.

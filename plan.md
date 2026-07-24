@@ -179,10 +179,11 @@ late.
   - Terraform in `swarmops-infrastructure`: VPC + EKS via `terraform-aws-modules/vpc/aws` and
     `terraform-aws-modules/eks/aws`. Connect to a Terraform Cloud workspace — VCS-driven runs,
     remote state with locking, state never in Git. Provisions VPC (public/private subnets, NAT,
-    routing), EKS control plane + node group, one ECR repo per component (11 repos — one per
-    deployable unit above, minus `swarmops-local`/`swarmops-infrastructure`/`swarmops-contracts`
-    which don't ship images), IAM (cluster role, node role, EBS CSI permissions), core add-ons
-    (VPC CNI, CoreDNS, kube-proxy, EBS CSI driver). No application workload during this step.
+    routing), EKS control plane + node group, one ECR repo per component (9 repos — one per
+    deployable unit above, minus `swarmops-local`/`swarmops-infrastructure`/`swarmops-contracts`/
+    `swarmops-deployments`, none of which ship images), IAM (cluster role, node role, EBS CSI
+    permissions), core add-ons (VPC CNI, CoreDNS, kube-proxy, EBS CSI driver). No application
+    workload during this step.
   - Installs AWS Load Balancer Controller; Ingress/ALB in front of the gateway is the only
     externally reachable thing.
   - Installs Argo CD as its own Helm release in its own namespace; writes the `AppProject`

@@ -134,6 +134,11 @@ Canonical shapes are in PRD §6 (data models) and §7 (API surface). Treat these
 - **Mission**: `id, priority (1-5), deadline, target_locations[], required_payload_type, estimated_duration_min, status`
 - **Plan**: `id, drone_id, mission_ids[ordered], route[waypoints], estimated_battery_at_completion, status`
 - **Telemetry event**: `drone_id, timestamp, position, battery_pct, event_type`
+- **No-fly zone**: `id, name, region [{lat,lng}, min 3], active` — owned by fleet-service
+  (`GET/POST /fleet/no-fly-zones`), consumed by planning-service for route avoidance.
+- **Charging station**: `id, name, position {lat,lng}, capacity, status (operational|offline)` —
+  owned by fleet-service (`GET/POST /fleet/charging-stations`), consumed by planning-service to
+  insert charging stops on infeasible routes.
 
 Status enums, exactly (don't invent synonyms):
 - Drone status: `idle | flying | charging | maintenance`

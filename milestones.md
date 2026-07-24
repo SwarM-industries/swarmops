@@ -56,7 +56,10 @@ Remaining (anyone):
 **Guy**
 1. Bipartite matching (`scipy.optimize.linear_sum_assignment`): minimize distance + urgency penalty.
 2. OR-Tools routing for multi-stop drones.
-3. Battery-drain simulation per route; reject or insert charging stop.
+3. Battery-drain simulation per route; check candidate route against active no-fly zones
+   (fetched from `fleet-service`) and reject/reroute if it crosses one; reject or insert a
+   charging stop using real `charging-stations` locations (also from `fleet-service`) if a route
+   would leave a drone stranded.
 4. Conflict handling: higher priority/earlier deadline wins; loser rescheduled or flagged unresolved.
 5. `POST /planning/simulate` (non-committing).
 6. Lock + publish `/planning/solve` and `/planning/simulate` response shape to `swarmops-contracts`.
@@ -65,16 +68,20 @@ Remaining (anyone):
 **Tony**
 1. `fleet-service`: maintenance/offline status, "take offline" endpoint.
 2. `fleet-service`/`mission-service`: payload/sensor-type compatibility fields.
-3. Scaffold `notification-service`: Node/TS, stateless, `/health`, stub endpoint.
-4. PR → approval → merge.
+3. `fleet-service`: `NoFlyZone` + `ChargingStation` models (PRD §6), `GET/POST /fleet/no-fly-zones`,
+   `GET/POST /fleet/charging-stations`. Publish both shapes to `swarmops-contracts`.
+4. Scaffold `notification-service`: Node/TS, stateless, `/health`, stub endpoint.
+5. PR → approval → merge.
 
 **Valfish**
 1. Fleet inventory view: battery, maintenance status, take-offline button.
 2. Show feasibility/conflict flags in mission board.
-3. `swarmops-deployments`: create `helm/swarmops/` skeleton (`Chart.yaml`, empty `values.yaml`).
-4. PR → approval → merge.
+3. Map overlay: no-fly zones as shaded regions, charging stations as markers (static fetch from
+   `fleet-service` — no live-update requirement yet, that's M3's WebSocket work).
+4. `swarmops-deployments`: create `helm/swarmops/` skeleton (`Chart.yaml`, empty `values.yaml`).
+5. PR → approval → merge.
 
-**Exit:** matched assignment beats M1 greedy on total distance. Infeasible route gets rejected/charging-stop, not silent failure.
+**Exit:** matched assignment beats M1 greedy on total distance. Infeasible route gets rejected/charging-stop, not silent failure. A route crossing a defined no-fly zone gets rejected/rerouted, not silently allowed.
 
 ---
 
@@ -97,7 +104,10 @@ Remaining (anyone):
 1. WebSocket client → telemetry/notification streams.
 2. Swap `LiveMap`'s fake data for real WebSocket positions (animation code unchanged).
 3. Alerts UI fed by notification-service.
-4. PR → approval → merge.
+4. Remove the dev auth-bypass button/path now that real `auth-service` login works end to end
+   (flagged during Tony's M3 integration testing — was still live, producing 401s against real
+   tokens).
+5. PR → approval → merge.
 
 **Exit:** simulator running → drones move on live map, no refresh. Disable a drone mid-route → planning-service re-solves, map updates.
 
