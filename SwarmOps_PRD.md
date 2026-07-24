@@ -172,6 +172,8 @@ id, name, position {lat, lng}, capacity, status (operational | offline)
 | POST | `/fleet/no-fly-zones` | Define a no-fly zone (admin) |
 | GET | `/fleet/charging-stations` | List charging stations (planning-service feasibility/charging-stop insertion, frontend overlay) |
 | POST | `/fleet/charging-stations` | Define a charging station (admin) |
+| PATCH | `/fleet/drones/{id}/status` | Set drone status (planning-service, on assign/complete — keeps `Drone.status` real instead of stuck at creation-time value) |
+| PATCH | `/missions/{id}/status` | Set mission status (planning-service, on assign/complete — keeps `Mission.status` real instead of stuck at `pending`) |
 
 ---
 

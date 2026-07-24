@@ -98,7 +98,11 @@ Remaining (anyone):
 **Tony**
 1. Lock down write ownership: telemetry-service writes drone `position`/`battery_pct`; fleet-service CRUD only touches static fields.
 2. Cross-service integration tests against real gateway (no mocks).
-3. PR → approval → merge.
+3. `PATCH /fleet/drones/:id/status` + `PATCH /missions/:id/status` — surfaced by Guy's M3 work
+   (planning-service assigns/completes Plans but neither service's `status` ever changed to
+   reflect it; planning-service worked around this internally instead). Endpoints exist now;
+   Guy wires the calls into `planning-service` on his own side.
+4. PR → approval → merge.
 
 **Valfish**
 1. WebSocket client → telemetry/notification streams.
