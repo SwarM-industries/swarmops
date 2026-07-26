@@ -98,7 +98,11 @@ config (in `swarmops-gateway`).
 ### Track B — Algorithm & Live Data — **Guy**
 `swarmops-planning-service`, `swarmops-telemetry-service`, `swarmops-drone-simulator`,
 `swarmops-notification-service`, the message bus, and the Argo Rollouts canary extension (owns
-planning-service end to end including its progressive-delivery story).
+planning-service end to end including its progressive-delivery story). Also owns the **Unity
+drone simulator** (Stages 0–4, `UNITY_SIMULATOR_PLAN.md`) — promoted from side-track to main
+track (Tony, 2026-07-26); it's a direct replacement/augment of his own `swarmops-drone-simulator`.
+Stage 2 (frontend camera panel) and Stage 4 (public ALB path) still need Valfish's buy-in since
+they touch his repos, but Guy drives the track.
 
 ### Track C — Frontend & Platform — **Valfish**
 `swarmops-frontend`, `swarmops-infrastructure` (Terraform), and the platform pieces of
@@ -207,6 +211,12 @@ late.
   - CI workflows (from Valfish's template) for planning-service, telemetry-service,
     drone-simulator, notification-service — each edits only its own image file in
     `swarmops-deployments`.
+  - **Unity drone simulator** (main track now, not a side branch — see
+    `UNITY_SIMULATOR_PLAN.md` and `milestones.md` M9.5): Stage 0 (generic ingest endpoint on his
+    own `telemetry-service`), Stage 1 (data-only proof), Stage 2 (camera-feed panel — lands in
+    `swarmops-frontend`, needs Valfish's coordination), Stage 3 (graphics polish), Stage 4
+    (two-machine demo — needs this phase's ALB/gateway path already up, so it's last, not
+    first).
 - **Tony**
   - CI workflows for auth/fleet/mission-service from Valfish's template.
   - `/metrics` instrumentation + `ServiceMonitor` for his four services.

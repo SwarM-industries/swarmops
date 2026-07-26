@@ -228,6 +228,43 @@ Remaining (anyone):
 
 ---
 
+## M9.5 — Unity drone simulator
+
+Promoted from side-track to main track (Tony, team lead, 2026-07-26) — see
+`UNITY_SIMULATOR_PLAN.md` for full stage detail. Goal: replace/augment `swarmops-drone-simulator`
+with a Unity-driven simulator for demo purposes (better visuals + live camera feed), without
+changing any downstream contract. Build order locked: data transmission first, graphics second.
+**Guy owns this track end to end** — it's a direct replacement/augment of his own
+`swarmops-drone-simulator`; Stages 2 and 4 need Valfish's coordination since they land in his
+repos/infra, but Guy drives all five stages.
+
+**Guy**
+1. Stage 0: `POST /telemetry/events` on `telemetry-service` — schema-validated HTTP route,
+   alongside the existing RabbitMQ-consumer path, reached only through the gateway's existing
+   `/telemetry` route. Signed off 2026-07-26, not yet built.
+2. Stage 1 (data-only proof): minimal Unity scene, one placeholder object, script POSTs
+   telemetry JSON to Stage 0's endpoint on an interval. Done when the real frontend shows a
+   drone moving, driven entirely by Unity, with zero changes to planning-service,
+   notification-service, or frontend code.
+3. Stage 2 (camera feed, only after Stage 1 works; coordinate with Valfish — lands in
+   `swarmops-frontend`): `Camera` on the drone object → `RenderTexture` → JPEG frames over a
+   separate WebSocket (not RabbitMQ). New small frontend panel to display it. Purely additive.
+4. Stage 3 (graphics polish, optional): swap placeholder shapes for a simple drone model/terrain
+   once Stage 1 (and optionally 2) work end-to-end. Demo aid, not a game — keep it light.
+5. Stage 4 (two-machine demo setup — needs M7's public ALB/gateway already up, coordinate with
+   Valfish since that's his infra; last stage, not first): Machine A loads the deployed frontend;
+   Machine B runs Unity, POSTs telemetry over HTTPS to the public gateway's `/telemetry/events`
+   route (same ALB → gateway path as everything else, no new Ingress rule). Add lightweight auth
+   (API key or short-lived `auth-service` token) on that endpoint before it's open to the
+   internet. Test Machine B's network path ahead of demo day, not live.
+
+**Exit:** frontend shows a drone moving under live Unity control with zero downstream contract
+changes (Stage 1 minimum bar). Stage 2–4 are stretch within this milestone, not required to move
+on to M10 — but Stage 4 must be done before the actual demo if this replaces the Node simulator
+for it.
+
+---
+
 ## M10 — Demo prep
 
 **Everyone**
