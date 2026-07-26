@@ -1,8 +1,9 @@
 # Unity Drone Simulator — Side-Track Plan
 
-**Status:** proposed side track, not yet raised with team, not part of `plan.md`'s phases.
-Do not merge anything from this track into the org repos (`swarmops-*`) until Guy/Valfish
-have signed off — this touches `telemetry-service`, which Guy owns (Phase 3, `plan.md` line 133).
+**Status:** proposed side track, not part of `plan.md`'s phases. Guy signed off on Stage 0
+(2026-07-26) — not built yet, just approved. Still needs Valfish's sign-off on Stage 2/4 before
+any of that gets built. Do not merge anything from this track into the org repos (`swarmops-*`)
+until then, and even after — stays a side branch until the team agrees it should be permanent.
 
 **Goal:** replace/augment `swarmops-drone-simulator` with a Unity-driven simulator for demo
 purposes — better visuals + live camera feed than the Node/TS simulator, without changing any
@@ -81,8 +82,9 @@ cross into real-drone territory. Keep it that way.
 
 ## Team coordination checklist (do before Stage 0 touches any org repo)
 
-- [ ] Raise with Guy: Stage 0 endpoint addition to `telemetry-service`, confirm it doesn't
-      collide with his Phase 3 WebSocket/map work.
+- [x] Raise with Guy: Stage 0 endpoint addition to `telemetry-service`, confirm it doesn't
+      collide with his Phase 3 WebSocket/map work. **Approved (2026-07-26)** — doesn't collide,
+      Stage 0 not built yet though, just signed off on.
 - [ ] Raise with Valfish: Stage 2/4 frontend panel addition, confirm timing vs Phase 3/4 frontend
       work.
 - [ ] Confirm this stays a side branch / demo-only addition, not merged into `main` of any
