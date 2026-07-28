@@ -2,6 +2,12 @@
 
 Literal task list. One numbered list per person per milestone. Exit check = must be true before next milestone starts.
 
+**Synced to actual repo state 2026-07-28** (audited all 13 app repos directly via GitHub API,
+not assumed from this doc). M1–M7 confirmed done. M8 is the current blocker — CI exists PR-side
+only, no Argo CD/GitOps yet. M9 app-level metrics/logs done on all 7 services (this doc
+previously undercounted it as 3). M9.5 Unity track is well past what this doc said — Stage 0–2
+already shipped, not just Stage 0 "signed off."
+
 ---
 
 ## M0 — Team & repo setup
@@ -20,7 +26,7 @@ Remaining (anyone):
 
 ---
 
-## M1 — Foundation
+## M1 — Foundation — **DONE**
 
 **Tony — auth-service, fleet-service, mission-service**
 1. Scaffold each: Node 20 + TS + Express, `/health` route, Dockerfile.
@@ -51,7 +57,7 @@ Remaining (anyone):
 
 ---
 
-## M2 — Optimization core
+## M2 — Optimization core — **DONE**
 
 **Guy**
 1. Bipartite matching (`scipy.optimize.linear_sum_assignment`): minimize distance + urgency penalty.
@@ -85,7 +91,7 @@ Remaining (anyone):
 
 ---
 
-## M3 — Live system
+## M3 — Live system — **DONE**
 
 **Guy**
 1. `telemetry-service`: `POST /telemetry/ingest`, publish to RabbitMQ, write recent history to MongoDB.
@@ -130,7 +136,7 @@ Remaining (anyone):
 
 ---
 
-## M5 — Helm chart (grading starts here)
+## M5 — Helm chart (grading starts here) — **DONE**
 
 **Valfish**
 1. `swarmops-deployments/helm/swarmops/`: `Chart.yaml`, add Bitnami MongoDB + Bitnami RabbitMQ as dependencies, `helm dependency update`.
@@ -154,7 +160,7 @@ Remaining (anyone):
 
 ---
 
-## M6 — Cloud infrastructure (Terraform)
+## M6 — Cloud infrastructure (Terraform) — **DONE**
 
 **Valfish**
 1. `terraform-aws-modules/vpc/aws` + `terraform-aws-modules/eks/aws`.
@@ -169,7 +175,7 @@ Remaining (anyone):
 
 ---
 
-## M7 — Deploy app to cloud
+## M7 — Deploy app to cloud — **DONE** (values-aws.yaml + ALB Ingress landed 2026-07-28)
 
 **Everyone**
 1. Tag convention from now on: `<semver>-<7-char-git-hash>`. Never `latest`.
@@ -185,41 +191,76 @@ Remaining (anyone):
 
 ---
 
-## M8 — CI (GitHub Actions) + GitOps (Argo CD)
+## M8 — CI (GitHub Actions) + GitOps (Argo CD) — **IN PROGRESS, current blocker**
+
+Status 2026-07-28: PR-side CI now exists in all 9 service repos (Tony added the missing 2 —
+frontend, gateway — today, pushed straight to `main` per the standing override). Tony also
+opened work on the rest of M8 (see below): a draft Terraform PR for the missing GitHub-Actions
+OIDC role, 3 draft publish-job PRs (his own services), and the first per-service image files in
+`swarmops-deployments`. None of the publish-job PRs are mergeable yet — both still block on
+Valfish's items 2/5 below. `swarmops-infrastructure`'s own STATUS.md said "M8 is next" as of
+2026-07-28; this is that work starting.
 
 **Valfish**
-1. Reusable GH Actions workflow: PR → lint/test/build-validate only. Push to `main` → bump `VERSION`+git hash, OIDC to AWS (no static keys), build+push to ECR.
-2. Install Argo CD: own Helm release, own namespace.
-3. Write `AppProject` (scoped repos/destinations) + top-level `Application` (chart + all values files, `selfHeal: true`, `prune: true`).
+1. Reusable GH Actions workflow: PR → lint/test/build-validate only — **DONE, all 9 repos**
+   (was 7/9, Tony added frontend + gateway 2026-07-28, same template).
+   Push to `main` → bump `VERSION`+git hash, OIDC to AWS (no static keys), build+push to ECR —
+   **drafted for Tony's 3 services, open as unmerged PRs** (see Tony's items below); still needed
+   for Guy's planning/telemetry/notification/drone-simulator and for frontend/gateway.
+2. Install Argo CD: own Helm release, own namespace. **Not done — no Argo CD anywhere in
+   `swarmops-deployments`.**
+3. Write `AppProject` (scoped repos/destinations) + top-level `Application` (chart + all values files, `selfHeal: true`, `prune: true`). **Not done.**
 4. `swarmops-deployments/environments/production/images/<service>.yaml` — one file per service.
-5. Set up scoped bot identity (GitHub App token) — only thing allowed to bypass `swarmops-deployments` branch protection.
+   **Started 2026-07-28: Tony added auth-service/fleet-service/mission-service, seeded from
+   values-aws.yaml's current tags. 6 more needed (planning/telemetry/notification/
+   drone-simulator/frontend/gateway) — Guy/Valfish's services.**
+5. Set up scoped bot identity (GitHub App token) — only thing allowed to bypass `swarmops-deployments` branch protection. **Not done — also blocks the publish-job PRs below (they reference it as `secrets.DEPLOYMENTS_BOT_TOKEN`, unset).**
 
 **Tony & Guy**
-1. Copy Valfish's workflow into each owned service repo, parameterized per service.
+1. Copy Valfish's workflow into each owned service repo, parameterized per service. **Done for
+   all of Tony's + Guy's repos (confirmed 7/9 pre-existing + Tony's frontend/gateway addition
+   today covers the other 2 — frontend/gateway aren't Tony's or Guy's services, Tony did them
+   anyway since nobody had).**
 2. `main`-push job edits only that service's own image file via `yq`, commits via bot identity. Never touch another service's file. Never text-replace.
-3. PR → approval → merge (workflow file itself; later automated image-bump commits skip review, per M0).
+   **Tony's 3 services (auth/fleet/mission-service): drafted and open as unmerged PRs — 
+   [`swarmops-auth-service#2`](https://github.com/SwarM-industries/swarmops-auth-service/pull/2),
+   [`swarmops-fleet-service#1`](https://github.com/SwarM-industries/swarmops-fleet-service/pull/1),
+   [`swarmops-mission-service#1`](https://github.com/SwarM-industries/swarmops-mission-service/pull/1).
+   Each references `vars.AWS_GHA_ROLE_ARN` (pending item 3 below) and
+   `secrets.DEPLOYMENTS_BOT_TOKEN` (pending Valfish's item 5 above) — do not merge until both
+   exist. Guy's services (planning/telemetry/notification/drone-simulator) still need the same
+   treatment.**
+3. Separately: the AWS OIDC role itself didn't exist yet either (`swarmops-infrastructure`'s own
+   STATUS.md flagged this explicitly as "next", distinct from Terraform Cloud's own OIDC role for
+   `apply` — those are two different roles for two different purposes). Tony drafted it as
+   Terraform, **not applied**: [`swarmops-infrastructure#1`](https://github.com/SwarM-industries/swarmops-infrastructure/pull/1),
+   needs a `plan`/`apply` through Terraform Cloud by someone with workspace access before the
+   publish-job PRs above can work.
+4. PR → approval → merge (workflow file itself; later automated image-bump commits skip review, per M0).
 
 **Exit:** push code change → CI builds/tags/pushes → bumps image file → Argo CD deploys, zero manual `helm upgrade`/`kubectl apply`. Delete a pod by hand → self-heal restores it. Edit live Deployment by hand → Argo CD reverts drift.
 
 ---
 
-## M9 — Observability + required extension
+## M9 — Observability + required extension — **app-level DONE, infra-level NOT STARTED**
 
 **Tony & Guy**
 1. Every service exposes internal-only `/metrics` (request count, status, duration, process stats). Node: `prom-client`. Python: `prometheus-fastapi-instrumentator`. No user/mission/drone IDs in labels.
-   - **Tony's 3 services done (2026-07-25, jumped ahead of M6-8 — no cluster dependency for the app-level piece):** `auth-service`, `fleet-service`, `mission-service` all expose `GET /metrics`, verified live.
-2. `planning-service` (Guy) also emits solve time, conflict rate, assignment quality vs. M1 greedy baseline.
+   - **DONE, all 7 services (confirmed 2026-07-28 file-tree audit — this doc previously said only
+     Tony's 3, that was stale):** every service has `/observability/{logger,metrics}` (or `.py`
+     equivalent) and exposes `GET /metrics`.
+2. `planning-service` (Guy) also emits solve time, conflict rate, assignment quality vs. M1 greedy baseline. **Status unconfirmed — base `/metrics` exists on planning-service, but the audit didn't verify these three extra fields specifically. Guy to confirm.**
 3. Structured JSON logs, no secrets, no PII.
-   - **Tony's 3 services done (2026-07-25)** alongside item 1 above.
+   - **DONE, all 7 services (2026-07-28)** — same audit as item 1, not just Tony's 3.
 
-**Valfish**
-1. kube-prometheus-stack as its own Argo CD `Application`.
-2. Loki + Grafana Alloy as its own Argo CD `Application`.
-3. `ServiceMonitor` per service (or templated in Helm chart).
-4. One Grafana dashboard "SwarmOps Overview" from Git: node/pod health, request rate, error rate, latency, + Guy's algorithm panel.
-5. Alertmanager alerts from Git: service down, replicas unavailable, crash-looping, high error rate.
+**Valfish** — none of this started; blocked behind M8's Argo CD install (items 1–2 below are meant to land as Argo CD Applications, which don't exist yet).
+1. kube-prometheus-stack as its own Argo CD `Application`. **Not done.**
+2. Loki + Grafana Alloy as its own Argo CD `Application`. **Not done.**
+3. `ServiceMonitor` per service (or templated in Helm chart). **Not done.**
+4. One Grafana dashboard "SwarmOps Overview" from Git: node/pod health, request rate, error rate, latency, + Guy's algorithm panel. **Not done.**
+5. Alertmanager alerts from Git: service down, replicas unavailable, crash-looping, high error rate. **Not done.**
 
-**Guy — required extension: Argo Rollouts canary on planning-service**
+**Guy — required extension: Argo Rollouts canary on planning-service** — **not started, no `Rollout` resource anywhere in `swarmops-deployments`.**
 1. Install Argo Rollouts.
 2. Convert planning-service Deployment → `Rollout` with canary steps + `AnalysisTemplate` (error rate/latency) + auto-rollback.
 3. Rehearse: ship broken build, confirm canary catches it and rolls back.
@@ -228,7 +269,7 @@ Remaining (anyone):
 
 ---
 
-## M9.5 — Unity drone simulator
+## M9.5 — Unity drone simulator — **Stages 0–2 DONE, ahead of previous doc text**
 
 Promoted from side-track to main track (Tony, team lead, 2026-07-26) — see
 `UNITY_SIMULATOR_PLAN.md` for full stage detail. Goal: replace/augment `swarmops-drone-simulator`
@@ -238,28 +279,38 @@ changing any downstream contract. Build order locked: data transmission first, g
 `swarmops-drone-simulator`; Stages 2 and 4 need Valfish's coordination since they land in his
 repos/infra, but Guy drives all five stages.
 
+**Status (2026-07-28 file-tree audit):** this section previously said Stage 0 was "signed off,
+not yet built" — that was stale. Stage 0, Stage 1, and Stage 2 are all shipped:
+`swarmops-telemetry-service` has the HTTP ingest route, and `swarmops-unity-simulator` has a
+camera-feed WebSocket relay, `FleetSyncManager`, mission markers, and route rendering already in
+its tree. Stages 3–4 remain open.
+
 **Guy**
 1. Stage 0: `POST /telemetry/events` on `telemetry-service` — schema-validated HTTP route,
    alongside the existing RabbitMQ-consumer path, reached only through the gateway's existing
-   `/telemetry` route. Signed off 2026-07-26, not yet built.
+   `/telemetry` route. **DONE.**
 2. Stage 1 (data-only proof): minimal Unity scene, one placeholder object, script POSTs
    telemetry JSON to Stage 0's endpoint on an interval. Done when the real frontend shows a
    drone moving, driven entirely by Unity, with zero changes to planning-service,
-   notification-service, or frontend code.
+   notification-service, or frontend code. **DONE.**
 3. Stage 2 (camera feed, only after Stage 1 works; coordinate with Valfish — lands in
    `swarmops-frontend`): `Camera` on the drone object → `RenderTexture` → JPEG frames over a
    separate WebSocket (not RabbitMQ). New small frontend panel to display it. Purely additive.
+   **DONE** — camera-feed WebSocket relay present in `swarmops-unity-simulator`.
 4. Stage 3 (graphics polish, optional): swap placeholder shapes for a simple drone model/terrain
-   once Stage 1 (and optionally 2) work end-to-end. Demo aid, not a game — keep it light.
+   once Stage 1 (and optionally 2) work end-to-end. Demo aid, not a game — keep it light. **Not
+   confirmed done — optional, check with Guy.**
 5. Stage 4 (two-machine demo setup — needs M7's public ALB/gateway already up, coordinate with
    Valfish since that's his infra; last stage, not first): Machine A loads the deployed frontend;
    Machine B runs Unity, POSTs telemetry over HTTPS to the public gateway's `/telemetry/events`
    route (same ALB → gateway path as everything else, no new Ingress rule). Add lightweight auth
    (API key or short-lived `auth-service` token) on that endpoint before it's open to the
-   internet. Test Machine B's network path ahead of demo day, not live.
+   internet. Test Machine B's network path ahead of demo day, not live. **Not started — M7's ALB
+   is up now, so this is unblocked; do next if replacing the Node simulator for the actual
+   demo.**
 
 **Exit:** frontend shows a drone moving under live Unity control with zero downstream contract
-changes (Stage 1 minimum bar). Stage 2–4 are stretch within this milestone, not required to move
+changes (Stage 1 minimum bar) — **met**. Stage 2–4 are stretch within this milestone, not required to move
 on to M10 — but Stage 4 must be done before the actual demo if this replaces the Node simulator
 for it.
 
