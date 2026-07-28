@@ -193,69 +193,63 @@ Remaining (anyone):
 
 ## M8 — CI (GitHub Actions) + GitOps (Argo CD) — **IN PROGRESS, current blocker**
 
-Status 2026-07-28: PR-side CI now exists in all 9 service repos (Tony added the missing 2 —
-frontend, gateway — today, pushed straight to `main` per the standing override). Tony also
-opened work on the rest of M8 (see below): a draft Terraform PR for the missing GitHub-Actions
-OIDC role, 3 draft publish-job PRs (his own services), and the first per-service image files in
-`swarmops-deployments`. None of the publish-job PRs are mergeable yet — both still block on
-Valfish's items 2/5 below. `swarmops-infrastructure`'s own STATUS.md said "M8 is next" as of
-2026-07-28; this is that work starting.
+Status 2026-07-28 (end of day): PR-side CI and the `publish` job are now live in **all 9**
+service repos. `AWS_GHA_ROLE_ARN` (org var) and `DEPLOYMENTS_BOT_TOKEN` (org secret, scoped to
+all 9 repos) both exist. Only real remaining blocker on the CI side: the IAM role's trust policy
+rejects the actual `sts:AssumeRoleWithWebIdentity` call (see below) — every merged `publish` job
+fails at the AWS-credentials step until that's fixed. Argo CD itself still isn't installed
+anywhere (no live cluster to install it on).
 
-**Valfish**
-1. Reusable GH Actions workflow: PR → lint/test/build-validate only — **DONE, all 9 repos**
-   (was 7/9, Tony added frontend + gateway 2026-07-28, same template).
-   Push to `main` → bump `VERSION`+git hash, OIDC to AWS (no static keys), build+push to ECR —
-   **drafted for Tony's 3 services, open as unmerged PRs** (see Tony's items below); still needed
-   for Guy's planning/telemetry/notification/drone-simulator and for frontend/gateway.
-2. Install Argo CD: own Helm release, own namespace. **Manifests + bootstrap runbook ready
-   (`argocd/appproject.yaml`, `argocd/application.yaml`, `argocd/README.md`, Tony, 2026-07-28) —
-   actually running `helm install argocd ...` still not done, blocked on `infra/cluster` existing
-   again (currently destroyed, cost discipline). One `helm install` + two `kubectl apply`s once
-   the cluster's back — see the README.**
-3. Write `AppProject` (scoped repos/destinations) + top-level `Application` (chart + all values files, `selfHeal: true`, `prune: true`). **Done, same as above — untested against a live instance yet (see application.yaml's own caveat about the valueFiles' relative path traversal).**
-4. `swarmops-deployments/environments/production/images/<service>.yaml` — one file per service.
-   **All 9 done (2026-07-28).** Also had to convert the chart's `services:` from a list to a map
-   (`values.yaml`/`values-aws.yaml`/`templates/service.yaml`) so Argo CD can layer each file on
-   top without wiping every other service's entry — Helm's multi-file merge replaces lists
-   wholesale but deep-merges maps. This changed the `yq` path in Tony's 3 already-merged CI
-   workflows (`.image.tag` → `.services.<name>.image.tag`), fixed same day. See
-   `swarmops-deployments`'s own STATUS.md for the full writeup.
-5. Set up scoped bot identity (GitHub App token) — only thing allowed to bypass `swarmops-deployments` branch protection. **Not done — also blocks the publish-job PRs below (they reference it as `secrets.DEPLOYMENTS_BOT_TOKEN`, unset).**
+**Done:**
+1. PR-side workflow (lint/test/build-validate) — all 9 repos.
+2. `publish` job (version, build, push to ECR, `yq`-bump `swarmops-deployments`) — **all 9 repos,
+   merged**: auth/fleet/mission-service (Tony, earlier), then telemetry-service/
+   notification-service/drone-simulator/frontend (subagent-drafted, Tony-verified/merged),
+   planning-service and gateway (subagent-drafted, Tony-verified/merged). planning-service and
+   gateway have no version file in their repos (Python with no pyproject.toml; pure NGINX config)
+   — both hardcode `version="0.1.0"` matching the tag already live in production from M7's manual
+   push, with a comment explaining why. drone-simulator's `yq` path is
+   `.droneSimulator.image.tag`, not `.services.<name>...`, since it's a worker with no `services:`
+   map entry — verified explicitly, easy to get wrong by copy-paste.
+3. Also fixed in passing: `swarmops-planning-service`'s `verify` job was failing on `main` itself
+   (pre-existing, unrelated to the new publish job) — `src/config.py` validates 8 required env
+   vars at import time, CI's bare `python -c "import src.main"` step never set any of them. Fixed
+   by scoping dummy values to just that one step.
+4. `swarmops-infrastructure`'s OIDC role Terraform: merged
+   ([`swarmops-infrastructure#1`](https://github.com/SwarM-industries/swarmops-infrastructure/pull/1)),
+   then the whole repo got split into `infra/persistent/` (ECR + OIDC role, never destroyed) +
+   `infra/cluster/` (VPC/EKS, destroy freely) after Valfish's cost-discipline destroy took ECR
+   down with the cluster once
+   ([`swarmops-infrastructure#2`](https://github.com/SwarM-industries/swarmops-infrastructure/pull/2),
+   merged) — see that repo's `RUNBOOK.md`. Valfish applied `infra/persistent` for real: all 9 ECR
+   repos + the OIDC role exist in AWS (`769638986113`), confirmed directly via the Terraform Cloud
+   API (Tony got added as TFC org owner). A stray UI-triggered destroy plan against
+   `infra/persistent` got caught and blocked by its `prevent_destroy` guards — worked as designed.
+5. Argo CD `AppProject` + `Application` + bootstrap runbook written
+   (`swarmops-deployments/argocd/`) — not yet installed, blocked on `infra/cluster` existing again
+   (currently destroyed). Also had to convert the chart's `services:` from a list to a map
+   (`values.yaml`/`values-aws.yaml`/`templates/service.yaml`) so Argo CD's per-service value-file
+   overrides merge safely — Helm's multi-file merge replaces lists wholesale but deep-merges maps.
+   All 9 `environments/production/images/<service>.yaml` files exist to match. Full writeup in
+   `swarmops-deployments`'s STATUS.md.
 
-**Tony & Guy**
-1. Copy Valfish's workflow into each owned service repo, parameterized per service. **Done for
-   all of Tony's + Guy's repos (confirmed 7/9 pre-existing + Tony's frontend/gateway addition
-   today covers the other 2 — frontend/gateway aren't Tony's or Guy's services, Tony did them
-   anyway since nobody had).**
-2. `main`-push job edits only that service's own image file via `yq`, commits via bot identity. Never touch another service's file. Never text-replace.
-   **Tony's 3 services (auth/fleet/mission-service): drafted and open as unmerged PRs — 
-   [`swarmops-auth-service#2`](https://github.com/SwarM-industries/swarmops-auth-service/pull/2),
-   [`swarmops-fleet-service#1`](https://github.com/SwarM-industries/swarmops-fleet-service/pull/1),
-   [`swarmops-mission-service#1`](https://github.com/SwarM-industries/swarmops-mission-service/pull/1).
-   Each references `vars.AWS_GHA_ROLE_ARN` (pending item 3 below) and
-   `secrets.DEPLOYMENTS_BOT_TOKEN` (pending Valfish's item 5 above) — do not merge until both
-   exist. Guy's services (planning/telemetry/notification/drone-simulator) still need the same
-   treatment.**
-3. Separately: the AWS OIDC role itself didn't exist yet either (`swarmops-infrastructure`'s own
-   STATUS.md flagged this explicitly as "next", distinct from Terraform Cloud's own OIDC role for
-   `apply` — those are two different roles for two different purposes). Tony drafted it as
-   Terraform: [`swarmops-infrastructure#1`](https://github.com/SwarM-industries/swarmops-infrastructure/pull/1)
-   — **merged 2026-07-28**. **Same day, Valfish then destroyed the whole cluster (EKS/VPC/all 9
-   ECR repos) for cost discipline** — since ECR + the OIDC role/provider were still in the same
-   Terraform state as the cluster at that point, they went down too (nothing lost, no images had
-   been pushed yet, but would've been a real problem later). **Fix, same day:**
-   `swarmops-infrastructure` split into `infra/persistent/` (ECR + OIDC role, `prevent_destroy`,
-   own TFC workspace, never destroyed) + `infra/cluster/` (VPC/EKS/etc, the actual cost driver,
-   destroy this one freely) — see that repo's own `RUNBOOK.md`. Open as
-   [`swarmops-infrastructure#2`](https://github.com/SwarM-industries/swarmops-infrastructure/pull/2),
-   not merged/applied yet. **Needs Valfish** (TFC workspace admin): review PR #2, point the
-   existing workspace at `infra/cluster`, create the new `-persistent` workspace, import the
-   pre-existing GH OIDC provider (command in RUNBOOK.md), then `plan`/`apply` **`infra/persistent`
-   only** — leave `infra/cluster` destroyed for now. That produces `github_actions_role_arn` for
-   real, which then gets set as the `AWS_GHA_ROLE_ARN` GitHub Actions variable. That's the only
-   thing left blocking the 3 draft publish-job PRs on this side; `DEPLOYMENTS_BOT_TOKEN`
-   (Valfish's item 5 above) is the other, separate blocker.
-4. PR → approval → merge (workflow file itself; later automated image-bump commits skip review, per M0).
+**Not done / current blockers:**
+1. **AWS trust-policy failure** — every merged `publish` job's "Configure AWS credentials via
+   OIDC" step fails: `Not authorized to perform sts:AssumeRoleWithWebIdentity`. Terraform's
+   recorded state for the trust policy looks correct (checked directly); real AWS behavior
+   disagrees, so this looks like drift or something outside Terraform's view. **Needs Valfish**:
+   compare `aws iam get-role --role-name swarmops-github-actions-ecr-push --query
+   'Role.AssumeRolePolicyDocument'` (live AWS) against what's actually applied. Nothing publishes
+   to ECR for real until this is fixed.
+2. **Argo CD not actually installed** — `infra/cluster` needs a fresh `apply` first (currently
+   destroyed for cost). Bootstrap is scripted and ready (`argocd/README.md`), just needs a cluster
+   to run it against.
+3. **Scoped bot identity** — resolved differently than originally planned: instead of a GitHub
+   App, used a fine-grained PAT (Contents: Read/write, scoped to `swarmops-deployments` only)
+   from an existing account, stored as `DEPLOYMENTS_BOT_TOKEN`. Deliberate simplification from
+   CLAUDE.md's literal "GitHub App, not personal token" wording — faster to stand up, same
+   scoping goal (one repo, one permission, not a broad personal token), but the resulting
+   image-bump commits will show as that person's account rather than a distinct bot identity.
 
 **Exit:** push code change → CI builds/tags/pushes → bumps image file → Argo CD deploys, zero manual `helm upgrade`/`kubectl apply`. Delete a pod by hand → self-heal restores it. Edit live Deployment by hand → Argo CD reverts drift.
 
