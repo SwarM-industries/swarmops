@@ -233,9 +233,14 @@ Valfish's items 2/5 below. `swarmops-infrastructure`'s own STATUS.md said "M8 is
 3. Separately: the AWS OIDC role itself didn't exist yet either (`swarmops-infrastructure`'s own
    STATUS.md flagged this explicitly as "next", distinct from Terraform Cloud's own OIDC role for
    `apply` — those are two different roles for two different purposes). Tony drafted it as
-   Terraform, **not applied**: [`swarmops-infrastructure#1`](https://github.com/SwarM-industries/swarmops-infrastructure/pull/1),
-   needs a `plan`/`apply` through Terraform Cloud by someone with workspace access before the
-   publish-job PRs above can work.
+   Terraform: [`swarmops-infrastructure#1`](https://github.com/SwarM-industries/swarmops-infrastructure/pull/1)
+   — **merged 2026-07-28** (diff was additive-only: new OIDC provider + IAM role + ECR-push
+   policy scoped to the 9 existing repos, nothing existing touched; TFC plan check had already
+   passed pre-merge). **Still needed:** confirm the TFC apply actually completed (VCS-driven —
+   check the workspace run), then set the resulting `github_actions_role_arn` output as the
+   `AWS_GHA_ROLE_ARN` GitHub Actions variable (org-level ideally) — the publish-job PRs reference
+   that var by name and won't work until it's set. That's the only thing left blocking them on
+   this side; `DEPLOYMENTS_BOT_TOKEN` (Valfish's item 5 above) is the other, separate blocker.
 4. PR → approval → merge (workflow file itself; later automated image-bump commits skip review, per M0).
 
 **Exit:** push code change → CI builds/tags/pushes → bumps image file → Argo CD deploys, zero manual `helm upgrade`/`kubectl apply`. Delete a pod by hand → self-heal restores it. Edit live Deployment by hand → Argo CD reverts drift.
