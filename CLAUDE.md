@@ -167,6 +167,14 @@ integration breaks.
   a unit test if you can hit a real (containerized) instance in an integration test instead —
   divergence between mocked and real behavior is exactly the kind of bug this system is supposed
   to catch, not cause.
+- **Leave a status note after every push or finished chunk of work.** Whichever of us's Claude
+  session (Tony's, Guy's, Valfish's) does the pushing: append a short dated note to that repo's
+  own `STATUS.md` (or this repo's `milestones.md` if the work is cross-repo/milestone-level) —
+  what changed, why, what's still open/blocked, and anything the next person's Claude needs to
+  know before building on it (e.g. "merged but not applied", "needs a var/secret set first",
+  "destroyed to save cost, re-apply before relying on it"). This is how the other two tracks'
+  Claude sessions stay accurate without re-deriving state from scratch or trusting a stale doc —
+  see the top of `milestones.md` for the format this should follow.
 
 ## When you're not sure whose problem something is
 
