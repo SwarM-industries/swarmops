@@ -207,13 +207,19 @@ Valfish's items 2/5 below. `swarmops-infrastructure`'s own STATUS.md said "M8 is
    Push to `main` → bump `VERSION`+git hash, OIDC to AWS (no static keys), build+push to ECR —
    **drafted for Tony's 3 services, open as unmerged PRs** (see Tony's items below); still needed
    for Guy's planning/telemetry/notification/drone-simulator and for frontend/gateway.
-2. Install Argo CD: own Helm release, own namespace. **Not done — no Argo CD anywhere in
-   `swarmops-deployments`.**
-3. Write `AppProject` (scoped repos/destinations) + top-level `Application` (chart + all values files, `selfHeal: true`, `prune: true`). **Not done.**
+2. Install Argo CD: own Helm release, own namespace. **Manifests + bootstrap runbook ready
+   (`argocd/appproject.yaml`, `argocd/application.yaml`, `argocd/README.md`, Tony, 2026-07-28) —
+   actually running `helm install argocd ...` still not done, blocked on `infra/cluster` existing
+   again (currently destroyed, cost discipline). One `helm install` + two `kubectl apply`s once
+   the cluster's back — see the README.**
+3. Write `AppProject` (scoped repos/destinations) + top-level `Application` (chart + all values files, `selfHeal: true`, `prune: true`). **Done, same as above — untested against a live instance yet (see application.yaml's own caveat about the valueFiles' relative path traversal).**
 4. `swarmops-deployments/environments/production/images/<service>.yaml` — one file per service.
-   **Started 2026-07-28: Tony added auth-service/fleet-service/mission-service, seeded from
-   values-aws.yaml's current tags. 6 more needed (planning/telemetry/notification/
-   drone-simulator/frontend/gateway) — Guy/Valfish's services.**
+   **All 9 done (2026-07-28).** Also had to convert the chart's `services:` from a list to a map
+   (`values.yaml`/`values-aws.yaml`/`templates/service.yaml`) so Argo CD can layer each file on
+   top without wiping every other service's entry — Helm's multi-file merge replaces lists
+   wholesale but deep-merges maps. This changed the `yq` path in Tony's 3 already-merged CI
+   workflows (`.image.tag` → `.services.<name>.image.tag`), fixed same day. See
+   `swarmops-deployments`'s own STATUS.md for the full writeup.
 5. Set up scoped bot identity (GitHub App token) — only thing allowed to bypass `swarmops-deployments` branch protection. **Not done — also blocks the publish-job PRs below (they reference it as `secrets.DEPLOYMENTS_BOT_TOKEN`, unset).**
 
 **Tony & Guy**
