@@ -234,13 +234,21 @@ Valfish's items 2/5 below. `swarmops-infrastructure`'s own STATUS.md said "M8 is
    STATUS.md flagged this explicitly as "next", distinct from Terraform Cloud's own OIDC role for
    `apply` — those are two different roles for two different purposes). Tony drafted it as
    Terraform: [`swarmops-infrastructure#1`](https://github.com/SwarM-industries/swarmops-infrastructure/pull/1)
-   — **merged 2026-07-28** (diff was additive-only: new OIDC provider + IAM role + ECR-push
-   policy scoped to the 9 existing repos, nothing existing touched; TFC plan check had already
-   passed pre-merge). **Still needed:** confirm the TFC apply actually completed (VCS-driven —
-   check the workspace run), then set the resulting `github_actions_role_arn` output as the
-   `AWS_GHA_ROLE_ARN` GitHub Actions variable (org-level ideally) — the publish-job PRs reference
-   that var by name and won't work until it's set. That's the only thing left blocking them on
-   this side; `DEPLOYMENTS_BOT_TOKEN` (Valfish's item 5 above) is the other, separate blocker.
+   — **merged 2026-07-28**. **Same day, Valfish then destroyed the whole cluster (EKS/VPC/all 9
+   ECR repos) for cost discipline** — since ECR + the OIDC role/provider were still in the same
+   Terraform state as the cluster at that point, they went down too (nothing lost, no images had
+   been pushed yet, but would've been a real problem later). **Fix, same day:**
+   `swarmops-infrastructure` split into `infra/persistent/` (ECR + OIDC role, `prevent_destroy`,
+   own TFC workspace, never destroyed) + `infra/cluster/` (VPC/EKS/etc, the actual cost driver,
+   destroy this one freely) — see that repo's own `RUNBOOK.md`. Open as
+   [`swarmops-infrastructure#2`](https://github.com/SwarM-industries/swarmops-infrastructure/pull/2),
+   not merged/applied yet. **Needs Valfish** (TFC workspace admin): review PR #2, point the
+   existing workspace at `infra/cluster`, create the new `-persistent` workspace, import the
+   pre-existing GH OIDC provider (command in RUNBOOK.md), then `plan`/`apply` **`infra/persistent`
+   only** — leave `infra/cluster` destroyed for now. That produces `github_actions_role_arn` for
+   real, which then gets set as the `AWS_GHA_ROLE_ARN` GitHub Actions variable. That's the only
+   thing left blocking the 3 draft publish-job PRs on this side; `DEPLOYMENTS_BOT_TOKEN`
+   (Valfish's item 5 above) is the other, separate blocker.
 4. PR → approval → merge (workflow file itself; later automated image-bump commits skip review, per M0).
 
 **Exit:** push code change → CI builds/tags/pushes → bumps image file → Argo CD deploys, zero manual `helm upgrade`/`kubectl apply`. Delete a pod by hand → self-heal restores it. Edit live Deployment by hand → Argo CD reverts drift.
