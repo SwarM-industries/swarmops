@@ -125,9 +125,11 @@ built and verified. Re-verify reachability after the next `infra/cluster` apply,
 depend on are actually live, not just written.)
 
 ## Talk-track ready (not extra work, just be able to answer)
-- [ ] **Security** — where creds live, OIDC/IRSA everywhere, least-privilege IAM/RBAC, nothing over-exposed
-- [ ] **Cost** — requests/limits set, what's actually costing money, real teardown path
-- [ ] **Performance** — what's measured vs. assumed, known slowest hop
-- [ ] **Caching** — anything recomputed that shouldn't be; worth a cache layer or not
+- [x] **Security** — Guy's services: see `TALK_TRACK_GUY.md` (2026-07-29)
+- [x] **Cost** — Guy's services: see `TALK_TRACK_GUY.md`
+- [x] **Performance** — Guy's services: see `TALK_TRACK_GUY.md`
+- [x] **Caching** — Guy's services: see `TALK_TRACK_GUY.md`
 
-(Human readiness, not code-verifiable — leaving as-is.)
+(Human readiness, not code-verifiable in general — but Guy's own 4 answers are now written down
+and grounded in real repo facts, not generic. Tony/Valfish still need their own equivalents for
+their tracks.)
