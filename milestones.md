@@ -191,14 +191,19 @@ Remaining (anyone):
 
 ---
 
-## M8 — CI (GitHub Actions) + GitOps (Argo CD) — **IN PROGRESS, current blocker**
+## M8 — CI (GitHub Actions) + GitOps (Argo CD) — **IN PROGRESS, trust-policy fixed, new bot-token blocker**
 
-Status 2026-07-28 (end of day): PR-side CI and the `publish` job are now live in **all 9**
-service repos. `AWS_GHA_ROLE_ARN` (org var) and `DEPLOYMENTS_BOT_TOKEN` (org secret, scoped to
-all 9 repos) both exist. Only real remaining blocker on the CI side: the IAM role's trust policy
-rejects the actual `sts:AssumeRoleWithWebIdentity` call (see below) — every merged `publish` job
-fails at the AWS-credentials step until that's fixed. Argo CD itself still isn't installed
-anywhere (no live cluster to install it on).
+Status 2026-07-29: `infra/cluster` reapplied and live again (TFC `run-HjMUnE4vUDUCv5ZS`, applied
+15:55 UTC). The AWS trust-policy bug is **fixed and confirmed live** — Valfish root-caused it via
+CloudTrail (GitHub's `sub` claim includes immutable numeric org/repo IDs the original policy
+didn't account for;
+[`swarmops-infrastructure` `6db9995`](https://github.com/SwarM-industries/swarmops-infrastructure/commit/6db9995db686d3b1bf392106d7b9ef8e4b2a426f),
+applied via TFC `run-RuF74w4iQQmciDnW` at 16:53 UTC). Real test (`swarmops-fleet-service` CI run
+30472911156): `Configure AWS credentials via OIDC` ✓, `Login to ECR` ✓, `Build and push image` ✓
+— first real image ever pushed to ECR for this project. **New, separate blocker surfaced right
+after**: the next step, `Bump image tag in swarmops-deployments`, fails
+(`Invalid username or token. Password authentication is not supported for Git operations.`) — see
+below. Argo CD itself still isn't installed on the (now-live) cluster yet.
 
 **Done:**
 1. PR-side workflow (lint/test/build-validate) — all 9 repos.
@@ -234,17 +239,22 @@ anywhere (no live cluster to install it on).
    `swarmops-deployments`'s STATUS.md.
 
 **Not done / current blockers:**
-1. **AWS trust-policy failure** — every merged `publish` job's "Configure AWS credentials via
-   OIDC" step fails: `Not authorized to perform sts:AssumeRoleWithWebIdentity`. Terraform's
-   recorded state for the trust policy looks correct (checked directly); real AWS behavior
-   disagrees, so this looks like drift or something outside Terraform's view. **Needs Valfish**:
-   compare `aws iam get-role --role-name swarmops-github-actions-ecr-push --query
-   'Role.AssumeRolePolicyDocument'` (live AWS) against what's actually applied. Nothing publishes
-   to ECR for real until this is fixed.
-2. **Argo CD not actually installed** — `infra/cluster` needs a fresh `apply` first (currently
-   destroyed for cost). Bootstrap is scripted and ready (`argocd/README.md`), just needs a cluster
-   to run it against.
-3. **Scoped bot identity** — resolved differently than originally planned: instead of a GitHub
+1. ~~AWS trust-policy failure~~ — **FIXED, confirmed live 2026-07-29** (see above).
+2. **`DEPLOYMENTS_BOT_TOKEN` value bad** — new blocker, found immediately after fixing #1. Every
+   `publish` job's `Bump image tag in swarmops-deployments` step fails: `remote: Invalid username
+   or token. Password authentication is not supported for Git operations.` The secret's *scope* is
+   confirmed correct (org secret, `visibility: selected`, all 9 service repos including the one
+   tested — checked directly via `gh api orgs/SwarM-industries/actions/secrets/
+   DEPLOYMENTS_BOT_TOKEN/repositories`); the run log shows `GH_TOKEN` resolving completely blank
+   instead of GitHub's usual `***` mask, which only happens when the secret's actual *value* is
+   empty — so the fine-grained PAT itself is empty, revoked, or expired, not a scoping issue.
+   Secret values can't be read back via API by design — **needs whoever holds that PAT** (Tony,
+   per M8 item 5 below) to check it's still valid and re-run `gh secret set
+   DEPLOYMENTS_BOT_TOKEN --org SwarM-industries` if not. Nothing lands in
+   `swarmops-deployments` for real (so Argo CD has nothing new to sync) until this is fixed.
+3. **Argo CD not actually installed** — cluster is back (`infra/cluster` reapplied 2026-07-29
+   15:55 UTC), but the bootstrap (`argocd/README.md`) hasn't been run against it yet.
+4. **Scoped bot identity** — resolved differently than originally planned: instead of a GitHub
    App, used a fine-grained PAT (Contents: Read/write, scoped to `swarmops-deployments` only)
    from an existing account, stored as `DEPLOYMENTS_BOT_TOKEN`. Deliberate simplification from
    CLAUDE.md's literal "GitHub App, not personal token" wording — faster to stand up, same
