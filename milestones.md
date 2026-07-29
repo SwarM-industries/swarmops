@@ -262,14 +262,7 @@ anywhere (no live cluster to install it on).
    - **DONE, all 7 services (confirmed 2026-07-28 file-tree audit — this doc previously said only
      Tony's 3, that was stale):** every service has `/observability/{logger,metrics}` (or `.py`
      equivalent) and exposes `GET /metrics`.
-2. `planning-service` (Guy) also emits solve time, conflict rate, assignment quality vs. M1 greedy baseline.
-   - **DONE (confirmed 2026-07-28, direct repo audit):** `planning_solve_duration_seconds`
-     (Histogram, `src/routes/planning.py:121`, wraps `run_solve()`), `planning_conflict_rate`
-     (Gauge, `src/routes/planning.py:154`), `planning_assignment_quality_vs_greedy` (Gauge,
-     `src/routes/planning.py:155-157`, ratio vs a real M1 `solve_greedy()` run computed in
-     `src/solver.py:403-417`, guarded against the zero-match case). All three live on the same
-     `/metrics` registry as the base instrumentator metrics, all actively updated in the real
-     solve path, not dead code.
+2. `planning-service` (Guy) also emits solve time, conflict rate, assignment quality vs. M1 greedy baseline. **DONE, confirmed by Guy (2026-07-29):** `planning_solve_duration_seconds` (histogram, `src/routes/planning.py:121`), `planning_conflict_rate` (gauge, `src/routes/planning.py:154`), `planning_assignment_quality_vs_greedy` (gauge, `src/routes/planning.py:155-157`, ratio vs a real M1 `solve_greedy()` run computed in `src/solver.py:403-417`, guarded against the zero-match case) — all three wired via `prometheus-fastapi-instrumentator` + a custom `assignment_quality_vs_greedy()` helper in `solver.py`, verified live against the real stack with real (non-zero) values after a real solve. See `swarmops-planning-service/STATUS.md`'s 2026-07-26 update for the full detail — this was done well before this doc's 2026-07-28 audit, the audit just couldn't tell from a file-tree scan alone.
 3. Structured JSON logs, no secrets, no PII.
    - **DONE, all 7 services (2026-07-28)** — same audit as item 1, not just Tony's 3.
 
@@ -305,8 +298,13 @@ changing any downstream contract. Build order locked: data transmission first, g
 `swarmops-drone-simulator`; Stages 2 and 4 need Valfish's coordination since they land in his
 repos/infra, but Guy drives all five stages.
 
-**Status (2026-07-28 file-tree audit):** this section previously said Stage 0 was "signed off,
-not yet built" — that was stale. Stage 0, Stage 1, and Stage 2 are all shipped:
+**Status (updated by Guy, 2026-07-29):** the 2026-07-28 file-tree audit below said only Stage 0–2
+were shipped and Stage 3 was "not confirmed, optional" — that undercounted it. Stage 0 through
+Stage 3 are now all done and verified live (Stage 3 well past "optional cosmetic," see item 4
+below for the full detail). Only Stage 4 remains open.
+
+**Prior status (2026-07-28 file-tree audit):** this section previously said Stage 0 was "signed
+off, not yet built" — that was stale. Stage 0, Stage 1, and Stage 2 are all shipped:
 `swarmops-telemetry-service` has the HTTP ingest route, and `swarmops-unity-simulator` has a
 camera-feed WebSocket relay, `FleetSyncManager`, mission markers, and route rendering already in
 its tree. Stages 3–4 remain open.
@@ -324,8 +322,29 @@ its tree. Stages 3–4 remain open.
    separate WebSocket (not RabbitMQ). New small frontend panel to display it. Purely additive.
    **DONE** — camera-feed WebSocket relay present in `swarmops-unity-simulator`.
 4. Stage 3 (graphics polish, optional): swap placeholder shapes for a simple drone model/terrain
-   once Stage 1 (and optionally 2) work end-to-end. Demo aid, not a game — keep it light. **Not
-   confirmed done — optional, check with Guy.**
+   once Stage 1 (and optionally 2) work end-to-end. Demo aid, not a game — keep it light. **DONE,
+   confirmed by Guy (2026-07-29) — well past "optional cosmetic," a full pass done live over
+   2026-07-27/28:**
+   - Real correctness fixes found while testing, not cosmetic: adopted (website-created) drones
+     were rendering thousands of units off the dressed terrain (wrong projection method — fixed);
+     flight speed tuned for demo pacing (`SIMULATION_SPEED_MULTIPLIER` 15 → 0.15 → 1.5, kept in
+     parity with `swarmops-drone-simulator`); flight altitude raised 0.6 → 15 units to clear
+     terrain buildings; terrain grown 700×700 → 900×900 to match the frontend's valid
+     lat/lng-placement range.
+   - No-fly-zone/charging-station rendering, route preview for adopted drones, flight feel
+     (bank-on-turn, propeller speed, low-battery strobe), atmosphere (sky/fog/rock variation/
+     day-night drift), a more realistic drone model (real propeller blades, landing legs, camera
+     gimbal, two-tone body — still zero external assets for the drone itself).
+   - Terrain decoration switched from pure primitives to real imported models for the one
+     deliberate exception to "zero external assets": Kenney's CC0 "City Kit (Commercial)" and
+     "Car Kit" for buildings/vehicles, auto-scaled per instance, with a primitive fallback if the
+     kit isn't imported yet. 7 distinct landmark clusters plus buildings/cars scattered across the
+     *whole* 900×900 terrain (not just clustered near the middle).
+   - Two real multi-drone bugs found live and fixed: a frame/tag interleaving race in the camera
+     feed protocol (only one of two concurrently-streaming drones' feeds ever rendered), and a
+     related relay bug where producer connections received every *other* producer's broadcast
+     traffic unread forever, eventually stalling — fixed by making the relay role-aware
+     (`swarmops-telemetry-service`). See `swarmops-unity-simulator/STATUS.md` for the full detail.
 5. Stage 4 (two-machine demo setup — needs M7's public ALB/gateway already up, coordinate with
    Valfish since that's his infra; last stage, not first): Machine A loads the deployed frontend;
    Machine B runs Unity, POSTs telemetry over HTTPS to the public gateway's `/telemetry/events`
