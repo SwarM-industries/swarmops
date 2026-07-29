@@ -255,28 +255,41 @@ anywhere (no live cluster to install it on).
 
 ---
 
-## M9 — Observability + required extension — **app-level DONE, infra-level NOT STARTED**
+## M9 — Observability + required extension — **app-level DONE, infra-level DRAFTED (PRs #1, #2 open, unsynced — needs live cluster)**
 
 **Tony & Guy**
 1. Every service exposes internal-only `/metrics` (request count, status, duration, process stats). Node: `prom-client`. Python: `prometheus-fastapi-instrumentator`. No user/mission/drone IDs in labels.
    - **DONE, all 7 services (confirmed 2026-07-28 file-tree audit — this doc previously said only
      Tony's 3, that was stale):** every service has `/observability/{logger,metrics}` (or `.py`
      equivalent) and exposes `GET /metrics`.
-2. `planning-service` (Guy) also emits solve time, conflict rate, assignment quality vs. M1 greedy baseline. **Status unconfirmed — base `/metrics` exists on planning-service, but the audit didn't verify these three extra fields specifically. Guy to confirm.**
+2. `planning-service` (Guy) also emits solve time, conflict rate, assignment quality vs. M1 greedy baseline.
+   - **DONE (confirmed 2026-07-28, direct repo audit):** `planning_solve_duration_seconds`
+     (Histogram, `src/routes/planning.py:121`, wraps `run_solve()`), `planning_conflict_rate`
+     (Gauge, `src/routes/planning.py:154`), `planning_assignment_quality_vs_greedy` (Gauge,
+     `src/routes/planning.py:155-157`, ratio vs a real M1 `solve_greedy()` run computed in
+     `src/solver.py:403-417`, guarded against the zero-match case). All three live on the same
+     `/metrics` registry as the base instrumentator metrics, all actively updated in the real
+     solve path, not dead code.
 3. Structured JSON logs, no secrets, no PII.
    - **DONE, all 7 services (2026-07-28)** — same audit as item 1, not just Tony's 3.
 
-**Valfish** — none of this started; blocked behind M8's Argo CD install (items 1–2 below are meant to land as Argo CD Applications, which don't exist yet).
-1. kube-prometheus-stack as its own Argo CD `Application`. **Not done.**
-2. Loki + Grafana Alloy as its own Argo CD `Application`. **Not done.**
-3. `ServiceMonitor` per service (or templated in Helm chart). **Not done.**
-4. One Grafana dashboard "SwarmOps Overview" from Git: node/pod health, request rate, error rate, latency, + Guy's algorithm panel. **Not done.**
-5. Alertmanager alerts from Git: service down, replicas unavailable, crash-looping, high error rate. **Not done.**
+**Valfish** — manifests drafted 2026-07-28 (Tony, via subagent), **PR open not merged/synced**:
+[`swarmops-deployments#2`](https://github.com/SwarM-industries/swarmops-deployments/pull/2)
+(`feature/m9-observability`). Still blocked on M8's Argo CD install for an actual sync — nothing
+here is verified against a live cluster yet.
+1. kube-prometheus-stack as its own Argo CD `Application` (local wrapper chart, `monitoring` ns). **Drafted, PR #2, unsynced.**
+2. Loki + Grafana Alloy as its own Argo CD `Application` (single-binary Loki + Alloy DaemonSet, scoped to `swarmops` ns). **Drafted, PR #2, unsynced.**
+3. `ServiceMonitor` templated in `helm/swarmops/templates/servicemonitor.yaml`, one per `services:` map entry. **Drafted, PR #2, unsynced — flag: unconfirmed whether `frontend`/`gateway` actually expose `/metrics` (gateway's plain NGINX), needs a check before this is trusted for those two.**
+4. "SwarmOps Overview" Grafana dashboard (ConfigMap, sidecar-discovered): cluster/pod health, request/error rate/latency, + planning-service's 3 real algorithm metrics. **Drafted, PR #2, unsynced.**
+5. Alertmanager `PrometheusRule`: service down, replicas unavailable, crash-looping, high error rate. **Drafted, PR #2, unsynced — first-pass thresholds, not tuned against real traffic.**
 
-**Guy — required extension: Argo Rollouts canary on planning-service** — **not started, no `Rollout` resource anywhere in `swarmops-deployments`.**
-1. Install Argo Rollouts.
-2. Convert planning-service Deployment → `Rollout` with canary steps + `AnalysisTemplate` (error rate/latency) + auto-rollback.
-3. Rehearse: ship broken build, confirm canary catches it and rolls back.
+**Guy — required extension: Argo Rollouts canary on planning-service** — manifests drafted
+2026-07-28 (Tony, via subagent), **PR open not merged/synced**:
+[`swarmops-deployments#1`](https://github.com/SwarM-industries/swarmops-deployments/pull/1)
+(`feature/argo-rollouts-canary`).
+1. Install Argo Rollouts — own AppProject/Application (2.41.1), cluster-scoped RBAC kept separate from the app's own AppProject. **Drafted, PR #1, unsynced.**
+2. Convert planning-service Deployment → `Rollout` (20% → analysis → 50% → analysis → 100%) + `AnalysisTemplate` (Prometheus error-rate >5%, p95 >2s, p99 >3s off `/metrics`) + auto-rollback. Other services keep plain Deployments. **Drafted, PR #1, unsynced — no `trafficRouting:` plugin exists (no mesh/ALB weighted-target-group), so this is a replica-split approximation of canary, not exact traffic weighting; flagged as a real limitation in the PR.**
+3. Rehearse: ship broken build, confirm canary catches it and rolls back. **Runbook written (`docs/canary-rollback-rehearsal.md`), rehearsal itself not run — needs a live cluster.**
 
 **Exit:** Grafana dashboard shows live data. Manufactured alert fires (e.g. scale to 0). Canary rehearsal actually catches a bad build.
 
