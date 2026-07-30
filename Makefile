@@ -94,12 +94,18 @@ push-all:
 sync: fetch-all pull-all
 
 trigger-publish:
-	@if [ -z "$(MSG)" ]; then \
+	@if [ -z "$$MSG" ]; then \
 		echo "usage: make trigger-publish MSG='reason for triggering CI' [REPO=<service-dir>]"; \
 		exit 1; \
 	fi; \
-	targets="$(SERVICE_REPOS)"; \
-	if [ -n "$(REPO)" ]; then targets="$(REPO)"; fi; \
+	if [ -n "$(REPO)" ]; then \
+		case " $(SERVICE_REPOS) " in \
+			*" $(REPO) "*) targets="$(REPO)" ;; \
+			*) echo "error: REPO='$(REPO)' is not one of SERVICE_REPOS (refusing — e.g. swarmops-deployments must never be pushed to directly, see CLAUDE.md)"; exit 1 ;; \
+		esac; \
+	else \
+		targets="$(SERVICE_REPOS)"; \
+	fi; \
 	for d in $$targets; do \
 		echo "== trigger $$d =="; \
 		branch=$$(git -C "$$d" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "?"); \
@@ -107,10 +113,19 @@ trigger-publish:
 			echo "  SKIP: $$d not on main ($$branch)"; \
 			continue; \
 		fi; \
+		if [ -n "$$(git -C "$$d" status --porcelain)" ]; then \
+			echo "  SKIP: $$d has local changes — refusing to risk sweeping them into main"; \
+			continue; \
+		fi; \
 		git -C "$$d" pull --ff-only || { echo "  FAILED pull: $$d"; continue; }; \
-		echo "" >> "$$d/README.md"; \
+		marker="<!-- ci-trigger: $$(date -u +%Y-%m-%dT%H:%M:%SZ) -->"; \
+		if grep -q '^<!-- ci-trigger:' "$$d/README.md" 2>/dev/null; then \
+			sed -i.bak "s|^<!-- ci-trigger:.*-->|$$marker|" "$$d/README.md" && rm -f "$$d/README.md.bak"; \
+		else \
+			printf '\n%s\n' "$$marker" >> "$$d/README.md"; \
+		fi; \
 		git -C "$$d" add README.md; \
-		git -C "$$d" commit -m "$(MSG)" --quiet || { echo "  nothing to commit: $$d"; continue; }; \
+		printf '%s' "$$MSG" | git -C "$$d" commit -F - --quiet -- README.md || { echo "  nothing to commit: $$d"; continue; }; \
 		git -C "$$d" push || echo "  FAILED push: $$d"; \
 	done
 
