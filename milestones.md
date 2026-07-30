@@ -191,19 +191,40 @@ Remaining (anyone):
 
 ---
 
-## M8 — CI (GitHub Actions) + GitOps (Argo CD) — **IN PROGRESS, trust-policy fixed, new bot-token blocker**
+## M8 — CI (GitHub Actions) + GitOps (Argo CD) — **CI/publish loop DONE, all 9 repos; GitOps sync live, 8/9 healthy**
 
-Status 2026-07-29: `infra/cluster` reapplied and live again (TFC `run-HjMUnE4vUDUCv5ZS`, applied
-15:55 UTC). The AWS trust-policy bug is **fixed and confirmed live** — Valfish root-caused it via
-CloudTrail (GitHub's `sub` claim includes immutable numeric org/repo IDs the original policy
-didn't account for;
-[`swarmops-infrastructure` `6db9995`](https://github.com/SwarM-industries/swarmops-infrastructure/commit/6db9995db686d3b1bf392106d7b9ef8e4b2a426f),
-applied via TFC `run-RuF74w4iQQmciDnW` at 16:53 UTC). Real test (`swarmops-fleet-service` CI run
-30472911156): `Configure AWS credentials via OIDC` ✓, `Login to ECR` ✓, `Build and push image` ✓
-— first real image ever pushed to ECR for this project. **New, separate blocker surfaced right
-after**: the next step, `Bump image tag in swarmops-deployments`, fails
-(`Invalid username or token. Password authentication is not supported for Git operations.`) — see
-below. Argo CD itself still isn't installed on the (now-live) cluster yet.
+Status 2026-07-30: **`DEPLOYMENTS_BOT_TOKEN` blocker (below) is fixed and confirmed live across
+all 9 service repos** — first time the full pipeline (push → build → ECR → bump
+`swarmops-deployments` → real `swarmops-ci-bot` commit) has worked end to end for every service.
+Root cause was never the PAT value (several re-sets, a full delete+recreate, and a brand-new test
+secret all reproduced the same failure) — it's a **GitHub Free-org-plan limitation: organization-
+level Actions secrets/vars cannot reach *private* repos, full stop, regardless of visibility
+setting (`all`/`private`/`selected` all equivalent for a private repo)**. Confirmed with a clean
+A/B test: same secret, same workflow, only repo privacy flipped — 15-char test value resolved
+correctly on a public throwaway repo, empty on the same repo made private. Fix: `DEPLOYMENTS_BOT_TOKEN`
+and `AWS_GHA_ROLE_ARN` moved from org-level to **repo-level** secret/var on each of the 9 service
+repos. Verified live 2026-07-30: all 9 `publish` jobs green, all 9 real bump commits landed in
+`swarmops-deployments` (`auth/fleet/mission/planning/telemetry/notification/frontend/gateway/
+drone-simulator: bump image to ...`). Diagnostic cruft (temp env vars, debug echo, stale
+"pending" comments) stripped from `swarmops-fleet-service`'s workflow after confirmation;
+worth the same pass on the other 8 next time one of them is touched.
+
+Separately, Valfish got Argo CD itself installed and synced against the live cluster on
+2026-07-29 (before the bot-token fix above — that sync used image tags Valfish bumped by hand,
+not via CI): **8 of 9 services deployed clean and healthy** (`auth, fleet, mission, telemetry,
+notification, drone-simulator, frontend, gateway`), ALB reachable from the real internet. Two
+real bugs found and fixed live along the way: `AppProject`'s `clusterResourceWhitelist: []` also
+blocked `Namespace` creation despite `CreateNamespace=true` (fixed by explicitly whitelisting
+`Namespace`), and all 9 ECR repos were empty from the `infra/persistent`/`infra/cluster` split
+recreating ECR from scratch (rebuilt/pushed all 9 manually to unblock the sync test). `planning-
+service` is the one exception — blocked on M9 (no Prometheus yet for its canary `AnalysisTemplate`)
+plus a real bug on top: its "stable" ReplicaSet references an image tag that no longer exists
+(predates the ECR fix), so it currently has zero working stable replicas, one working canary
+replica. **Flagged to Guy directly** — his to fix, see `swarmops-deployments/STATUS.md`'s
+2026-07-29 entry for full detail. Since the bot-token fix above lands *new* images automatically
+now, Argo CD has real fresh commits to sync for the first time — worth re-confirming all 8 are
+still healthy (and whether planning-service's situation changed) rather than trusting the
+2026-07-29 snapshot.
 
 **Done:**
 1. PR-side workflow (lint/test/build-validate) — all 9 repos.
@@ -240,26 +261,27 @@ below. Argo CD itself still isn't installed on the (now-live) cluster yet.
 
 **Not done / current blockers:**
 1. ~~AWS trust-policy failure~~ — **FIXED, confirmed live 2026-07-29** (see above).
-2. **`DEPLOYMENTS_BOT_TOKEN` value bad** — new blocker, found immediately after fixing #1. Every
-   `publish` job's `Bump image tag in swarmops-deployments` step fails: `remote: Invalid username
-   or token. Password authentication is not supported for Git operations.` The secret's *scope* is
-   confirmed correct (org secret, `visibility: selected`, all 9 service repos including the one
-   tested — checked directly via `gh api orgs/SwarM-industries/actions/secrets/
-   DEPLOYMENTS_BOT_TOKEN/repositories`); the run log shows `GH_TOKEN` resolving completely blank
-   instead of GitHub's usual `***` mask, which only happens when the secret's actual *value* is
-   empty — so the fine-grained PAT itself is empty, revoked, or expired, not a scoping issue.
-   Secret values can't be read back via API by design — **needs whoever holds that PAT** (Tony,
-   per M8 item 5 below) to check it's still valid and re-run `gh secret set
-   DEPLOYMENTS_BOT_TOKEN --org SwarM-industries` if not. Nothing lands in
-   `swarmops-deployments` for real (so Argo CD has nothing new to sync) until this is fixed.
-3. **Argo CD not actually installed** — cluster is back (`infra/cluster` reapplied 2026-07-29
-   15:55 UTC), but the bootstrap (`argocd/README.md`) hasn't been run against it yet.
-4. **Scoped bot identity** — resolved differently than originally planned: instead of a GitHub
+2. ~~`DEPLOYMENTS_BOT_TOKEN` value bad~~ — **FIXED, confirmed live 2026-07-30** (see above). Was
+   never the value — Free-org-plan org-secret-to-private-repo limitation. Fixed via per-repo
+   secrets/vars on all 9 service repos.
+3. **planning-service not healthy on the live cluster** — blocked on M9 (no Prometheus for its
+   canary `AnalysisTemplate` yet) plus a real bug: stable ReplicaSet points at a deleted image tag.
+   Flagged to Guy directly (see above) — needs Guy to re-point or re-deploy it now that CI pushes
+   real images automatically.
+4. **Re-confirm Argo CD sync post-bot-token-fix** — 2026-07-29's "8/9 healthy" snapshot predates
+   automated image bumps; worth a fresh `kubectl get applications -n argocd` / `argocd app list`
+   check once there's a cluster to check against. Not urgent right now: `infra/cluster` is
+   destroyed again between sessions (cost discipline, per Valfish 2026-07-30) — sync mechanics
+   already proven end-to-end 2026-07-29, this only changes what's feeding it, so low-risk to defer
+   to the next `infra/cluster` apply rather than re-applying just to check.
+5. **Scoped bot identity** — resolved differently than originally planned: instead of a GitHub
    App, used a fine-grained PAT (Contents: Read/write, scoped to `swarmops-deployments` only)
    from an existing account, stored as `DEPLOYMENTS_BOT_TOKEN`. Deliberate simplification from
    CLAUDE.md's literal "GitHub App, not personal token" wording — faster to stand up, same
    scoping goal (one repo, one permission, not a broad personal token), but the resulting
    image-bump commits will show as that person's account rather than a distinct bot identity.
+   Also now per-repo rather than org-scoped (see #2) — any *future* org-wide secret/var needs the
+   same per-repo treatment on this plan, org-level won't reach any of the 9 private service repos.
 
 **Exit:** push code change → CI builds/tags/pushes → bumps image file → Argo CD deploys, zero manual `helm upgrade`/`kubectl apply`. Delete a pod by hand → self-heal restores it. Edit live Deployment by hand → Argo CD reverts drift.
 

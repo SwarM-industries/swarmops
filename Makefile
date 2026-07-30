@@ -9,7 +9,14 @@ REPOS := swarmops-frontend swarmops-gateway swarmops-auth-service swarmops-fleet
 # "." is this repo (swarmops — docs/plan/pitch site), included in every all-repo operation.
 ALL := . $(REPOS)
 
-.PHONY: help repos clone-missing status fetch-all pull-all push-all sync branch foreach
+# The 9 repos with a `publish` job (build -> push ECR -> bump swarmops-deployments).
+# Excludes swarmops-local/-deployments/-infrastructure/-contracts and this docs repo,
+# none of which have that CI job.
+SERVICE_REPOS := swarmops-auth-service swarmops-fleet-service swarmops-mission-service \
+                 swarmops-planning-service swarmops-telemetry-service swarmops-notification-service \
+                 swarmops-frontend swarmops-gateway swarmops-drone-simulator
+
+.PHONY: help repos clone-missing status fetch-all pull-all push-all sync branch foreach trigger-publish check-publish
 
 help:
 	@echo "SwarmOps multi-repo automation (14 repos: swarmops + 13 app repos)"
@@ -28,6 +35,14 @@ help:
 	@echo ""
 	@echo "push-all refuses to push a repo that's on main — per CLAUDE.md, nobody pushes main"
 	@echo "directly. Override with FORCE_MAIN=1 make push-all if you really mean it."
+	@echo ""
+	@echo "  make trigger-publish MSG='...'    trivial commit + push to main on all 9 service repos,"
+	@echo "                             to fire each one's publish (build/ECR/bump) CI job. Uses the"
+	@echo "                             CLAUDE.md temporary direct-to-main override — skips any repo"
+	@echo "                             not currently on main."
+	@echo "  make trigger-publish REPO=<dir> MSG='...'"
+	@echo "                             same, but only that one service repo"
+	@echo "  make check-publish         latest publish-job run + conclusion for every service repo"
 
 repos:
 	@for d in $(ALL); do echo "$$d"; done
@@ -77,6 +92,36 @@ push-all:
 	done
 
 sync: fetch-all pull-all
+
+trigger-publish:
+	@if [ -z "$(MSG)" ]; then \
+		echo "usage: make trigger-publish MSG='reason for triggering CI' [REPO=<service-dir>]"; \
+		exit 1; \
+	fi; \
+	targets="$(SERVICE_REPOS)"; \
+	if [ -n "$(REPO)" ]; then targets="$(REPO)"; fi; \
+	for d in $$targets; do \
+		echo "== trigger $$d =="; \
+		branch=$$(git -C "$$d" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "?"); \
+		if [ "$$branch" != "main" ]; then \
+			echo "  SKIP: $$d not on main ($$branch)"; \
+			continue; \
+		fi; \
+		git -C "$$d" pull --ff-only || { echo "  FAILED pull: $$d"; continue; }; \
+		echo "" >> "$$d/README.md"; \
+		git -C "$$d" add README.md; \
+		git -C "$$d" commit -m "$(MSG)" --quiet || { echo "  nothing to commit: $$d"; continue; }; \
+		git -C "$$d" push || echo "  FAILED push: $$d"; \
+	done
+
+check-publish:
+	@for d in $(SERVICE_REPOS); do \
+		echo "== $$d =="; \
+		gh run list --repo $(ORG)/$$d --branch main --limit 1 \
+			--json displayTitle,status,conclusion,createdAt \
+			--jq '.[0] | "  \(.createdAt)  \(.status)/\(.conclusion // "-")  \(.displayTitle)"' \
+			|| echo "  FAILED: $$d"; \
+	done
 
 branch:
 	@if [ -z "$(REPO)" ] || [ -z "$(NAME)" ]; then \
