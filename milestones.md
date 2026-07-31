@@ -298,25 +298,36 @@ still healthy (and whether planning-service's situation changed) rather than tru
 3. Structured JSON logs, no secrets, no PII.
    - **DONE, all 7 services (2026-07-28)** — same audit as item 1, not just Tony's 3.
 
-**Valfish** — manifests drafted 2026-07-28 (Tony, via subagent), **PR open not merged/synced**:
-[`swarmops-deployments#2`](https://github.com/SwarM-industries/swarmops-deployments/pull/2)
-(`feature/m9-observability`). Still blocked on M8's Argo CD install for an actual sync — nothing
-here is verified against a live cluster yet.
-1. kube-prometheus-stack as its own Argo CD `Application` (local wrapper chart, `monitoring` ns). **Drafted, PR #2, unsynced.**
-2. Loki + Grafana Alloy as its own Argo CD `Application` (single-binary Loki + Alloy DaemonSet, scoped to `swarmops` ns). **Drafted, PR #2, unsynced.**
-3. `ServiceMonitor` templated in `helm/swarmops/templates/servicemonitor.yaml`, one per `services:` map entry. **Drafted, PR #2, unsynced — flag: unconfirmed whether `frontend`/`gateway` actually expose `/metrics` (gateway's plain NGINX), needs a check before this is trusted for those two.**
-4. "SwarmOps Overview" Grafana dashboard (ConfigMap, sidecar-discovered): cluster/pod health, request/error rate/latency, + planning-service's 3 real algorithm metrics. **Drafted, PR #2, unsynced.**
-5. Alertmanager `PrometheusRule`: service down, replicas unavailable, crash-looping, high error rate. **Drafted, PR #2, unsynced — first-pass thresholds, not tuned against real traffic.**
+**Valfish** — drafted 2026-07-28 (Tony, via subagent), picked back up and **merged to `main`
+2026-07-30** (`swarmops-deployments#2`, hand-merged past drift from M8's canary/bot-token work —
+see that repo's `STATUS.md`). **Still not synced against a live cluster** — `infra/cluster` is
+destroyed between sessions, nothing below is verified for real yet, only `helm lint`/`helm
+template`.
+1. kube-prometheus-stack as its own Argo CD `Application` (local wrapper chart, `monitoring` ns). **Merged, unsynced.**
+2. Loki + Grafana Alloy as its own Argo CD `Application` (single-binary Loki + Alloy DaemonSet, scoped to `swarmops` ns). **Merged, unsynced.**
+3. `ServiceMonitor` templated in `helm/swarmops/templates/servicemonitor.yaml`, one per `services:` map entry. **Merged, unsynced — flag: unconfirmed whether `frontend`/`gateway` actually expose `/metrics` (gateway's plain NGINX), needs a check before this is trusted for those two.**
+4. "SwarmOps Overview" Grafana dashboard (ConfigMap, sidecar-discovered): cluster/pod health, request/error rate/latency, + planning-service's 3 real algorithm metrics. **Merged, unsynced.**
+5. Alertmanager `PrometheusRule`: service down, replicas unavailable, crash-looping, high error rate. **Merged, unsynced — first-pass thresholds, not tuned against real traffic.**
 
-**Guy — required extension: Argo Rollouts canary on planning-service** — manifests drafted
-2026-07-28 (Tony, via subagent), **PR open not merged/synced**:
-[`swarmops-deployments#1`](https://github.com/SwarM-industries/swarmops-deployments/pull/1)
-(`feature/argo-rollouts-canary`).
-1. Install Argo Rollouts — own AppProject/Application (2.41.1), cluster-scoped RBAC kept separate from the app's own AppProject. **Drafted, PR #1, unsynced.**
-2. Convert planning-service Deployment → `Rollout` (20% → analysis → 50% → analysis → 100%) + `AnalysisTemplate` (Prometheus error-rate >5%, p95 >2s, p99 >3s off `/metrics`) + auto-rollback. Other services keep plain Deployments. **Drafted, PR #1, unsynced — no `trafficRouting:` plugin exists (no mesh/ALB weighted-target-group), so this is a replica-split approximation of canary, not exact traffic weighting; flagged as a real limitation in the PR.**
-3. Rehearse: ship broken build, confirm canary catches it and rolls back. **Runbook written (`docs/canary-rollback-rehearsal.md`), rehearsal itself not run — needs a live cluster.**
+**Guy — required extension: Argo Rollouts canary on planning-service** — drafted 2026-07-28
+(Tony, via subagent), diverged from Guy's own parallel implementation on `main`, hand-merged
+(keeping the stronger half of each — see `swarmops-deployments/STATUS.md`'s 2026-07-30 entry)
+and **merged to `main` 2026-07-30** (`swarmops-deployments#1`). Also fixed the same day: the
+live cluster's stable ReplicaSet was pointing at an image tag deleted in the ECR rebuild —
+triggered a fresh publish (`swarmops-planning-service` `0.1.0-ad2d1aa`) so it has a real tag to
+sync next. **Still not synced against a live cluster** — same reason as Valfish's item above.
+1. Install Argo Rollouts — own AppProject/Application (2.41.1), cluster-scoped RBAC kept separate from the app's own AppProject. **Merged, unsynced.**
+2. Convert planning-service Deployment → `Rollout` (20% → analysis → 50% → analysis → 100%, both steps gated) + `AnalysisTemplate` (Prometheus error-rate >5%, p95 >2s, p99 >3s off `/metrics`, scoped to canary-pod metrics only via pod-template-hash) + auto-rollback. Other services keep plain Deployments. **Merged, unsynced — no `trafficRouting:` plugin exists (no mesh/ALB weighted-target-group), so this is a replica-split approximation of canary, not exact traffic weighting; flagged as a real limitation in the manifests.**
+3. Rehearse: ship broken build, confirm canary catches it and rolls back. **Runbook written (`docs/canary-rollback-rehearsal.md`), rehearsal itself not run — needs a live cluster with Prometheus actually up (item 3 above resolves the "nothing to query" gap the AnalysisTemplate had until this merge).**
 
 **Exit:** Grafana dashboard shows live data. Manufactured alert fires (e.g. scale to 0). Canary rehearsal actually catches a bad build.
+
+**Actual next step, both tracks above:** re-apply `infra/cluster` (Tony/Valfish, TFC workspace
+admin only — Guy has no path to trigger this himself) and re-run `argocd/README.md`'s bootstrap,
+which now installs Argo Rollouts *and* kube-prometheus-stack/loki-stack in the same pass. Once
+that's live: confirm all 9 services sync healthy (last real check, 2026-07-29, predates both
+these merges), confirm planning-service's Rollout actually reaches "stable" instead of stalling
+at its first analysis gate, then run the rehearsal for real.
 
 ---
 
