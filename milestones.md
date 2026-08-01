@@ -191,7 +191,7 @@ Remaining (anyone):
 
 ---
 
-## M8 — CI (GitHub Actions) + GitOps (Argo CD) — **CI/publish loop DONE, all 9 repos; GitOps sync live, 8/9 healthy**
+## M8 — CI (GitHub Actions) + GitOps (Argo CD) — **DONE, all 9 services healthy, verified live 2026-08-01**
 
 Status 2026-07-30: **`DEPLOYMENTS_BOT_TOKEN` blocker (below) is fixed and confirmed live across
 all 9 service repos** — first time the full pipeline (push → build → ECR → bump
@@ -287,7 +287,7 @@ still healthy (and whether planning-service's situation changed) rather than tru
 
 ---
 
-## M9 — Observability + required extension — **app-level DONE, infra-level DRAFTED (PRs #1, #2 open, unsynced — needs live cluster)**
+## M9 — Observability + required extension — **DONE, verified live end-to-end 2026-08-01**
 
 **Tony & Guy**
 1. Every service exposes internal-only `/metrics` (request count, status, duration, process stats). Node: `prom-client`. Python: `prometheus-fastapi-instrumentator`. No user/mission/drone IDs in labels.
