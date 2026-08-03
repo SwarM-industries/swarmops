@@ -403,6 +403,53 @@ effort), confirm `planning-service`'s Rollout reaches "stable" rather than stall
 analysis gate — note its stable ReplicaSet previously pointed at a deleted ECR tag, with a fresh
 `0.1.0-ad2d1aa` pushed to clear it — then run the canary rehearsal for real.
 
+### Update, later on 2026-08-03 (Tony) — cluster verified for real; API live, **SPA is broken**
+
+Supersedes the "NOT yet verified" block above for the `swarmops` namespace. Valfish created a
+dedicated `Tony-1` IAM user (`infra/persistent/tony-iam.tf`) plus a cluster-wide **read-only**
+EKS access entry (`tony_view`, `AmazonEKSViewPolicy`, `infra/cluster/eks.tf`) — so the
+"Tony can't inspect the cluster" blocker above is gone. Note the IAM policy grants only
+`eks:DescribeCluster` on the `swarmops` cluster, so `aws eks list-clusters` is denied by design;
+use `--name swarmops` directly. Access is View, so **no `rollout restart`, `exec`, or
+`port-forward`** — inspection only, deliberately (see that file's comment).
+
+**All 16 pods in `swarmops` are `Running`/ready**, and the ALB is internet-reachable at
+`k8s-swarmops-gateway-3b08f79c2f-1927114502.us-east-1.elb.amazonaws.com` (auto-generated, changes
+on every `infra/cluster` destroy/apply — never hardcode it). Guy's Unity simulator is driving real
+traffic through it right now, all 200s.
+
+**But `GET /` — the actual UI — returns 504 after exactly 60s.** Everything else is fine:
+`/healthz` 200 in 0.58s, and `/fleet/*`, `/missions`, `/planning/*`, `/telemetry/*`, `/auth/*` all
+200/201 and fast. So "all 9 services healthy" is true pod-wise but **misleading about the demo
+URL** — the one page you'd put in front of a stakeholder is the one that doesn't load.
+
+nginx's own error log names the cause precisely:
+`upstream timed out (110: Operation timed out) while connecting to upstream, upstream:
+"http://172.20.215.99:80/"` — the frontend Service's ClusterIP. DNS resolves correctly, then the
+TCP connect times out. Ruled out, all verified live: frontend pod ready with **0 restarts** and
+serving 200s to kubelet probes every 5s; EndpointSlice correct and `ready: true` →
+`10.1.31.228:80`; Service ports `80→80`; no NetworkPolicy on frontend (only mongo/rabbitmq have
+one); **not the node** (planning-service has a pod on frontend's exact node, 62/62 200s); **not
+the high-IP/secondary-ENI range** (planning's `10.1.30.103` is that same range on that same node,
+ready and serving); kube-proxy/aws-node/coredns all healthy with 0 restarts. **Decisive fact: the
+frontend pod received zero non-probe requests in 40 minutes** — the gateway's packets never
+arrive, dropped between the ClusterIP DNAT and the pod. Every declarative object is correct, so
+this looks like stale datapath state (conntrack/iptables) on the gateway's node rather than a
+config error. **Flagged to Guy on Discord** (he has Edit in `swarmops`); first thing to try is
+`kubectl rollout restart deployment/swarmops-frontend -n swarmops`, then the gateway if that
+doesn't clear it.
+
+**Still genuinely unverified:** `kubectl get applications -n argocd`. `AmazonEKSViewPolicy` covers
+built-in resources only, **not CRDs** — `applications.argoproj.io` is forbidden for `Tony-1`, so
+the Argo CD sync confirmation still needs Valfish's cluster-admin. Same for anything in
+`monitoring`.
+
+**Also observed:** Prometheus scraped the gateway's `/metrics` 158 times in 40 minutes, every one
+a 499. That's the known "`frontend`/`gateway` don't serve `/metrics`" gap (documented as accepted
+out-of-scope in `swarmops-deployments/STATUS.md`) now showing up as continuous scrape failures —
+worth having an answer ready before demoing the Grafana dashboard, since two targets will be
+visibly down.
+
 ---
 
 ## M9.5 — Unity drone simulator — **Stages 0–2 DONE, ahead of previous doc text**
