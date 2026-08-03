@@ -217,14 +217,19 @@ real bugs found and fixed live along the way: `AppProject`'s `clusterResourceWhi
 blocked `Namespace` creation despite `CreateNamespace=true` (fixed by explicitly whitelisting
 `Namespace`), and all 9 ECR repos were empty from the `infra/persistent`/`infra/cluster` split
 recreating ECR from scratch (rebuilt/pushed all 9 manually to unblock the sync test). `planning-
-service` is the one exception — blocked on M9 (no Prometheus yet for its canary `AnalysisTemplate`)
-plus a real bug on top: its "stable" ReplicaSet references an image tag that no longer exists
-(predates the ECR fix), so it currently has zero working stable replicas, one working canary
-replica. **Flagged to Guy directly** — his to fix, see `swarmops-deployments/STATUS.md`'s
-2026-07-29 entry for full detail. Since the bot-token fix above lands *new* images automatically
-now, Argo CD has real fresh commits to sync for the first time — worth re-confirming all 8 are
-still healthy (and whether planning-service's situation changed) rather than trusting the
-2026-07-29 snapshot.
+service` was the one exception at that point — blocked on M9 (no Prometheus yet for its canary
+`AnalysisTemplate`) plus a real bug on top: its "stable" ReplicaSet referenced an image tag that
+no longer existed (predated the ECR fix), leaving zero working stable replicas.
+
+**Both resolved since.** Guy fixed planning-service 2026-07-30 by re-triggering its publish job
+([`swarmops-planning-service@ad2d1aa`](https://github.com/SwarM-industries/swarmops-planning-service/commit/ad2d1aa)),
+which built and pushed a real image and bumped `swarmops-deployments` to a tag that actually
+exists. Valfish then brought `infra/cluster` back up and verified the whole stack live on
+2026-08-01: **all 9 services healthy** (including planning-service), M9's observability stack
+synced, and the canary rollback rehearsal passed for real against a deliberately broken image —
+so blocker #4's "re-confirm the sync post-bot-token-fix" is closed too, against real
+CI-produced images rather than hand-bumped tags. Full detail in `swarmops-deployments/STATUS.md`'s
+"M9 verified live end-to-end, 2026-08-01" entry.
 
 **Done:**
 1. PR-side workflow (lint/test/build-validate) — all 9 repos.
@@ -252,8 +257,9 @@ still healthy (and whether planning-service's situation changed) rather than tru
    API (Tony got added as TFC org owner). A stray UI-triggered destroy plan against
    `infra/persistent` got caught and blocked by its `prevent_destroy` guards — worked as designed.
 5. Argo CD `AppProject` + `Application` + bootstrap runbook written
-   (`swarmops-deployments/argocd/`) — not yet installed, blocked on `infra/cluster` existing again
-   (currently destroyed). Also had to convert the chart's `services:` from a list to a map
+   (`swarmops-deployments/argocd/`) — **installed and syncing for real since 2026-07-29**, and as
+   of 2026-08-03 the bootstrap itself is automated via `infra/cluster`'s Terraform rather than
+   run by hand (see the M9 update below). Also had to convert the chart's `services:` from a list to a map
    (`values.yaml`/`values-aws.yaml`/`templates/service.yaml`) so Argo CD's per-service value-file
    overrides merge safely — Helm's multi-file merge replaces lists wholesale but deep-merges maps.
    All 9 `environments/production/images/<service>.yaml` files exist to match. Full writeup in
@@ -264,16 +270,11 @@ still healthy (and whether planning-service's situation changed) rather than tru
 2. ~~`DEPLOYMENTS_BOT_TOKEN` value bad~~ — **FIXED, confirmed live 2026-07-30** (see above). Was
    never the value — Free-org-plan org-secret-to-private-repo limitation. Fixed via per-repo
    secrets/vars on all 9 service repos.
-3. **planning-service not healthy on the live cluster** — blocked on M9 (no Prometheus for its
-   canary `AnalysisTemplate` yet) plus a real bug: stable ReplicaSet points at a deleted image tag.
-   Flagged to Guy directly (see above) — needs Guy to re-point or re-deploy it now that CI pushes
-   real images automatically.
-4. **Re-confirm Argo CD sync post-bot-token-fix** — 2026-07-29's "8/9 healthy" snapshot predates
-   automated image bumps; worth a fresh `kubectl get applications -n argocd` / `argocd app list`
-   check once there's a cluster to check against. Not urgent right now: `infra/cluster` is
-   destroyed again between sessions (cost discipline, per Valfish 2026-07-30) — sync mechanics
-   already proven end-to-end 2026-07-29, this only changes what's feeding it, so low-risk to defer
-   to the next `infra/cluster` apply rather than re-applying just to check.
+3. ~~planning-service not healthy on the live cluster~~ — **FIXED, verified live 2026-08-01.**
+   Guy re-triggered its publish job (`ad2d1aa`) so the stable ReplicaSet points at an image tag
+   that exists; M9's Prometheus landed in parallel, unblocking the canary `AnalysisTemplate`.
+4. ~~Re-confirm Argo CD sync post-bot-token-fix~~ — **DONE, verified live 2026-08-01** by Valfish,
+   against real CI-produced images rather than hand-bumped tags. All 9 services healthy.
 5. **Scoped bot identity** — resolved differently than originally planned: instead of a GitHub
    App, used a fine-grained PAT (Contents: Read/write, scoped to `swarmops-deployments` only)
    from an existing account, stored as `DEPLOYMENTS_BOT_TOKEN`. Deliberate simplification from
