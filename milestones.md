@@ -323,25 +323,54 @@ sync next. **Still not synced against a live cluster** — same reason as Valfis
 **Exit:** Grafana dashboard shows live data. Manufactured alert fires (e.g. scale to 0). Canary rehearsal actually catches a bad build.
 
 **Update 2026-08-03 (Tony):** the "re-run `argocd/README.md`'s bootstrap" step above is now
-automated — `swarmops-infrastructure`'s `infra/cluster/argocd.tf`
-([merged](https://github.com/SwarM-industries/swarmops-infrastructure/commit/f5b69a5)) folds
-Argo CD + Argo Rollouts + all 4 Applications into `terraform apply` itself (`helm_release` +
-`kubectl_manifest`, fetching the 6 `argocd/*.yaml` manifests from `swarmops-deployments` at apply
-time so that repo stays the single source of truth). `argocd/README.md`
-([updated](https://github.com/SwarM-industries/swarmops-deployments/commit/c0ed1e1)) now
-documents this as the primary path, manual steps kept only as fallback reference. **Blocker before
-next `infra/cluster` apply:** the new sensitive TFC workspace variable
-`argocd_deployments_repo_token` must be set once (reuse `DEPLOYMENTS_BOT_TOKEN`'s PAT value) or
-plan/apply fails — not yet set as of this note. `terraform validate`/`fmt` pass; **not yet applied
-against a live cluster** (destroyed between sessions, per usual) — first real apply after this
-merge is also the first real test of the automation itself.
+automated, in two stages after two false starts:
 
-**Actual next step, both tracks above:** re-apply `infra/cluster` (Tony/Valfish, TFC workspace
-admin only — Guy has no path to trigger this himself) after setting the TFC variable above. Once
-that's live: confirm all 9 services sync healthy (last real check, 2026-07-29, predates both
-the canary/observability merges above and this automation change), confirm planning-service's
-Rollout actually reaches "stable" instead of stalling at its first analysis gate, then run the
-rehearsal for real.
+1. First attempt — folded everything into `infra/cluster/argocd.tf`
+   ([merged](https://github.com/SwarM-industries/swarmops-infrastructure/commit/f5b69a5)):
+   `helm_release` for Argo CD + `kubectl_manifest` for all 6 `argocd/*.yaml` manifests (fetched
+   from `swarmops-deployments` at apply time, keeping that repo the single source of truth).
+   **Broke at `terraform plan`, not just apply** — `kubectl_manifest` does a live existence-check
+   GET against the cluster during plan, even for brand-new resources, which 404s unparseably on
+   `argoproj.io` CRDs that don't exist until Argo CD's own Helm chart actually installs them.
+   `depends_on` doesn't help: at plan time nothing has been created yet regardless of graph order.
+2. Second attempt — `apply_only = true` on the `kubectl_manifest` resources
+   ([merged](https://github.com/SwarM-industries/swarmops-infrastructure/commit/ff341f8)): didn't
+   fix it either, that flag only affects delete behavior.
+3. Tried a two-phase `terraform apply -target=...` wrapper script (`apply.sh`,
+   [merged](https://github.com/SwarM-industries/swarmops-infrastructure/commit/63f8fe0)): correct
+   idea, wrong execution model — the `swarmops-infrastructure` TFC workspace enforces VCS-driven-
+   only applies, so CLI `apply` (targeted or not) is rejected outright ("Apply not allowed for
+   workspaces with a VCS connection"), confirmed live.
+4. **Actual fix, merged
+   ([4d6937b](https://github.com/SwarM-industries/swarmops-infrastructure/commit/4d6937b)):** two
+   separate Terraform states, same pattern as the existing `infra/persistent`-vs-`infra/cluster`
+   split. `infra/cluster/argocd.tf` now only installs Argo CD + the repo-read Secret. A new module
+   `infra/argocd-apps/` (new TFC workspace `swarmops-argocd-apps`, created via the TFC API,
+   working directory `infra/argocd-apps`, same repo) holds the 6 `kubectl_manifest` resources — by
+   the time *that* workspace's plan runs, `infra/cluster` has already really applied and the CRDs
+   really exist, so the plan-time GET succeeds. A TFC **run trigger** on the new workspace (sourced
+   from `infra/cluster`) auto-queues its plan right after `infra/cluster` applies, so the split
+   costs no manual sequencing — same "push → plan → confirm" discipline throughout, nothing lost.
+
+**Current blocker:** `swarmops-argocd-apps` authenticates to AWS the same way `infra/cluster` does
+(Dynamic Credentials via the `swarmops-terraform-cloud` IAM role), but that role's trust policy is
+scoped by `sub` to `infra/cluster`'s workspace name specifically — it rejects the new workspace's
+OIDC token until broadened. That's an AWS IAM change on account `769638986113` that needs
+console/CLI access neither Tony nor this session has (Tony's local `aws` CLI resolves to a
+different, personal account entirely — see `[[feedback_aws_account_mismatch]]`). **Pinged Valfish
+directly on Discord 2026-08-03** with the exact ask (broaden the trust policy's `sub` condition,
+e.g. `StringLike` on `workspace:swarmops-*` instead of an exact match). Also still open from
+before this update: the `argocd_deployments_repo_token` sensitive TFC variable (on
+`infra/cluster`) — confirmed set by Tony 2026-08-03. Both `infra/cluster`'s and
+`swarmops-argocd-apps`'s `terraform validate`/`fmt` pass; **neither has completed a real apply
+yet** — `infra/cluster`'s push-triggered plan for this change is in flight as of this note,
+`swarmops-argocd-apps`'s will fail on AWS auth until Valfish's fix lands.
+
+**Actual next step, both tracks above:** once Valfish's IAM fix lands, confirm
+`swarmops-argocd-apps`'s next run trigger succeeds, then confirm all 9 services sync healthy (last
+real check, 2026-07-29, predates the canary/observability merges above and this whole automation
+effort), confirm planning-service's Rollout actually reaches "stable" instead of stalling at its
+first analysis gate, then run the rehearsal for real.
 
 ---
 
