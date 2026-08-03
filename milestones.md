@@ -535,3 +535,22 @@ for it.
 5. Confirm `terraform destroy` path ready post-demo.
 
 **Exit:** demo runs cold, start to finish, no "this part's still flaky."
+
+**Update 2026-08-03 (Tony) — defense deck planned, not built.** `PRESENTATION_PLAN.md` (repo
+root) holds the full plan for a self-contained HTML slide deck for the capstone defense, built
+via the `frontend-slides` plugin skill. Locked: 16 sheets, platform/DevOps-heavy with a real
+optimizer section, inline browser editing on, and a custom visual system ("Stealth Dossier" —
+five revisions, the last one is what's locked; the plugin's own 12 presets were all rejected as
+not technical enough). Content sourced from `SwarmOps_PRD.md`, this file, `SERVICES.md` and
+`TALK_TRACK_GUY.md` — nothing invented, but **every figure on the evidence/infra/gaps sheets
+still needs a cross-check against those sources before the deck is shown to anyone**.
+
+Two things the next session needs to know: the plugin is currently **disabled** in
+`~/.claude/settings.json` (`"frontend-slides@frontend-slides": false`), so the Skill tool can't
+invoke it — the plan follows `SKILL.md` from the marketplace path directly. And the plan
+deliberately includes a **"what is not done" sheet** (plaintext secrets in `values.yaml`, the
+`GET /` 504 on the demo URL, gateway/frontend `/metrics` 499s, Argo CD sync still unconfirmed) —
+per `TALK_TRACK_GUY.md`'s position that these are gaps to own rather than hide. If the team
+disagrees, that's one sheet to cut, flagged in the plan.
+
+`presentation.html` itself is **not built** — the plan is the deliverable at this point.
