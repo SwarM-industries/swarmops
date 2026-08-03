@@ -322,12 +322,26 @@ sync next. **Still not synced against a live cluster** — same reason as Valfis
 
 **Exit:** Grafana dashboard shows live data. Manufactured alert fires (e.g. scale to 0). Canary rehearsal actually catches a bad build.
 
+**Update 2026-08-03 (Tony):** the "re-run `argocd/README.md`'s bootstrap" step above is now
+automated — `swarmops-infrastructure`'s `infra/cluster/argocd.tf`
+([merged](https://github.com/SwarM-industries/swarmops-infrastructure/commit/f5b69a5)) folds
+Argo CD + Argo Rollouts + all 4 Applications into `terraform apply` itself (`helm_release` +
+`kubectl_manifest`, fetching the 6 `argocd/*.yaml` manifests from `swarmops-deployments` at apply
+time so that repo stays the single source of truth). `argocd/README.md`
+([updated](https://github.com/SwarM-industries/swarmops-deployments/commit/c0ed1e1)) now
+documents this as the primary path, manual steps kept only as fallback reference. **Blocker before
+next `infra/cluster` apply:** the new sensitive TFC workspace variable
+`argocd_deployments_repo_token` must be set once (reuse `DEPLOYMENTS_BOT_TOKEN`'s PAT value) or
+plan/apply fails — not yet set as of this note. `terraform validate`/`fmt` pass; **not yet applied
+against a live cluster** (destroyed between sessions, per usual) — first real apply after this
+merge is also the first real test of the automation itself.
+
 **Actual next step, both tracks above:** re-apply `infra/cluster` (Tony/Valfish, TFC workspace
-admin only — Guy has no path to trigger this himself) and re-run `argocd/README.md`'s bootstrap,
-which now installs Argo Rollouts *and* kube-prometheus-stack/loki-stack in the same pass. Once
+admin only — Guy has no path to trigger this himself) after setting the TFC variable above. Once
 that's live: confirm all 9 services sync healthy (last real check, 2026-07-29, predates both
-these merges), confirm planning-service's Rollout actually reaches "stable" instead of stalling
-at its first analysis gate, then run the rehearsal for real.
+the canary/observability merges above and this automation change), confirm planning-service's
+Rollout actually reaches "stable" instead of stalling at its first analysis gate, then run the
+rehearsal for real.
 
 ---
 
