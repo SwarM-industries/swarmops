@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SwarmOps, Architecture &amp; Delivery</title>
+
+<!-- Archivo Black for display, Archivo for everything else. One family, two
+     extremes of weight, the Swiss discipline is that hierarchy comes from
+     size and weight, not from adding typefaces. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=Archivo+Black&display=swap" rel="stylesheet">
+
+<style>
+/* ===========================================================================
+   SWISS SIGNAL
+   Bauhaus discipline: off-white ground, black type, one red. Enormous
+   headlines, a thick red rule, a giant section number in the left rail, and a
+   lot of deliberate emptiness. Hierarchy does the work, there is no panel,
+   no grid overlay, no badge, no card. Change these four colours and the whole
+   deck changes.
+   =========================================================================== */
+:root {
+    --paper:  #f2f2f0;   /* off-white ground */
+    --ink:    #0a0a0a;   /* headlines + body */
+    --muted:  #6b6b68;   /* kickers, notes, secondary */
+    --hair:   #c9c9c5;   /* the only neutral line colour */
+    --accent: #ff3300;   /* signal red, numbers, rules, key terms */
+
+    --display: 'Archivo Black', sans-serif;
+    --body:    'Archivo', sans-serif;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===========================================================================
+   VIEWPORT BASE, full contents of the skill's viewport-base.css, verbatim.
+   MANDATORY. Deck-specific overrides come after this block.
+   =========================================================================== */
+
+/* 1. Lock html/body to viewport */
+html, body {
+    height: 100%;
+    overflow-x: hidden;
+}
+
+html {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+}
+
+/* 2. Each slide = exact viewport height */
+.slide {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
+    overflow: hidden; /* CRITICAL: Prevent ANY overflow */
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* 3. Content container with flex for centering */
+.slide-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-height: 100%;
+    overflow: hidden; /* Double-protection against overflow */
+    padding: var(--slide-padding);
+}
+
+/* 4. ALL typography uses clamp() for responsive scaling */
+:root {
+    /* Titles scale from mobile to desktop */
+    --title-size: clamp(1.5rem, 5vw, 4rem);
+    --h2-size: clamp(1.25rem, 3.5vw, 2.5rem);
+    --h3-size: clamp(1rem, 2.5vw, 1.75rem);
+
+    /* Body text */
+    --body-size: clamp(0.75rem, 1.5vw, 1.125rem);
+    --small-size: clamp(0.65rem, 1vw, 0.875rem);
+
+    /* Spacing scales with viewport */
+    --slide-padding: clamp(1rem, 4vw, 4rem);
+    --content-gap: clamp(0.5rem, 2vw, 2rem);
+    --element-gap: clamp(0.25rem, 1vw, 1rem);
+}
+
+/* 5. Cards/containers use viewport-relative max sizes */
+.card, .container, .content-box {
+    max-width: min(90vw, 1000px);
+    max-height: min(80vh, 700px);
+}
+
+/* 6. Lists auto-scale with viewport */
+.feature-list, .bullet-list {
+    gap: clamp(0.4rem, 1vh, 1rem);
+}
+
+.feature-list li, .bullet-list li {
+    font-size: var(--body-size);
+    line-height: 1.4;
+}
+
+/* 7. Grids adapt to available space */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+    gap: clamp(0.5rem, 1.5vw, 1rem);
+}
+
+/* 8. Images constrained to viewport */
+img, .image-container {
+    max-width: 100%;
+    max-height: min(50vh, 400px);
+    object-fit: contain;
+}
+
+/* ===========================================
+   RESPONSIVE BREAKPOINTS
+   Aggressive scaling for smaller viewports
+   =========================================== */
+
+/* Short viewports (< 700px height) */
+@media (max-height: 700px) {
+    :root {
+        --slide-padding: clamp(0.75rem, 3vw, 2rem);
+        --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+        --title-size: clamp(1.25rem, 4.5vw, 2.5rem);
+        --h2-size: clamp(1rem, 3vw, 1.75rem);
+    }
+}
+
+/* Very short viewports (< 600px height) */
+@media (max-height: 600px) {
+    :root {
+        --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+        --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+        --title-size: clamp(1.1rem, 4vw, 2rem);
+        --body-size: clamp(0.7rem, 1.2vw, 0.95rem);
+    }
+
+    /* Hide non-essential elements */
+    .nav-dots, .keyboard-hint, .decorative {
+        display: none;
+    }
+}
+
+/* Extremely short (landscape phones, < 500px height) */
+@media (max-height: 500px) {
+    :root {
+        --slide-padding: clamp(0.4rem, 2vw, 1rem);
+        --title-size: clamp(1rem, 3.5vw, 1.5rem);
+        --h2-size: clamp(0.9rem, 2.5vw, 1.25rem);
+        --body-size: clamp(0.65rem, 1vw, 0.85rem);
+    }
+}
+
+/* Narrow viewports (< 600px width) */
+@media (max-width: 600px) {
+    :root {
+        --title-size: clamp(1.25rem, 7vw, 2.5rem);
+    }
+
+    /* Stack grids vertically */
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===========================================
+   REDUCED MOTION
+   Respect user preferences
+   =========================================== */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.2s !important;
+    }
+
+    html {
+        scroll-behavior: auto;
+    }
+}
+
+/* ===========================================================================
+   PAGE + SLIDE GRID
+   Two columns: a narrow left rail holding the section number, and the body.
+   The rail is what makes the layout asymmetric rather than centred.
+   =========================================================================== */
+body { background: var(--paper); color: var(--ink); font-family: var(--body); -webkit-font-smoothing: antialiased; }
+
+/* Centred composition. The section number stacks above the body rather than
+   sitting in a side rail, and every block is centred on the page. */
+.slide-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    align-content: center;
+    text-align: center;
+    row-gap: clamp(0.5rem, 1.6vh, 1.1rem);
+    padding: clamp(1.5rem, 5vw, 5rem) clamp(1.5rem, 4vw, 4rem);
+    padding-bottom: clamp(2.8rem, 7.5vh, 4.5rem);
+}
+
+.rail {
+    font-family: var(--display);
+    font-size: clamp(2rem, 5vw, 4.2rem);
+    line-height: 0.8;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+}
+.body { min-width: 0; max-width: min(100%, 900px); width: 100%; }
+
+/* ===========================================================================
+   TYPE
+   =========================================================================== */
+.kicker {
+    font-size: clamp(0.7rem, 1.12vw, 0.95rem);
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+h1 {
+    font-family: var(--display);
+    font-size: clamp(3rem, 9.4vw, 7.4rem);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+}
+h2 {
+    font-family: var(--display);
+    font-size: clamp(2.2rem, 6.4vw, 5.1rem);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    margin: clamp(0.4rem, 1.4vh, 0.9rem) auto 0;
+    max-width: 16ch;
+    text-wrap: balance;
+}
+/* The hard rule. Thick, red, structural, never decorative. */
+.rule {
+    height: clamp(4px, 0.7vh, 7px);
+    width: clamp(90px, 13vw, 180px);
+    background: var(--accent);
+    margin: clamp(0.8rem, 2.4vh, 1.6rem) auto;
+}
+
+.lede {
+    font-size: clamp(1rem, 1.82vw, 1.55rem);
+    color: var(--muted);
+    line-height: 1.45;
+    max-width: 44ch;
+    margin-left: auto; margin-right: auto;
+}
+
+/* Three points, never more. Each one line. */
+ul.points { list-style: none; display: flex; flex-direction: column; align-items: center; gap: clamp(0.55rem, 1.8vh, 1.15rem); }
+ul.points li {
+    font-size: clamp(1rem, 1.78vw, 1.52rem);
+    line-height: 1.38;
+    max-width: 40ch;
+}
+ul.points b { font-weight: 800; }
+ul.points em { font-style: normal; font-weight: 500; color: var(--muted); }
+
+.note {
+    margin: clamp(0.9rem, 2.8vh, 1.8rem) auto 0;
+    font-size: clamp(0.8rem, 1.24vw, 1.06rem);
+    color: var(--muted);
+    line-height: 1.5;
+    max-width: 52ch;
+}
+.note b { color: var(--ink); font-weight: 600; }
+
+/* Title-sheet stat row, four numbers, no labels competing with them */
+.stats { display: flex; justify-content: center; gap: clamp(1.2rem, 4.5vw, 3.6rem); flex-wrap: wrap; }
+.stat .n {
+    font-family: var(--display);
+    font-size: clamp(1.9rem, 4.2vw, 3.5rem);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+.stat .l {
+    display: block;
+    margin-top: 0.45em;
+    font-size: clamp(0.62rem, 1vw, 0.82rem);
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+/* ===========================================================================
+   DIAGRAMS
+   Dark strokes on the pale ground. Width is CAPPED, not just 100%, these have
+   a fixed viewBox aspect, so an uncapped width on a wide monitor renders them
+   hundreds of px tall and pushes the sheet past 100vh.
+   =========================================================================== */
+.figure { width: 100%; max-width: min(100%, 780px); margin-left: auto; margin-right: auto; }
+.figure svg { width: 100%; height: auto; display: block; }
+.figure text { font-family: var(--body); font-size: 12.5px; font-weight: 500; fill: var(--ink); }
+.figure .dim { fill: var(--muted); }
+.figure .box { fill: none; stroke: var(--ink); stroke-width: 1.4; }
+.figure .box-hot { fill: var(--accent); stroke: none; }
+.figure .lbl-hot { fill: #fff; }
+/* Secondary text ON a filled orange box needs to stay white (grey has poor
+   contrast there), just dimmer than the bold label above it for hierarchy. */
+.figure .lbl-hot-dim { fill: rgba(255, 255, 255, 0.8); }
+.figure .wire { stroke: var(--ink); stroke-width: 1.4; fill: none; }
+.figure .wire-hot { stroke: var(--accent); stroke-width: 2; fill: none; }
+@media (max-height: 820px) { .figure { max-width: min(100%, 620px); } }
+@media (max-height: 640px) { .figure { max-width: min(100%, 500px); } }
+
+/* Pipeline strip, hard-edged blocks, no rounding, red on the gated steps */
+.flow { display: flex; width: 100%; max-width: min(100%, 860px); border: 2px solid var(--ink); margin-left: auto; margin-right: auto; text-align: left; }
+.flow .step {
+    flex: 1 1 0; min-width: 0;
+    padding: clamp(0.5rem, 1.6vh, 0.95rem) clamp(0.4rem, 0.9vw, 0.8rem);
+    border-right: 2px solid var(--ink);
+}
+.flow .step:last-child { border-right: 0; }
+.flow .s {
+    display: block;
+    font-size: clamp(0.56rem, 0.9vw, 0.74rem);
+    font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 0.4em;
+}
+.flow .v { font-size: clamp(0.8rem, 1.28vw, 1.12rem); font-weight: 600; line-height: 1.25; }
+.flow .step.hot { background: var(--accent); }
+.flow .step.hot .s, .flow .step.hot .v { color: #fff; }
+
+/* ===========================================================================
+   BRAND MARK
+   The real SWARM logo (three quadrotors in a mesh triangle) from
+   swarmops-frontend/src/assets. RGBA, so it drops straight onto the paper.
+   =========================================================================== */
+.logo { display: block; margin: 0 auto; height: auto; }
+.logo--title { width: clamp(120px, 17vw, 230px); max-height: min(26vh, 230px); }
+.logo--close { width: clamp(70px, 9vw, 120px); opacity: 0.85; }
+
+/* Telemetry pulse on the quadrotor that stands in for the simulator inside
+   the bus chart. One ring every 2s, the simulator's real tick, so the
+   animation is stating a fact rather than decorating. */
+.pulse {
+    stroke: var(--accent); stroke-width: 2; fill: none; opacity: 0;
+    transform-origin: 70px 56px;
+    animation: ping 2s linear infinite;
+}
+@keyframes ping {
+    0%   { opacity: 0.7; transform: scale(0.4); }
+    100% { opacity: 0;   transform: scale(1.35); }
+}
+
+/* ===========================================================================
+   WORKFLOW CHARTS
+   Boxes with real arrowheads and labelled edges. Built to be read from the
+   back of a room: 2px strokes, filled nodes for terminal states, red only on
+   gates and failure paths.
+   =========================================================================== */
+.chart { width: 100%; max-width: min(100%, 900px); margin: 0 auto; }
+/* The full-system sheet's viewBox (1000x470, taller than the deck's other
+   charts) meant a 1240px cap rendered at ~580px, pushing the note down into
+   the fixed footer. Capped lower here specifically so total sheet height
+   clears it, even though it costs some of the width other charts get. */
+.chart--wide { max-width: min(100%, 980px); margin: clamp(0.5rem, 1.8vh, 1.1rem) auto clamp(0.4rem, 1.4vh, 0.9rem); }
+.chart--wide text { font-size: 13px; }
+.chart--wide .t-lbl { font-size: 11px; }
+@media (max-height: 820px) { .chart--wide { max-width: min(100%, 800px); } }
+@media (max-height: 700px) { .chart--wide { max-width: min(100%, 660px); } }
+@media (max-height: 620px) { .chart--wide { max-width: min(100%, 540px); } }
+.chart svg { width: 100%; height: auto; display: block; }
+.chart text { font-family: var(--body); font-weight: 700; fill: var(--ink); font-size: 15px; }
+.chart .t-out { fill: var(--paper); }
+.chart .t-lbl { font-weight: 600; font-size: 12px; fill: var(--muted); }
+.chart .node { fill: none; stroke: var(--ink); stroke-width: 2.5; }
+.chart .node-fill { fill: var(--ink); stroke: none; }
+.chart .node-hot { fill: var(--accent); stroke: none; }
+.chart .edge { stroke: var(--ink); stroke-width: 2.5; fill: none; }
+.chart .edge-hot { stroke: var(--accent); stroke-width: 2.5; fill: none; stroke-dasharray: 6 4; }
+@media (max-height: 760px) { .chart { max-width: min(100%, 740px); } }
+@media (max-height: 620px) { .chart { max-width: min(100%, 600px); } }
+
+/* ===========================================================================
+   FIX CARDS
+   Six hard-edged cards, 3 x 2. Text is left-aligned inside each card even
+   though the sheet is centred: ragged-centre body copy in a small box is
+   harder to scan than flush-left.
+   =========================================================================== */
+.fixes {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(0.45rem, 1.1vw, 0.9rem);
+    width: 100%; margin: 0 auto; text-align: left;
+}
+.fix { border: 2px solid var(--ink); padding: clamp(0.5rem, 1.4vh, 0.9rem) clamp(0.5rem, 1vw, 0.85rem); }
+.fix .h {
+    display: block; font-weight: 800;
+    font-size: clamp(0.74rem, 1.16vw, 1rem);
+    line-height: 1.2; margin-bottom: 0.4em;
+}
+.fix .d { font-size: clamp(0.63rem, 0.99vw, 0.85rem); color: var(--muted); line-height: 1.4; }
+.fix.hot { border-color: var(--accent); }
+.fix.hot .h { color: var(--accent); }
+@media (max-width: 880px) { .fixes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .fixes { grid-template-columns: 1fr; } }
+@media (max-height: 640px) { .fix .d { display: none; } }
+
+/* ===========================================================================
+   CHROME, all of it: a red progress bar, a foot line, square nav dots.
+   =========================================================================== */
+.progress {
+    position: fixed; left: 0; bottom: 0; height: clamp(3px, 0.55vh, 6px); width: 0;
+    background: var(--accent); z-index: 50; transition: width 0.45s var(--ease);
+}
+.foot {
+    position: fixed; left: 50%; transform: translateX(-50%);
+    bottom: clamp(0.9rem, 2.6vh, 1.9rem);
+    font-size: clamp(0.62rem, 0.98vw, 0.82rem); font-weight: 600;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);
+    z-index: 50; white-space: nowrap;
+}
+.foot b { color: var(--ink); font-weight: 800; font-variant-numeric: tabular-nums; }
+
+.nav-dots {
+    position: fixed; right: clamp(0.6rem, 1.2vw, 1.1rem); top: 50%; transform: translateY(-50%);
+    display: flex; flex-direction: column; gap: clamp(5px, 0.8vh, 9px); z-index: 50;
+}
+.nav-dot {
+    width: 6px; height: 6px; padding: 0; border: 0; background: var(--hair);
+    cursor: pointer; transition: background 0.25s ease, transform 0.25s ease;
+}
+.nav-dot.is-active { background: var(--accent); transform: scale(1.6); }
+.nav-dot:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+/* ===========================================================================
+   REVEAL, one staggered load per sheet. Nothing else moves.
+   =========================================================================== */
+.reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.slide.visible .reveal:nth-child(1) { transition-delay: 0.04s; }
+.slide.visible .reveal:nth-child(2) { transition-delay: 0.11s; }
+.slide.visible .reveal:nth-child(3) { transition-delay: 0.18s; }
+.slide.visible .reveal:nth-child(4) { transition-delay: 0.25s; }
+.slide.visible .reveal:nth-child(5) { transition-delay: 0.32s; }
+.slide.visible .rail { transition: opacity 0.6s var(--ease); }
+
+/* Narrow: drop the rail, stack */
+@media (max-width: 700px) {
+    .slide-content { grid-template-columns: minmax(0, 1fr); }
+    .rail { margin-bottom: 0.5rem; }
+}
+
+/* ===========================================================================
+   INLINE EDIT MODE
+   Visibility driven by JS classes only, the CSS `~` sibling approach breaks
+   because pointer-events:none severs the hover chain.
+   =========================================================================== */
+.edit-hotzone { position: fixed; top: 0; left: 0; width: 80px; height: 80px; z-index: 10000; cursor: pointer; }
+.edit-toggle {
+    position: fixed; top: clamp(0.8rem,2vh,1.5rem); left: clamp(0.8rem,2vw,1.5rem);
+    background: var(--ink); color: var(--paper); border: 0;
+    padding: 0.4em 0.8em; cursor: pointer; font-family: var(--body);
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.16em;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 10001;
+}
+.edit-toggle.show, .edit-toggle.active { opacity: 1; pointer-events: auto; }
+.edit-banner {
+    position: fixed; bottom: clamp(1.4rem,3.4vh,2.4rem); left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: #fff; padding: 0.45em 1.1em;
+    font-size: clamp(0.58rem,0.9vw,0.74rem); font-weight: 600; letter-spacing: 0.16em;
+    text-transform: uppercase; opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease; z-index: 10001;
+}
+.edit-banner.active { opacity: 1; }
+body.edit-active [contenteditable] { outline: 1px dashed rgba(255,51,0,0.5); outline-offset: 4px; }
+body.edit-active [contenteditable]:focus { outline: 2px solid var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="edit-hotzone" aria-hidden="true"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)">EDIT</button>
+<div class="edit-banner">Edit mode · click any text · Ctrl+S exports</div>
+
+<div class="progress" id="progress"></div>
+<div class="foot">SwarmOps · Capstone defense 2026 · <b id="counterNow">01</b>/<b id="counterAll">13</b></div>
+<nav class="nav-dots" aria-label="Slide navigation"></nav>
+
+<!-- ==========================================================================
+     01 · TITLE
+     ========================================================================== -->
+<section class="slide slide--title">
+  <div class="slide-content">
+    <div class="body" style="max-width:min(100%,1100px)">
+      <img class="logo logo--title reveal" src="presentation-assets/logo-mark.png" alt="SWARM logo: three quadrotors in a mesh triangle" />
+      <p class="kicker reveal" style="margin-top:clamp(0.6rem,2vh,1.4rem)">SwarmOps · Capstone defense 2026</p>
+      <h1 class="reveal" style="margin:clamp(0.4rem,1.4vh,1rem) 0 0">Architecture<br>&amp; delivery</h1>
+      <div class="rule reveal" style="width:clamp(120px,18vw,260px)"></div>
+      <p class="lede reveal">A drone fleet mission planner, built as a real distributed system, shipped by a pipeline nobody drives by hand.</p>
+      <div class="stats reveal" style="margin-top:clamp(1.2rem,3.6vh,2.6rem)">
+        <div class="stat"><span class="n">9</span><span class="l">Services</span></div>
+        <div class="stat"><span class="n">13</span><span class="l">Repos</span></div>
+        <div class="stat"><span class="n">0</span><span class="l">Static keys</span></div>
+        <div class="stat"><span class="n">0</span><span class="l">Manual deploys</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     02 · ARCHITECTURE
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail">02</div>
+    <div class="body">
+      <p class="kicker reveal">Architecture</p>
+      <h2 class="reveal">One exposed port</h2>
+      <div class="rule reveal"></div>
+      <div class="figure reveal">
+        <svg viewBox="0 0 560 244" role="img" aria-label="Frontend to NGINX gateway to six services with ports, over RabbitMQ and MongoDB">
+          <rect class="box" x="200" y="2" width="160" height="26" />
+          <text x="280" y="19" text-anchor="middle">frontend · React/Vite</text>
+
+          <path class="wire" d="M280 28v12" />
+          <rect class="box-hot" x="132" y="40" width="296" height="40" />
+          <text class="lbl-hot" x="280" y="57" text-anchor="middle">gateway · NGINX</text>
+          <!-- textLength forces an exact fit regardless of font metrics --
+               this was overflowing past the box edge at plain font-size 8.5. -->
+          <text class="lbl-hot-dim" x="280" y="72" text-anchor="middle" font-size="8.5"
+                textLength="266" lengthAdjust="spacingAndGlyphs">/auth /fleet /missions /planning /telemetry /notifications</text>
+
+          <path class="wire" d="M280 80v12 M56 92h448 M56 92v14 M146 92v14 M236 92v14 M326 92v14 M416 92v14 M504 92v14" />
+          <g text-anchor="middle">
+            <rect class="box" x="12" y="106" width="88" height="36" />
+            <text x="56" y="122">auth</text><text class="dim" x="56" y="135" font-size="8.5">:3001</text>
+            <rect class="box" x="102" y="106" width="88" height="36" />
+            <text x="146" y="122">fleet</text><text class="dim" x="146" y="135" font-size="8.5">:3002</text>
+            <rect class="box" x="192" y="106" width="88" height="36" />
+            <text x="236" y="122">mission</text><text class="dim" x="236" y="135" font-size="8.5">:3003</text>
+            <rect class="box-hot" x="282" y="106" width="88" height="36" />
+            <text class="lbl-hot" x="326" y="122">planning</text><text class="lbl-hot" x="326" y="135" font-size="8.5">:8000 · canary</text>
+            <rect class="box" x="372" y="106" width="88" height="36" />
+            <text x="416" y="122">telemetry</text><text class="dim" x="416" y="135" font-size="8.5">:3004</text>
+            <rect class="box" x="462" y="106" width="88" height="36" />
+            <text x="506" y="122">notification</text><text class="dim" x="506" y="135" font-size="8.5">:3005</text>
+          </g>
+
+          <path class="wire-hot" d="M326 142v14 M416 142v14 M506 142v14" />
+          <rect class="box" x="160" y="156" width="390" height="32" />
+          <text x="355" y="172" text-anchor="middle">RabbitMQ · fanout exchange</text>
+          <text class="dim" x="355" y="184" text-anchor="middle" font-size="8.5">one bound queue per consumer</text>
+
+          <path class="wire" d="M104 172h56" />
+          <rect class="box" x="12" y="156" width="92" height="32" />
+          <text x="58" y="176" text-anchor="middle">simulator</text>
+
+          <path class="wire" d="M280 188v12" />
+          <rect class="box" x="132" y="200" width="296" height="34" />
+          <text x="280" y="216" text-anchor="middle">MongoDB · Bitnami chart</text>
+          <text class="dim" x="280" y="228" text-anchor="middle" font-size="8.5">one logical database per service</text>
+        </svg>
+      </div>
+      <p class="note reveal">The <b>gateway is the only externally reachable port</b>. Everything else is cluster-internal, reachable only by ClusterIP.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     03 · THE OPTIMIZER (one sheet only, this is a platform talk)
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail">03</div>
+    <div class="body">
+      <p class="kicker reveal">The core</p>
+      <h2 class="reveal">Capacity is battery</h2>
+      <div class="rule reveal"></div>
+      <!-- The five stages, with the feedback edge that makes re-planning
+           cyclic rather than one-shot. -->
+      <div class="chart reveal">
+        <svg viewBox="0 0 900 158" role="img" aria-label="Greedy, Hungarian, OR-Tools, battery check, plan, with a re-solve loop back to the start">
+          <defs>
+            <marker id="sv-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#0a0a0a" />
+            </marker>
+            <marker id="sv-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#ff3300" />
+            </marker>
+          </defs>
+
+          <rect class="node" x="0" y="12" width="160" height="56" />
+          <text x="80" y="46" text-anchor="middle">greedy</text>
+          <path class="edge" d="M160 40 H177" marker-end="url(#sv-a)" />
+
+          <rect class="node" x="185" y="12" width="160" height="56" />
+          <text x="265" y="46" text-anchor="middle">Hungarian</text>
+          <path class="edge" d="M345 40 H362" marker-end="url(#sv-a)" />
+
+          <rect class="node" x="370" y="12" width="160" height="56" />
+          <text x="450" y="46" text-anchor="middle">OR-Tools</text>
+          <path class="edge" d="M530 40 H547" marker-end="url(#sv-a)" />
+
+          <rect class="node-hot" x="555" y="12" width="160" height="56" />
+          <text class="t-out" x="635" y="46" text-anchor="middle">battery check</text>
+          <path class="edge" d="M715 40 H732" marker-end="url(#sv-a)" />
+
+          <rect class="node-fill" x="740" y="12" width="160" height="56" />
+          <text class="t-out" x="820" y="46" text-anchor="middle">plan</text>
+
+          <!-- the loop: a new event re-enters at the top -->
+          <path class="edge-hot" d="M820 68 V112 H80 V68" marker-end="url(#sv-r)" />
+          <text class="t-lbl" x="450" y="136" text-anchor="middle" fill="#ff3300">re-solve on new telemetry or mission events</text>
+        </svg>
+      </div>
+      <p class="note reveal">Capacity is <b>battery range</b>, which moves with distance flown and payload weight. The constraint depends on the route you are still choosing. <b>Python lives here and nowhere else.</b></p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     04 · THE BUS
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail">04</div>
+    <div class="body">
+      <p class="kicker reveal">Architecture</p>
+      <h2 class="reveal">Event-driven, not polled</h2>
+      <div class="rule reveal"></div>
+      <!-- The event loop, closed: the simulator flies a plan, emits telemetry,
+           planning re-solves, and the new plan comes back to the simulator.
+           The quadrotor IS the simulator node, imagery that carries meaning. -->
+      <div class="chart reveal">
+        <svg viewBox="0 0 900 272" role="img" aria-label="drone-simulator emits a TelemetryEvent to telemetry-service, which publishes to a RabbitMQ fanout exchange feeding fleet-service, notification-service and planning-service; planning-service's new plan returns to the simulator">
+          <defs>
+            <marker id="bus-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#0a0a0a" />
+            </marker>
+            <marker id="bus-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#ff3300" />
+            </marker>
+          </defs>
+
+          <!-- drone-simulator, drawn as a quadrotor. Centred at x=70 (not 50)
+               so "drone-simulator" at font-size 13 has room either side and
+               never clips against the viewBox's left edge. -->
+          <circle class="pulse" cx="70" cy="56" r="30" />
+          <path d="M48 34 L92 78 M92 34 L48 78" stroke="#0a0a0a" stroke-width="2.5" fill="none" />
+          <rect x="62" y="48" width="16" height="16" rx="2" fill="#0a0a0a" />
+          <circle cx="48" cy="34" r="11" fill="none" stroke="#0a0a0a" stroke-width="2.5" />
+          <circle cx="92" cy="34" r="11" fill="none" stroke="#ff3300" stroke-width="2.5" />
+          <circle cx="48" cy="78" r="11" fill="none" stroke="#0a0a0a" stroke-width="2.5" />
+          <circle cx="92" cy="78" r="11" fill="none" stroke="#0a0a0a" stroke-width="2.5" />
+          <text x="70" y="108" text-anchor="middle" font-size="13">drone-simulator</text>
+          <text class="t-lbl" x="70" y="126" text-anchor="middle">flies the route</text>
+
+          <!-- the event on the wire is the locked contract shape. Label is
+               left-anchored, clear of the rotor's right edge (x=103), so it
+               never sits on top of the red rotor. -->
+          <path class="edge" d="M108 56 H150" marker-end="url(#bus-a)" />
+          <text class="t-lbl" x="112" y="24" text-anchor="start">TelemetryEvent</text>
+          <text class="t-lbl" x="112" y="38" text-anchor="start">every 2s</text>
+
+          <rect class="node" x="158" y="26" width="210" height="64" />
+          <text x="263" y="53" text-anchor="middle" font-size="14">telemetry-service</text>
+          <text class="t-lbl" x="263" y="74" text-anchor="middle">only writer of position + battery</text>
+
+          <path class="edge" d="M368 58 H418" marker-end="url(#bus-a)" />
+          <text class="t-lbl" x="393" y="46" text-anchor="middle">publish</text>
+
+          <rect class="node-hot" x="426" y="26" width="180" height="64" />
+          <text class="t-out" x="516" y="53" text-anchor="middle" font-size="14">RabbitMQ</text>
+          <text class="t-out" x="516" y="74" text-anchor="middle" font-size="12">fanout exchange</text>
+
+          <path class="edge" d="M606 58 H686" marker-end="url(#bus-a)" />
+          <text class="t-lbl" x="646" y="46" text-anchor="middle">re-solve</text>
+          <rect class="node" x="694" y="26" width="206" height="64" />
+          <text x="797" y="53" text-anchor="middle" font-size="14">planning-service</text>
+          <text class="t-lbl" x="797" y="74" text-anchor="middle">re-plans affected routes</text>
+
+          <!-- each consumer has its own bound queue -->
+          <path class="edge" d="M516 90 V122 H400 V152" marker-end="url(#bus-a)" />
+          <path class="edge" d="M516 90 V122 H660 V152" marker-end="url(#bus-a)" />
+          <rect class="node" x="296" y="160" width="208" height="60" />
+          <text x="400" y="186" text-anchor="middle" font-size="14">fleet-service</text>
+          <text class="t-lbl" x="400" y="206" text-anchor="middle">drone position + battery</text>
+          <rect class="node" x="546" y="160" width="228" height="60" />
+          <text x="660" y="186" text-anchor="middle" font-size="14">notification-service</text>
+          <text class="t-lbl" x="660" y="206" text-anchor="middle">alerts · stateless</text>
+
+          <!-- close the loop -->
+          <path class="edge-hot" d="M797 90 V240 H70 V138" marker-end="url(#bus-r)" />
+          <text class="t-lbl" x="430" y="260" text-anchor="middle" fill="#ff3300">new plan: the simulator flies it, and the cycle repeats</text>
+        </svg>
+      </div>
+      <p class="note reveal">Five services, one event. <b>One bound queue per consumer</b>, so each gets a full copy. The payload is the locked <em>TelemetryEvent</em> contract: drone_id, position, battery_pct, event_type.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     05 · POLYREPO
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail">05</div>
+    <div class="body">
+      <p class="kicker reveal">Platform</p>
+      <h2 class="reveal">Thirteen repos</h2>
+      <div class="rule reveal"></div>
+      <ul class="points reveal">
+        <li><b>Nine ship images.</b> The rest are docs and infra.</li>
+        <li>Each with its own remote, CI and protected <em>main</em>.</li>
+        <li><b>swarmops-contracts</b> holds the shared types.</li>
+      </ul>
+      <p class="note reveal">Polyrepo costs coordination on every shared change. The contracts repo is what buys it back. Without it, services drift on field names.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     06 · HELM
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail">06</div>
+    <div class="body">
+      <p class="kicker reveal">Packaging</p>
+      <h2 class="reveal">One chart, not nine</h2>
+      <div class="rule reveal"></div>
+      <ul class="points reveal">
+        <li><b>range + _helpers.tpl</b> generate the services.</li>
+        <li>Bitnami Mongo and RabbitMQ are <b>dependencies</b>.</li>
+        <li><em>drone-simulator</em> is the exception: no Service.</li>
+      </ul>
+      <p class="note reveal"><b>services: is a map, not a list.</b> Helm replaces lists wholesale but deep-merges maps, so Argo CD's per-service overrides only compose safely once it stopped being a list.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     07 · TERRAFORM
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail">07</div>
+    <div class="body">
+      <p class="kicker reveal">Provisioning</p>
+      <h2 class="reveal">Split by blast radius</h2>
+      <div class="rule reveal"></div>
+      <!-- Two states, one destroy line. The line is the whole idea. -->
+      <div class="chart reveal">
+        <svg viewBox="0 0 900 238" role="img" aria-label="infra/persistent above the destroy line, infra/cluster below it">
+          <rect class="node" x="0" y="6" width="600" height="80" />
+          <text x="24" y="40">infra/persistent</text>
+          <text class="t-lbl" x="24" y="66">ECR ×9 · GitHub OIDC role · state that outlives the cluster</text>
+          <text class="t-lbl" x="624" y="40" fill="#ff3300">prevent_destroy</text>
+          <text class="t-lbl" x="624" y="60">never torn down</text>
+
+          <!-- the destroy line -->
+          <path d="M0 119 H900" stroke="#ff3300" stroke-width="2.5" stroke-dasharray="8 6" />
+          <rect x="352" y="105" width="196" height="28" fill="#f2f2f0" />
+          <text class="t-lbl" x="450" y="124" text-anchor="middle" fill="#ff3300">DESTROY LINE</text>
+
+          <rect class="node" x="0" y="152" width="600" height="80" />
+          <text x="24" y="186">infra/cluster</text>
+          <text class="t-lbl" x="24" y="212">VPC · EKS · node group · add-ons</text>
+          <text class="t-lbl" x="624" y="186">torn down between</text>
+          <text class="t-lbl" x="624" y="206">work sessions, to save spend</text>
+        </svg>
+      </div>
+      <p class="note reveal">Not stylistic. A cost-saving teardown <b>once took all nine ECR repos down with the cluster</b>. Terraform Cloud, VCS-driven, no local applies.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     08 · END TO END: how images, config and infrastructure converge on AWS
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail">08</div>
+    <div class="body" style="max-width:min(100%,1000px)">
+      <p class="kicker reveal">End to end</p>
+      <h2 class="reveal">From commit to cluster</h2>
+      <div class="rule reveal"></div>
+      <!-- Three independent inputs, images, config, infrastructure, each
+           produced by a different tool, converging on one running cluster. -->
+      <div class="chart reveal">
+        <svg viewBox="0 0 900 300" role="img" aria-label="Images from CI, config from Argo CD and infrastructure from Terraform all converge on the EKS cluster, fronted by an ALB">
+          <defs>
+            <marker id="e2e-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#0a0a0a" />
+            </marker>
+          </defs>
+
+          <!-- ---- lane 1: images ---- -->
+          <text class="t-lbl" x="0" y="14" fill="#ff3300">IMAGES</text>
+          <rect class="node" x="0" y="24" width="170" height="52" />
+          <text x="85" y="56" text-anchor="middle">9 repos</text>
+          <path class="edge" d="M170 50 H196" marker-end="url(#e2e-a)" />
+          <rect class="node" x="204" y="24" width="170" height="52" />
+          <text x="289" y="49" text-anchor="middle">Actions</text>
+          <text class="t-lbl" x="289" y="66" text-anchor="middle">docker build</text>
+          <path class="edge" d="M374 50 H400" marker-end="url(#e2e-a)" />
+          <rect class="node-fill" x="408" y="24" width="100" height="52" />
+          <text class="t-out" x="458" y="56" text-anchor="middle">ECR</text>
+
+          <!-- ---- lane 2: config ---- -->
+          <text class="t-lbl" x="0" y="112" fill="#ff3300">CONFIG</text>
+          <rect class="node" x="0" y="122" width="240" height="52" />
+          <text x="120" y="147" text-anchor="middle">deployments</text>
+          <text class="t-lbl" x="120" y="164" text-anchor="middle">Helm chart</text>
+          <path class="edge" d="M240 148 H266" marker-end="url(#e2e-a)" />
+          <rect class="node-hot" x="274" y="122" width="150" height="52" />
+          <text class="t-out" x="349" y="154" text-anchor="middle">Argo CD</text>
+
+          <!-- ---- lane 3: infrastructure ---- -->
+          <text class="t-lbl" x="0" y="210" fill="#ff3300">PLATFORM</text>
+          <rect class="node" x="0" y="220" width="190" height="52" />
+          <text x="95" y="252" text-anchor="middle">Terraform</text>
+          <path class="edge" d="M190 246 H216" marker-end="url(#e2e-a)" />
+          <rect class="node" x="224" y="220" width="240" height="52" />
+          <text x="344" y="245" text-anchor="middle">AWS account</text>
+          <text class="t-lbl" x="344" y="262" text-anchor="middle">VPC · EKS · IAM · ECR</text>
+
+          <!-- ---- convergence ---- -->
+          <path class="edge" d="M508 50 H556 V120 H596" marker-end="url(#e2e-a)" />
+          <text class="t-lbl" x="524" y="42">pulls</text>
+          <path class="edge" d="M424 148 H596" marker-end="url(#e2e-a)" />
+          <text class="t-lbl" x="470" y="140">syncs</text>
+          <path class="edge" d="M464 246 H556 V166 H596" marker-end="url(#e2e-a)" />
+          <text class="t-lbl" x="474" y="238">provisions</text>
+
+          <rect class="node" x="604" y="88" width="200" height="96" stroke-width="3" />
+          <text x="704" y="128" text-anchor="middle">EKS cluster</text>
+          <text class="t-lbl" x="704" y="152" text-anchor="middle">9 services · 1 namespace</text>
+
+          <path class="edge" d="M704 184 V216" marker-end="url(#e2e-a)" />
+          <rect class="node-fill" x="604" y="224" width="200" height="48" />
+          <text class="t-out" x="704" y="254" text-anchor="middle">ALB</text>
+          <path class="edge" d="M804 248 H852" marker-end="url(#e2e-a)" />
+          <text class="t-lbl" x="820" y="240">users</text>
+        </svg>
+      </div>
+      <p class="note reveal">Local dev is a <b>separate stack</b>. <em>swarmops-local</em>'s docker compose brings the whole system up on a laptop with its own database. Nothing syncs between the two.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     09 · CI
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail">09</div>
+    <div class="body">
+      <p class="kicker reveal">Continuous integration</p>
+      <h2 class="reveal">PRs never touch the cluster</h2>
+      <div class="rule reveal"></div>
+      <!-- Two tracks, so the "PRs never touch the cluster" claim is visible
+           rather than asserted: the PR track dead-ends before AWS. -->
+      <div class="chart reveal">
+        <svg viewBox="0 0 900 210" role="img" aria-label="Pull request track stops after build; main track continues through OIDC to ECR">
+          <defs>
+            <marker id="ci-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#0a0a0a" />
+            </marker>
+          </defs>
+
+          <!-- The trust boundary. Merging is what crosses it, a PR is
+               unprivileged, not unverified. -->
+          <path d="M436 6 V206" stroke="#ff3300" stroke-width="2.5" stroke-dasharray="7 5" />
+          <text class="t-lbl" transform="rotate(-90 428 106)" x="428" y="106"
+                text-anchor="middle" fill="#ff3300">TRUST BOUNDARY</text>
+
+          <!-- PR track, full feedback, no credentials -->
+          <text class="t-lbl" x="0" y="24">PULL REQUEST</text>
+          <rect class="node" x="0" y="34" width="230" height="52" />
+          <text x="115" y="66" text-anchor="middle">lint · test · build</text>
+          <path class="edge" d="M230 60 H392" />
+          <path class="edge" d="M400 40 V80" />
+          <text class="t-lbl" x="0" y="108">no credentials issued: the PR ref cannot assume the role</text>
+
+          <!-- main track, crosses the boundary and gains credentials -->
+          <text class="t-lbl" x="0" y="140">PUSH TO MAIN</text>
+          <rect class="node" x="0" y="150" width="160" height="52" />
+          <text x="80" y="182" text-anchor="middle">version</text>
+          <path class="edge" d="M160 176 H470" marker-end="url(#ci-a)" />
+
+          <rect class="node-hot" x="482" y="150" width="176" height="52" />
+          <text class="t-out" x="570" y="182" text-anchor="middle">OIDC → AWS</text>
+          <path class="edge" d="M658 176 H700" marker-end="url(#ci-a)" />
+
+          <rect class="node-fill" x="708" y="150" width="192" height="52" />
+          <text class="t-out" x="804" y="182" text-anchor="middle">build → ECR</text>
+        </svg>
+      </div>
+      <p class="note reveal">A PR is <b>unprivileged, not unverified</b>. It still lints, tests and builds. Merging is what crosses the boundary. <b>Zero static keys</b>, and the tag <em>latest</em> is never used.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     10 · CD
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail">10</div>
+    <div class="body">
+      <p class="kicker reveal">Continuous delivery</p>
+      <h2 class="reveal">A deploy is a git commit</h2>
+      <div class="rule reveal"></div>
+      <!-- The GitOps loop. The dashed red edge back from the cluster is the
+           self-heal path, it is what makes git the source of truth. -->
+      <div class="chart reveal">
+        <svg viewBox="0 0 900 200" role="img" aria-label="CI bumps the deployments repo, Argo CD syncs the cluster, self-heal returns drift to git">
+          <defs>
+            <marker id="cd-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#0a0a0a" />
+            </marker>
+            <marker id="cd-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#ff3300" />
+            </marker>
+          </defs>
+
+          <rect class="node" x="0" y="24" width="176" height="56" />
+          <text x="88" y="58" text-anchor="middle">CI</text>
+          <path class="edge" d="M176 52 H250" marker-end="url(#cd-a)" />
+          <text class="t-lbl" x="180" y="42">writes new tag</text>
+
+          <rect class="node-fill" x="258" y="24" width="216" height="56" />
+          <text class="t-out" x="366" y="58" text-anchor="middle">deployments repo</text>
+          <path class="edge" d="M474 52 H548" marker-end="url(#cd-a)" />
+          <text class="t-lbl" x="482" y="42">watches</text>
+
+          <rect class="node-hot" x="556" y="24" width="164" height="56" />
+          <text class="t-out" x="638" y="58" text-anchor="middle">Argo CD</text>
+          <path class="edge" d="M720 52 H794" marker-end="url(#cd-a)" />
+          <text class="t-lbl" x="726" y="42">syncs</text>
+
+          <rect class="node" x="802" y="24" width="98" height="56" />
+          <text x="851" y="58" text-anchor="middle">EKS</text>
+
+          <!-- self-heal loop back to git -->
+          <path class="edge-hot" d="M851 80 V150 H366 V80" marker-end="url(#cd-r)" />
+          <text class="t-lbl" x="608" y="172" text-anchor="middle" fill="#ff3300">drift is reverted: self-heal and prune</text>
+        </svg>
+      </div>
+      <p class="note reveal">CI edits one YAML node with <em>yq</em>: a path, not a text replace, so it can't hit another service's block or fail silently. <b>Nobody runs helm upgrade.</b></p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     11 · CANARY
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail">11</div>
+    <div class="body">
+      <p class="kicker reveal">Progressive delivery</p>
+      <h2 class="reveal">Canary on the optimizer</h2>
+      <div class="rule reveal"></div>
+      <!-- The replica split made literal: 5 pods, filled = canary. This is
+           what "replica-split approximation" actually looks like, and why
+           replicas: 5 was chosen, 20/50/100 round to ~1, ~3, 5 pods. -->
+      <div class="chart reveal">
+        <svg viewBox="0 0 900 214" role="img" aria-label="Five pods: one canary at 20 percent, three at 50 percent, five at 100 percent, with analysis gates between and a rollback path on failure">
+          <defs>
+            <marker id="cy-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#0a0a0a" />
+            </marker>
+            <marker id="cy-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#ff3300" />
+            </marker>
+          </defs>
+
+          <!-- stage 1, setWeight 20 -->
+          <text class="t-lbl" x="85" y="30" text-anchor="middle">setWeight 20</text>
+          <rect x="16"  y="44" width="22" height="22" fill="#ff3300" />
+          <rect x="45"  y="44" width="22" height="22" fill="none" stroke="#0a0a0a" stroke-width="2" />
+          <rect x="74"  y="44" width="22" height="22" fill="none" stroke="#0a0a0a" stroke-width="2" />
+          <rect x="103" y="44" width="22" height="22" fill="none" stroke="#0a0a0a" stroke-width="2" />
+          <rect x="132" y="44" width="22" height="22" fill="none" stroke="#0a0a0a" stroke-width="2" />
+          <text class="t-lbl" x="85" y="86" text-anchor="middle">1 canary · 4 stable</text>
+          <path class="edge" d="M162 55 H192" marker-end="url(#cy-a)" />
+
+          <!-- gate 1 -->
+          <rect class="node-hot" x="200" y="30" width="130" height="52" />
+          <text class="t-out" x="265" y="52" text-anchor="middle" font-size="14">analysis</text>
+          <text class="t-out" x="265" y="72" text-anchor="middle" font-size="12">5 × 1m soak</text>
+          <path class="edge" d="M330 55 H357" marker-end="url(#cy-a)" />
+
+          <!-- stage 2, setWeight 50 -->
+          <text class="t-lbl" x="430" y="30" text-anchor="middle">setWeight 50</text>
+          <rect x="361" y="44" width="22" height="22" fill="#ff3300" />
+          <rect x="390" y="44" width="22" height="22" fill="#ff3300" />
+          <rect x="419" y="44" width="22" height="22" fill="#ff3300" />
+          <rect x="448" y="44" width="22" height="22" fill="none" stroke="#0a0a0a" stroke-width="2" />
+          <rect x="477" y="44" width="22" height="22" fill="none" stroke="#0a0a0a" stroke-width="2" />
+          <text class="t-lbl" x="430" y="86" text-anchor="middle">3 canary · 2 stable</text>
+          <path class="edge" d="M507 55 H537" marker-end="url(#cy-a)" />
+
+          <!-- gate 2 -->
+          <rect class="node-hot" x="545" y="30" width="130" height="52" />
+          <text class="t-out" x="610" y="52" text-anchor="middle" font-size="14">analysis</text>
+          <text class="t-out" x="610" y="72" text-anchor="middle" font-size="12">5 × 1m soak</text>
+          <path class="edge" d="M675 55 H702" marker-end="url(#cy-a)" />
+
+          <!-- stage 3, promoted -->
+          <text class="t-lbl" x="790" y="30" text-anchor="middle">setWeight 100</text>
+          <rect x="721" y="44" width="22" height="22" fill="#ff3300" />
+          <rect x="750" y="44" width="22" height="22" fill="#ff3300" />
+          <rect x="779" y="44" width="22" height="22" fill="#ff3300" />
+          <rect x="808" y="44" width="22" height="22" fill="#ff3300" />
+          <rect x="837" y="44" width="22" height="22" fill="#ff3300" />
+          <text class="t-lbl" x="790" y="86" text-anchor="middle">promoted · stable</text>
+
+          <!-- failure path from either gate -->
+          <path class="edge-hot" d="M265 82 V140 H166" marker-end="url(#cy-r)" />
+          <path class="edge-hot" d="M610 82 V140 H166" marker-end="url(#cy-r)" />
+          <rect x="8" y="116" width="150" height="48" fill="none" stroke="#ff3300" stroke-width="2.5" />
+          <text x="83" y="146" text-anchor="middle" fill="#ff3300">rollback</text>
+          <text class="t-lbl" x="430" y="182" text-anchor="middle">a 2nd failed measurement aborts: canary scales to 0, stable keeps serving 100%</text>
+          <text class="t-lbl" x="430" y="202" text-anchor="middle">no human has to notice</text>
+        </svg>
+      </div>
+      <div class="flow reveal" style="margin-top:clamp(0.6rem,1.8vh,1.1rem)">
+        <div class="step"><span class="s">Error rate</span><span class="v">5xx ≤ 5%</span></div>
+        <div class="step"><span class="s">Latency p95</span><span class="v">≤ 2s</span></div>
+        <div class="step"><span class="s">Latency p99</span><span class="v">≤ 3s</span></div>
+        <div class="step"><span class="s">Tolerance</span><span class="v">failureLimit 2</span></div>
+      </div>
+      <p class="note reveal" style="margin-top:clamp(0.6rem,1.8vh,1.1rem)">Every query is scoped to the canary's <b>own pods by pod-template-hash</b>. Without it, a broken canary's errors are diluted by the 80% of traffic still hitting healthy stable pods, and the gate only catches what already broke the whole service. <b>Limitation:</b> no trafficRouting plugin, so weight is approximated by replica count.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     12 · OBSERVABILITY
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail">12</div>
+    <div class="body">
+      <p class="kicker reveal">Observability</p>
+      <h2 class="reveal">Installed by Argo CD</h2>
+      <div class="rule reveal"></div>
+      <ul class="points reveal">
+        <li><b>/metrics on all seven app services.</b></li>
+        <li>Prometheus and Loki are <b>Applications too</b>.</li>
+        <li>Three real algorithm metrics on the dashboard.</li>
+      </ul>
+      <p class="note reveal"><em>planning_assignment_quality_vs_greedy</em> compares the real matcher's route distance against the greedy baseline on the same input. Verified live, non-zero.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     13 · BUGS
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail">13</div>
+    <div class="body">
+      <p class="kicker reveal">Found the hard way</p>
+      <h2 class="reveal">Three real bugs</h2>
+      <div class="rule reveal"></div>
+      <!-- The fanout bug, before and after. Round-robin vs copy is hard to
+           say in a sentence and obvious in a picture. -->
+      <div class="chart reveal">
+        <svg viewBox="0 0 900 250" role="img" aria-label="Before: one shared queue round-robins messages. After: a fanout exchange gives every consumer a copy.">
+          <defs>
+            <marker id="fo-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#0a0a0a" />
+            </marker>
+            <marker id="fo-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#ff3300" />
+            </marker>
+          </defs>
+
+          <!-- ============ BEFORE ============ -->
+          <text class="t-lbl" x="0" y="14" fill="#ff3300">BEFORE: ONE SHARED QUEUE</text>
+          <rect class="node" x="130" y="26" width="160" height="42" />
+          <text x="210" y="53" text-anchor="middle">telemetry</text>
+          <path class="edge" d="M210 68 V88" marker-end="url(#fo-a)" />
+          <rect x="130" y="96" width="160" height="38" fill="none" stroke="#ff3300" stroke-width="2.5" />
+          <text x="210" y="121" text-anchor="middle" fill="#ff3300">one queue</text>
+          <path class="edge-hot" d="M210 134 V152 H60 V172" marker-end="url(#fo-r)" />
+          <path class="edge-hot" d="M210 134 V172" marker-end="url(#fo-r)" />
+          <path class="edge-hot" d="M210 134 V152 H360 V172" marker-end="url(#fo-r)" />
+          <rect class="node" x="10" y="180" width="100" height="40" />
+          <text x="60" y="206" text-anchor="middle">fleet</text>
+          <rect class="node" x="160" y="180" width="100" height="40" />
+          <text x="210" y="206" text-anchor="middle">planning</text>
+          <rect class="node" x="310" y="180" width="100" height="40" />
+          <text x="360" y="206" text-anchor="middle">notify</text>
+          <text class="t-lbl" x="210" y="242" text-anchor="middle">each message reaches ONE consumer, updates silently lost</text>
+
+          <!-- divider -->
+          <path d="M450 10 V240" stroke="#c9c9c5" stroke-width="1.5" />
+
+          <!-- ============ AFTER ============ -->
+          <text class="t-lbl" x="490" y="14">AFTER: FANOUT EXCHANGE</text>
+          <rect class="node" x="620" y="26" width="160" height="42" />
+          <text x="700" y="53" text-anchor="middle">telemetry</text>
+          <path class="edge" d="M700 68 V80" marker-end="url(#fo-a)" />
+          <rect class="node-fill" x="620" y="88" width="160" height="38" />
+          <text class="t-out" x="700" y="113" text-anchor="middle">exchange</text>
+          <path class="edge" d="M700 126 V140 H550 V152" marker-end="url(#fo-a)" />
+          <path class="edge" d="M700 126 V152" marker-end="url(#fo-a)" />
+          <path class="edge" d="M700 126 V140 H850 V152" marker-end="url(#fo-a)" />
+          <rect x="502" y="158" width="96" height="26" fill="none" stroke="#0a0a0a" stroke-width="1.5" />
+          <text class="t-lbl" x="550" y="176" text-anchor="middle">queue</text>
+          <rect x="652" y="158" width="96" height="26" fill="none" stroke="#0a0a0a" stroke-width="1.5" />
+          <text class="t-lbl" x="700" y="176" text-anchor="middle">queue</text>
+          <rect x="802" y="158" width="96" height="26" fill="none" stroke="#0a0a0a" stroke-width="1.5" />
+          <text class="t-lbl" x="850" y="176" text-anchor="middle">queue</text>
+          <path class="edge" d="M550 184 V196" marker-end="url(#fo-a)" />
+          <path class="edge" d="M700 184 V196" marker-end="url(#fo-a)" />
+          <path class="edge" d="M850 184 V196" marker-end="url(#fo-a)" />
+          <rect class="node" x="500" y="204" width="100" height="34" />
+          <text x="550" y="227" text-anchor="middle">fleet</text>
+          <rect class="node" x="650" y="204" width="100" height="34" />
+          <text x="700" y="227" text-anchor="middle">planning</text>
+          <rect class="node" x="800" y="204" width="100" height="34" />
+          <text x="850" y="227" text-anchor="middle">notify</text>
+        </svg>
+      </div>
+      <p class="note reveal">Also found: GitHub Free can't pass org secrets to <b>private</b> repos, proved with an A/B flip. And a 404 body that <b>is valid YAML</b> parsed into a manifest.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     14 · MORE FIXES
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail">14</div>
+    <div class="body" style="max-width:min(100%,1060px)">
+      <p class="kicker reveal">Also found and fixed</p>
+      <h2 class="reveal">Six more, root-caused</h2>
+      <div class="rule reveal"></div>
+      <div class="fixes reveal">
+        <div class="fix hot">
+          <span class="h">No auth on the optimizer</span>
+          <span class="d">/planning/* shipped with no JWT check at all. Found and closed on 2026-07-26. A real gap that shipped, not a hypothetical.</span>
+        </div>
+        <div class="fix hot">
+          <span class="h">OIDC trust policy</span>
+          <span class="d">GitHub's sub claim carries immutable org and repo IDs, so the pattern never matched. Root-caused in CloudTrail, not guessed.</span>
+        </div>
+        <div class="fix">
+          <span class="h">Org secrets</span>
+          <span class="d">GitHub Free cannot pass org-level Actions secrets to private repos. Proved with a clean A/B flip, then moved to repo level on all nine.</span>
+        </div>
+        <div class="fix">
+          <span class="h">A 404 that is valid YAML</span>
+          <span class="d">A private repo returned a plain-text 404 body. It parsed to a map and was handed to kubectl_manifest as the manifest.</span>
+        </div>
+        <div class="fix">
+          <span class="h">Access-entry race</span>
+          <span class="d">EKS access entries take seconds to propagate. Granting one and using it in the same apply returned 403.</span>
+        </div>
+        <div class="fix">
+          <span class="h">Webhook ordering</span>
+          <span class="d">The load balancer controller's webhook intercepts every Service in the cluster. It rejected Argo CD's own before its pod was serving.</span>
+        </div>
+      </div>
+      <p class="note reveal">Two of these were security gaps that had already shipped. Both were closed the day they were found.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     15 · GAPS
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail">15</div>
+    <div class="body">
+      <p class="kicker reveal">Closing</p>
+      <h2 class="reveal">What is still open</h2>
+      <div class="rule reveal"></div>
+      <ul class="points reveal">
+        <li>Secrets are <b>plaintext in values.yaml</b>.</li>
+        <li><b>GET / returns 504</b> at the ALB. Pod is healthy.</li>
+        <li>Argo CD Applications unconfirmed: <b>View skips CRDs</b>.</li>
+      </ul>
+      <p class="note reveal">Owned, not hidden. An examiner opening the URL finds the 504 in ten seconds. Better it comes from us.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     16 · FULL ARCHITECTURE REFERENCE
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail">16</div>
+    <div class="body" style="max-width:min(100%,1240px)">
+      <p class="kicker reveal">Reference</p>
+      <h2 class="reveal">The whole system</h2>
+      <div class="rule reveal"></div>
+      <div class="chart chart--wide reveal">
+        <svg viewBox="0 0 1000 470" role="img" aria-label="Complete architecture: users through an ALB into the EKS cluster, with the swarmops, argocd and monitoring namespaces, fed by GitHub, ECR and Terraform Cloud">
+          <defs>
+            <marker id="ar-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#0a0a0a" />
+            </marker>
+            <marker id="ar-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#ff3300" />
+            </marker>
+          </defs>
+
+          <!-- ============ outside AWS ============ -->
+          <rect class="node" x="0" y="26" width="132" height="42" />
+          <text x="66" y="53" text-anchor="middle">users</text>
+
+          <rect class="node" x="0" y="196" width="132" height="52" />
+          <text x="66" y="220" text-anchor="middle">GitHub</text>
+          <text class="t-lbl" x="66" y="238" text-anchor="middle">9 repos · CI</text>
+
+          <rect class="node" x="0" y="330" width="132" height="52" />
+          <text x="66" y="354" text-anchor="middle">Terraform</text>
+          <text class="t-lbl" x="66" y="372" text-anchor="middle">Cloud</text>
+
+          <!-- ============ AWS boundary ============ -->
+          <rect x="168" y="8" width="832" height="454" fill="none" stroke="#6b6b68" stroke-width="1.5" stroke-dasharray="7 5" />
+          <text class="t-lbl" x="180" y="26">AWS · us-east-1</text>
+
+          <rect class="node" x="836" y="36" width="150" height="40" />
+          <text x="911" y="62" text-anchor="middle">ECR</text>
+
+          <rect class="node-fill" x="192" y="36" width="132" height="40" />
+          <text class="t-out" x="258" y="62" text-anchor="middle">ALB</text>
+
+          <!-- ============ EKS cluster ============ -->
+          <rect x="184" y="98" width="800" height="352" fill="none" stroke="#0a0a0a" stroke-width="3" />
+          <text class="t-lbl" x="196" y="118">EKS cluster · private subnets</text>
+
+          <!-- namespace: swarmops -->
+          <rect x="196" y="128" width="776" height="200" fill="none" stroke="#6b6b68" stroke-width="1.5" stroke-dasharray="5 4" />
+          <text class="t-lbl" x="208" y="146">namespace: swarmops</text>
+
+          <rect class="node-fill" x="212" y="154" width="150" height="38" />
+          <text class="t-out" x="287" y="178" text-anchor="middle">gateway</text>
+          <rect class="node" x="384" y="154" width="150" height="38" />
+          <text x="459" y="178" text-anchor="middle">frontend</text>
+
+          <!-- gateway fans out to the six services along one rail -->
+          <path class="edge" d="M287 192 V204" />
+          <path class="edge" d="M362 192 H459 V154" marker-end="url(#ar-a)" />
+          <path class="edge" d="M256 204 H900" />
+          <g>
+            <path class="edge" d="M256 204 V222" marker-end="url(#ar-a)" />
+            <path class="edge" d="M382 204 V222" marker-end="url(#ar-a)" />
+            <path class="edge" d="M508 204 V222" marker-end="url(#ar-a)" />
+            <path class="edge" d="M634 204 V222" marker-end="url(#ar-a)" />
+            <path class="edge" d="M760 204 V222" marker-end="url(#ar-a)" />
+            <path class="edge" d="M900 204 V222" marker-end="url(#ar-r)" />
+          </g>
+          <rect class="node" x="208" y="228" width="96" height="38" />
+          <text x="256" y="252" text-anchor="middle">auth</text>
+          <rect class="node" x="334" y="228" width="96" height="38" />
+          <text x="382" y="252" text-anchor="middle">fleet</text>
+          <rect class="node" x="460" y="228" width="96" height="38" />
+          <text x="508" y="252" text-anchor="middle">mission</text>
+          <rect class="node" x="586" y="228" width="96" height="38" />
+          <text x="634" y="252" text-anchor="middle">telemetry</text>
+          <rect class="node" x="712" y="228" width="96" height="38" />
+          <text x="760" y="252" text-anchor="middle">notify</text>
+          <rect x="838" y="228" width="124" height="38" fill="none" stroke="#ff3300" stroke-width="2.5" />
+          <text x="900" y="247" text-anchor="middle" fill="#ff3300" font-size="12">planning</text>
+          <text x="900" y="261" text-anchor="middle" fill="#ff3300" font-size="10">Rollout · canary</text>
+
+          <!-- data + bus tier -->
+          <rect class="node-hot" x="208" y="282" width="250" height="36" />
+          <text class="t-out" x="333" y="306" text-anchor="middle">RabbitMQ · fanout</text>
+          <rect class="node" x="480" y="282" width="220" height="36" />
+          <text x="590" y="306" text-anchor="middle">MongoDB</text>
+          <rect class="node" x="722" y="282" width="240" height="36" />
+          <text x="842" y="306" text-anchor="middle">drone-simulator</text>
+
+          <path class="edge" d="M634 266 V282" marker-end="url(#ar-a)" />
+          <!-- routed BELOW the row, not through it: the direct horizontal
+               version crossed straight through MongoDB's own box and label,
+               6px from its text baseline. -->
+          <path class="edge" d="M842 318 V330 H333 V318" marker-end="url(#ar-a)" />
+          <!-- lands at RabbitMQ's actual centre (x=333, matching its label),
+               not off-centre at x=400 which cut an awkward notch into its
+               top border -->
+          <path class="edge-hot" d="M900 266 V276 H333 V282" marker-end="url(#ar-r)" />
+
+          <!-- namespace: argocd + monitoring -->
+          <rect x="196" y="344" width="376" height="92" fill="none" stroke="#6b6b68" stroke-width="1.5" stroke-dasharray="5 4" />
+          <text class="t-lbl" x="208" y="362">namespace: argocd</text>
+          <rect class="node" x="212" y="372" width="180" height="46" />
+          <text x="302" y="400" text-anchor="middle">Argo CD</text>
+          <text class="t-lbl" x="404" y="392">syncs the</text>
+          <text class="t-lbl" x="404" y="408">whole cluster</text>
+
+          <rect x="596" y="344" width="376" height="92" fill="none" stroke="#6b6b68" stroke-width="1.5" stroke-dasharray="5 4" />
+          <text class="t-lbl" x="608" y="362">namespace: monitoring</text>
+          <rect class="node" x="612" y="372" width="164" height="46" />
+          <text x="694" y="400" text-anchor="middle">Prometheus</text>
+          <rect class="node" x="792" y="372" width="164" height="46" />
+          <text x="874" y="400" text-anchor="middle">Loki · Grafana</text>
+
+          <!-- ============ cross-boundary edges ============ -->
+          <path class="edge" d="M132 47 H192" marker-end="url(#ar-a)" />
+          <path class="edge" d="M258 76 V154" marker-end="url(#ar-a)" />
+          <path class="edge" d="M132 222 H160 V394 H212" marker-end="url(#ar-a)" />
+          <!-- 16px clear of GitHub's right edge (132), and clear above the
+               path's own horizontal run at y=222, not sitting on top of it -->
+          <text class="t-lbl" x="148" y="192">watched by</text>
+          <text class="t-lbl" x="148" y="206">Argo CD</text>
+          <path class="edge" d="M132 356 H152 V440 H560 V436" marker-end="url(#ar-a)" />
+          <text class="t-lbl" x="300" y="456">provisions VPC · EKS · IAM · ECR</text>
+          <path class="edge" d="M911 76 V228" marker-end="url(#ar-a)" />
+          <text class="t-lbl" x="920" y="120">image</text>
+          <text class="t-lbl" x="920" y="136">pull</text>
+        </svg>
+      </div>
+      <p class="note reveal">Everything that runs, where it runs, and what talks to what. The gateway is the only externally reachable port; Terraform provisions the platform underneath, and Argo CD keeps the cluster matching git.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+/* ===========================================================================
+   SLIDE CONTROLLER
+   Keyboard, wheel, touch, dots, progress bar, counter, and the .visible class
+   that fires the staggered reveals.
+   =========================================================================== */
+class Deck {
+    constructor() {
+        this.slides = Array.from(document.querySelectorAll('.slide'));
+        this.dotsEl = document.querySelector('.nav-dots');
+        this.progress = document.getElementById('progress');
+        this.now = document.getElementById('counterNow');
+        this.current = 0;
+        this.locked = false;
+
+        document.getElementById('counterAll').textContent = String(this.slides.length).padStart(2, '0');
+        this.buildDots();
+        this.observe();
+        this.keys();
+        this.wheel();
+        this.touch();
+        this.sync();
+    }
+
+    /* Cleared first: an exported file already contains dots, and rebuilding
+       without clearing would append a second set on top of them. */
+    buildDots() {
+        this.dotsEl.innerHTML = '';
+        this.slides.forEach((_, i) => {
+            const b = document.createElement('button');
+            b.className = 'nav-dot';
+            b.type = 'button';
+            b.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+            b.addEventListener('click', () => this.goTo(i));
+            this.dotsEl.appendChild(b);
+        });
+    }
+
+    observe() {
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (!e.isIntersecting) return;
+                e.target.classList.add('visible');
+                this.current = this.slides.indexOf(e.target);
+                this.sync();
+            });
+        }, { threshold: 0.55 });
+        this.slides.forEach(s => io.observe(s));
+    }
+
+    sync() {
+        this.progress.style.width = (((this.current + 1) / this.slides.length) * 100) + '%';
+        this.now.textContent = String(this.current + 1).padStart(2, '0');
+        this.dotsEl.querySelectorAll('.nav-dot').forEach((d, i) => {
+            d.classList.toggle('is-active', i === this.current);
+        });
+    }
+
+    goTo(i) {
+        if (i < 0 || i >= this.slides.length) return;
+        this.current = i;
+        this.slides[i].scrollIntoView({ behavior: 'smooth' });
+        this.sync();
+    }
+    next() { this.goTo(Math.min(this.current + 1, this.slides.length - 1)); }
+    prev() { this.goTo(Math.max(this.current - 1, 0)); }
+
+    keys() {
+        document.addEventListener('keydown', e => {
+            if (e.target.getAttribute && e.target.getAttribute('contenteditable')) return;
+            switch (e.key) {
+                case 'ArrowDown': case 'ArrowRight': case 'PageDown': case ' ':
+                    e.preventDefault(); this.next(); break;
+                case 'ArrowUp': case 'ArrowLeft': case 'PageUp':
+                    e.preventDefault(); this.prev(); break;
+                case 'Home': e.preventDefault(); this.goTo(0); break;
+                case 'End': e.preventDefault(); this.goTo(this.slides.length - 1); break;
+            }
+        });
+    }
+
+    /* Throttled so one gesture moves exactly one slide. */
+    wheel() {
+        window.addEventListener('wheel', e => {
+            if (this.locked || document.body.classList.contains('edit-active')) return;
+            if (Math.abs(e.deltaY) < 12) return;
+            this.locked = true;
+            if (e.deltaY > 0) { this.next(); } else { this.prev(); }
+            setTimeout(() => { this.locked = false; }, 700);
+        }, { passive: true });
+    }
+
+    touch() {
+        let y0 = null;
+        window.addEventListener('touchstart', e => { y0 = e.touches[0].clientY; }, { passive: true });
+        window.addEventListener('touchend', e => {
+            if (y0 === null) return;
+            const dy = y0 - e.changedTouches[0].clientY;
+            if (Math.abs(dy) > 45) { if (dy > 0) { this.next(); } else { this.prev(); } }
+            y0 = null;
+        }, { passive: true });
+    }
+}
+
+/* ===========================================================================
+   INLINE EDITOR
+   E toggles · top-left hotzone reveals the button · autosave to localStorage
+   · Ctrl+S exports a clean copy.
+   =========================================================================== */
+class InlineEditor {
+    constructor() {
+        this.isActive = false;
+        this.key = 'swarmops-swiss-deck';
+        this.selector = 'h1, h2, .lede, .points li, .note, .kicker, .flow .v, .flow .s, .stat .n, .stat .l';
+        this.restore();
+        this.wire();
+    }
+
+    targets() { return Array.from(document.querySelectorAll(this.selector)); }
+
+    toggleEditMode() {
+        this.isActive = !this.isActive;
+        document.body.classList.toggle('edit-active', this.isActive);
+        document.getElementById('editToggle').classList.toggle('active', this.isActive);
+        document.querySelector('.edit-banner').classList.toggle('active', this.isActive);
+        this.targets().forEach(el => {
+            if (this.isActive) {
+                el.setAttribute('contenteditable', 'true');
+                el.addEventListener('input', this.save);
+            } else {
+                el.removeAttribute('contenteditable');
+            }
+        });
+    }
+
+    save = () => {
+        const data = {};
+        this.targets().forEach((el, i) => { data['e' + i] = el.innerHTML; });
+        try { localStorage.setItem(this.key, JSON.stringify(data)); } catch (err) {}
+    };
+
+    restore() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem(this.key) || 'null'); } catch (err) { return; }
+        if (!data) return;
+        this.targets().forEach((el, i) => {
+            if (data['e' + i] !== undefined) el.innerHTML = data['e' + i];
+        });
+    }
+
+    /* Strips edit state before capturing outerHTML so the saved file opens
+       clean instead of looking permanently stuck in edit mode. */
+    exportFile() {
+        const editableEls = Array.from(document.querySelectorAll('[contenteditable]'));
+        editableEls.forEach(el => el.removeAttribute('contenteditable'));
+        document.body.classList.remove('edit-active');
+
+        const editToggle = document.getElementById('editToggle');
+        const editBanner = document.querySelector('.edit-banner');
+        editToggle?.classList.remove('active', 'show');
+        editBanner?.classList.remove('active', 'show');
+
+        const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
+        if (this.isActive) {
+            document.body.classList.add('edit-active');
+            editableEls.forEach(el => el.setAttribute('contenteditable', 'true'));
+            editToggle?.classList.add('active');
+            editBanner?.classList.add('active');
+        }
+
+        const blob = new Blob([html], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'presentation.html';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    wire() {
+        const hotzone = document.querySelector('.edit-hotzone');
+        const editToggle = document.getElementById('editToggle');
+        let hideTimeout = null;
+
+        editToggle.addEventListener('click', () => this.toggleEditMode());
+        hotzone.addEventListener('click', () => this.toggleEditMode());
+
+        hotzone.addEventListener('mouseenter', () => {
+            clearTimeout(hideTimeout);
+            editToggle.classList.add('show');
+        });
+        hotzone.addEventListener('mouseleave', () => {
+            hideTimeout = setTimeout(() => {
+                if (!this.isActive) editToggle.classList.remove('show');
+            }, 400);
+        });
+        editToggle.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+        editToggle.addEventListener('mouseleave', () => {
+            hideTimeout = setTimeout(() => {
+                if (!this.isActive) editToggle.classList.remove('show');
+            }, 400);
+        });
+
+        document.addEventListener('keydown', e => {
+            if ((e.key === 'e' || e.key === 'E') && !e.target.getAttribute('contenteditable')) {
+                this.toggleEditMode();
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                this.exportFile();
+            }
+        });
+    }
+}
+
+const deck = new Deck();
+const editor = new InlineEditor();
+document.querySelector('.slide').classList.add('visible');
+</script>
+</body>
+</html>
