@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SwarmOps · מצגת</title>
+
+<!-- Archivo Black for display, Archivo for everything else. Same Swiss
+     discipline as presentation.html: hierarchy comes from size and weight,
+     not from adding typefaces. Neither has a Hebrew subset, but both render
+     Hebrew glyphs fine, Google Fonts just doesn't call it out separately. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=Archivo+Black&display=swap" rel="stylesheet">
+
+<style>
+/* ===========================================================================
+   SWISS SIGNAL, HEBREW
+   Same system as presentation.html: off-white ground, black type, one red.
+   Ported to RTL using logical properties (inline-start/end, text-align:start)
+   instead of physical left/right, so the asymmetry stays correct in both
+   directions rather than just mirrored by accident.
+   =========================================================================== */
+:root {
+    --paper:  #f2f2f0;
+    --ink:    #0a0a0a;
+    --muted:  #6b6b68;
+    --hair:   #c9c9c5;
+    --accent: #ff3300;
+
+    --display: 'Archivo Black', sans-serif;
+    --body:    'Archivo', sans-serif;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===========================================================================
+   VIEWPORT BASE (verbatim from the skill's viewport-base.css)
+   =========================================================================== */
+html, body { height: 100%; overflow-x: hidden; }
+html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+
+.slide {
+    width: 100vw; height: 100vh; height: 100dvh;
+    overflow: hidden;
+    scroll-snap-align: start;
+    display: flex; flex-direction: column;
+    position: relative;
+}
+.slide-content-outer { flex: 1; display: flex; max-height: 100%; overflow: hidden; }
+
+:root {
+    --title-size: clamp(1.5rem, 5vw, 4rem);
+    --h2-size: clamp(1.25rem, 3.5vw, 2.5rem);
+    --h3-size: clamp(1rem, 2.5vw, 1.75rem);
+    --body-size: clamp(0.75rem, 1.5vw, 1.125rem);
+    --small-size: clamp(0.65rem, 1vw, 0.875rem);
+    --slide-padding: clamp(1rem, 4vw, 4rem);
+    --content-gap: clamp(0.5rem, 2vw, 2rem);
+    --element-gap: clamp(0.25rem, 1vw, 1rem);
+}
+
+img, .image-container { max-width: 100%; max-height: min(50vh, 400px); object-fit: contain; }
+
+@media (max-height: 700px) {
+    :root {
+        --slide-padding: clamp(0.75rem, 3vw, 2rem);
+        --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+        --title-size: clamp(1.25rem, 4.5vw, 2.5rem);
+        --h2-size: clamp(1rem, 3vw, 1.75rem);
+    }
+}
+@media (max-height: 600px) {
+    :root {
+        --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+        --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+        --body-size: clamp(0.7rem, 1.2vw, 0.95rem);
+    }
+    .nav-dots, .hint { display: none; }
+}
+@media (max-height: 500px) {
+    :root {
+        --slide-padding: clamp(0.4rem, 2vw, 1rem);
+        --title-size: clamp(1rem, 3.5vw, 1.5rem);
+        --h2-size: clamp(0.9rem, 2.5vw, 1.25rem);
+        --body-size: clamp(0.65rem, 1vw, 0.85rem);
+    }
+    .lede, .note, .fix .d { display: none; }   /* keep headline + structure, drop prose */
+}
+@media (max-width: 600px) {
+    :root { --title-size: clamp(1.25rem, 7vw, 2.5rem); }
+    .fixes, .fixes.three { grid-template-columns: 1fr; }
+    .flow { flex-direction: column; }
+    .flow .step { border-inline-end: 0; border-bottom: 2px solid var(--ink); }
+    .flow .step:last-child { border-bottom: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+    html { scroll-behavior: auto; }
+}
+
+/* ===========================================================================
+   PAGE + SLIDE GRID
+   Centred composition: the section number stacks above the body, every
+   block centred on the page.
+   =========================================================================== */
+body { background: var(--paper); color: var(--ink); font-family: var(--body); -webkit-font-smoothing: antialiased; }
+
+.slide-content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    align-content: center;
+    text-align: center;
+    row-gap: clamp(0.5rem, 1.6vh, 1.1rem);
+    padding: clamp(1.5rem, 5vw, 5rem) clamp(1.5rem, 4vw, 4rem);
+    padding-bottom: clamp(2.8rem, 7.5vh, 4.5rem);
+    max-width: 100%; max-height: 100%; overflow: hidden;
+}
+
+.rail {
+    font-family: var(--display);
+    font-size: clamp(2rem, 5vw, 4.2rem);
+    line-height: 0.8;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+}
+.body { min-width: 0; max-width: min(100%, 900px); width: 100%; }
+
+/* ===========================================================================
+   TYPE
+   =========================================================================== */
+.kicker {
+    font-size: clamp(0.95rem, 1.6vw, 1.3rem);
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    color: var(--muted);
+}
+h1 {
+    font-family: var(--display);
+    font-size: clamp(2.6rem, 8vw, 6.4rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+}
+h2 {
+    font-family: var(--display);
+    font-size: clamp(2.1rem, 5.8vw, 4.4rem);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    margin: clamp(0.4rem, 1.4vh, 0.9rem) auto 0;
+    max-width: 18ch;
+    text-wrap: balance;
+}
+.rule { height: clamp(4px, 0.7vh, 7px); width: clamp(90px, 13vw, 180px); background: var(--accent); margin: clamp(0.8rem, 2.4vh, 1.6rem) auto; }
+
+.lede { font-size: clamp(1.15rem, 2.4vw, 1.9rem); color: var(--muted); line-height: 1.45; max-width: 38ch; margin-left: auto; margin-right: auto; }
+
+ul.points { list-style: none; display: flex; flex-direction: column; align-items: center; gap: clamp(0.6rem, 1.8vh, 1.1rem); }
+ul.points li { font-size: clamp(1.15rem, 2.3vw, 1.85rem); line-height: 1.38; max-width: 36ch; text-align: start; }
+ul.points b { font-weight: 800; }
+ul.points em { font-style: normal; font-weight: 500; color: var(--muted); }
+
+.note { margin: clamp(0.9rem, 2.8vh, 1.8rem) auto 0; font-size: clamp(1rem, 1.7vw, 1.35rem); color: var(--muted); line-height: 1.45; max-width: 44ch; }
+.note b { color: var(--ink); font-weight: 600; }
+
+/* ===========================================================================
+   DIAGRAMS (SVG charts, node/edge convention lifted from presentation.html)
+   =========================================================================== */
+.chart { width: 100%; max-width: min(100%, 780px); margin: clamp(0.4rem,1.4vh,0.8rem) auto 0; }
+.chart svg { width: 100%; height: auto; display: block; }
+.chart text { font-family: var(--body); font-weight: 700; fill: var(--ink); font-size: 19px; }
+.chart .t-out { fill: var(--paper); }
+.chart .t-lbl { font-weight: 600; font-size: 15px; fill: var(--muted); }
+.chart .node { fill: none; stroke: var(--ink); stroke-width: 2; }
+.chart .node-fill { fill: var(--ink); stroke: none; }
+.chart .node-hot { fill: var(--accent); stroke: none; }
+.chart .edge { stroke: var(--hair); stroke-width: 1.6; fill: none; }
+/* The branch lines draw themselves in once the slide is visible, same "draw
+   a real length then animate the offset to zero" technique as the tactical
+   deck, just in Swiss's thin hairline strokes instead of the tactical green. */
+.chart .edge-draw { stroke-dasharray: 210; stroke-dashoffset: 210; }
+.slide.visible .chart .edge-draw { animation: draw-edge 0.9s var(--ease) forwards; }
+.slide.visible .chart .edge-draw:nth-of-type(2) { animation-delay: .28s; }
+.slide.visible .chart .edge-draw:nth-of-type(3) { animation-delay: .34s; }
+.slide.visible .chart .edge-draw:nth-of-type(4) { animation-delay: .40s; }
+.slide.visible .chart .edge-draw:nth-of-type(5) { animation-delay: .46s; }
+.slide.visible .chart .edge-draw:nth-of-type(6) { animation-delay: .52s; }
+.slide.visible .chart .edge-draw:nth-of-type(7) { animation-delay: .58s; }
+@keyframes draw-edge { to { stroke-dashoffset: 0; } }
+@media (max-height: 700px) { .chart { max-width: min(100%, 620px); } }
+@media (max-height: 600px) { .chart { max-width: min(100%, 500px); } }
+
+/* ===========================================================================
+   FIX CARDS
+   Hard-edged bordered boxes, 2-up by default, .three for a 3-up row. Text is
+   start-aligned inside each card even though the sheet is centred: ragged
+   centred copy in a small box is harder to scan than a flush edge.
+   =========================================================================== */
+.fixes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(0.5rem, 1.3vw, 1rem); width: 100%; max-width: 820px; margin: clamp(.5rem,1.6vh,1rem) auto 0; text-align: start; }
+.fixes.three { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 1080px; }
+.fix { border: 2px solid var(--ink); padding: clamp(0.6rem, 1.8vh, 1.1rem) clamp(0.6rem, 1.2vw, 1rem); }
+.fix .h { display: block; font-weight: 800; font-size: clamp(1rem, 1.7vw, 1.4rem); line-height: 1.2; margin-bottom: 0.35em; }
+.fix .d { font-size: clamp(0.85rem, 1.35vw, 1.15rem); color: var(--muted); line-height: 1.35; }
+.fix.hot { border-color: var(--accent); }
+.fix.hot .h { color: var(--accent); }
+
+/* Pipeline strip: hard-edged blocks in a row, no rounding. */
+.flow { display: flex; width: 100%; max-width: min(100%, 860px); border: 2px solid var(--ink); margin: clamp(.5rem,1.6vh,1rem) auto 0; text-align: start; }
+.flow .step { flex: 1 1 0; min-width: 0; padding: clamp(0.6rem, 2vh, 1.1rem) clamp(0.4rem, 0.9vw, 0.8rem); border-inline-end: 2px solid var(--ink); }
+.flow .step:last-child { border-inline-end: 0; }
+.flow .s { display: block; font-size: clamp(0.7rem, 1.1vw, 0.9rem); font-weight: 700; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 0.35em; }
+.flow .v { font-size: clamp(1rem, 1.7vw, 1.45rem); font-weight: 600; line-height: 1.25; }
+
+/* ===========================================================================
+   PLACEHOLDER FRAMES (photo / video / diagram slots for real assets)
+   Dashed border on purpose, everything else here is a solid hairline or a
+   thick rule, so a dashed box reads immediately as "swap this."
+   =========================================================================== */
+.ph-frame {
+    width: 100%; max-width: 560px; aspect-ratio: 16/9;
+    border: 2px dashed var(--hair); background: transparent;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.6em;
+    margin: clamp(0.6rem, 2vh, 1.2rem) auto 0; padding: 1rem;
+}
+.ph-frame.tall { aspect-ratio: 3/4; max-width: 260px; }
+.ph-frame .ph-icon { width: clamp(1.8rem, 3.6vw, 2.6rem); height: auto; stroke: var(--muted); fill: none; stroke-width: 1.3; opacity: .8; }
+.ph-frame .ph-label { font-weight: 700; font-size: clamp(0.8rem, 1.3vw, 1.05rem); letter-spacing: 0.12em; color: var(--accent); }
+.ph-frame .ph-caption { font-size: clamp(0.9rem, 1.4vw, 1.15rem); color: var(--muted); text-align: center; max-width: 34ch; line-height: 1.45; }
+.ph-text {
+    width: 100%; max-width: 520px; margin: clamp(0.6rem, 2vh, 1.2rem) auto 0;
+    border: 2px dashed var(--hair);
+    padding: clamp(0.7rem, 2vh, 1.1rem) clamp(0.8rem, 2vw, 1.3rem);
+    font-size: clamp(1rem, 1.6vw, 1.3rem); font-style: italic; color: var(--muted); line-height: 1.5;
+}
+@media (max-height: 600px) { .ph-frame.tall { max-width: 170px; } }
+@media (max-height: 500px) { .ph-frame { aspect-ratio: 21/9; } .ph-frame .ph-caption, .ph-text { display: none; } }
+
+/* ===========================================================================
+   BRAND MARK
+   Real logo-mark.png (three quadrotors in a mesh triangle). Transparent
+   background, drops straight onto the paper.
+   =========================================================================== */
+.logo { display: block; margin: 0 auto; height: auto; }
+.logo--title { width: clamp(90px, 12vw, 160px); max-height: min(20vh, 160px); margin-bottom: clamp(.4rem,1.4vh,.8rem); }
+.logo--close { width: clamp(70px, 9vw, 120px); opacity: 0.85; }
+
+/* ===========================================================================
+   REVEAL ANIMATION
+   =========================================================================== */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.slide.visible .reveal:nth-child(1) { transition-delay: .05s; }
+.slide.visible .reveal:nth-child(2) { transition-delay: .15s; }
+.slide.visible .reveal:nth-child(3) { transition-delay: .25s; }
+.slide.visible .reveal:nth-child(4) { transition-delay: .35s; }
+.slide.visible .reveal:nth-child(5) { transition-delay: .45s; }
+.slide.visible .reveal:nth-child(6) { transition-delay: .55s; }
+
+/* ===========================================================================
+   PROGRESS BAR + NAV DOTS
+   =========================================================================== */
+.progress-bar { position: fixed; top: 0; right: 0; height: 3px; width: 0%; background: var(--accent); z-index: 9000; transition: width .2s linear; }
+.nav-dots { position: fixed; left: clamp(.6rem,1.6vw,1.4rem); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: clamp(.4rem,1vh,.7rem); z-index: 9000; }
+.nav-dots button { width: 8px; height: 8px; padding: 0; border-radius: 50%; border: 2px solid var(--hair); background: transparent; cursor: pointer; transition: background .2s, border-color .2s; }
+.nav-dots button.on { background: var(--accent); border-color: var(--accent); }
+.hint { position: fixed; bottom: clamp(.5rem,1.6vh,1rem); left: 50%; transform: translateX(-50%); font-size: .65rem; letter-spacing: .1em; color: var(--muted); z-index: 9000; opacity: .7; pointer-events: none; }
+
+/* ===========================================================================
+   INLINE EDITING
+   =========================================================================== */
+.edit-hotzone { position: fixed; top: 0; left: 0; width: 80px; height: 80px; z-index: 10000; cursor: pointer; }
+.edit-toggle { position: fixed; top: clamp(.5rem,1.4vh,1rem); left: clamp(.5rem,1.4vw,1rem); width: 36px; height: 36px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); font-size: 15px; cursor: pointer; z-index: 10001; opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+.edit-toggle.show, .edit-toggle.active { opacity: 1; pointer-events: auto; }
+.edit-toggle.active { border-color: var(--accent); color: var(--accent); }
+.edit-banner { position: fixed; top: 0; left: 0; right: 0; z-index: 10000; background: var(--accent); color: #fff; text-align: center; font-size: .65rem; letter-spacing: .08em; padding: .4em; opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+.edit-banner.active { opacity: 1; }
+body.edit-active [contenteditable] { outline: 1px dashed var(--accent); outline-offset: 3px; }
+body.edit-active [contenteditable]:focus { outline: 1px solid var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<nav class="nav-dots" id="navDots" aria-label="ניווט שקופיות"></nav>
+<p class="hint" dir="ltr">← → / SPACE</p>
+
+<div class="edit-hotzone"></div>
+<button class="edit-toggle" id="editToggle" title="מצב עריכה (E)">✏️</button>
+<div class="edit-banner" id="editBanner">מצב עריכה פעיל · לחצו על טקסט כדי לערוך · Ctrl+S לשמירה</div>
+
+
+<!-- ==========================================================================
+     01 · פתיחה · הצוות והבעיה
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail reveal">01</div>
+    <div class="body">
+      <img class="logo logo--title reveal" src="presentation-assets/logo-mark.png" alt="הלוגו של SwarmOps">
+      <p class="kicker reveal">גיא · טוני · וולפיש</p>
+      <h1 class="reveal">לרחפן אחד קל לתת פקודה.<br>לעשרה?</h1>
+      <div class="rule reveal"></div>
+      <p class="lede reveal">לכל רחפן סוללה, מסלול, והחלטה משלו. זה כבר לא עניין של אדם אחד עם שלט.</p>
+      <p class="note reveal" dir="ltr">SWARMOPS · CAPSTONE 2026</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     02 · הצוות · שלושה אנשים, שלושה מסלולים
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail reveal">02</div>
+    <div class="body">
+      <p class="kicker reveal">הצוות</p>
+      <h2 class="reveal">שלושה אנשים, שלושה מסלולים</h2>
+      <div class="rule reveal"></div>
+      <p class="lede reveal">חילקנו את המערכת לשלושה חלקים, וכל אחד לקח חלק ואחראי עליו מקצה לקצה.</p>
+      <div class="fixes three reveal">
+        <div class="fix hot">
+          <span class="h">טוני · TRACK A</span>
+          <span class="d">שירותי הליבה: משתמשים, צי, ומשימות.</span>
+          <span class="d" dir="ltr" style="display:block;margin-top:.5em">auth · fleet · mission</span>
+        </div>
+        <div class="fix">
+          <span class="h">גיא · TRACK B</span>
+          <span class="d">האלגוריתם: מי טס לאן, בזמן אמת.</span>
+          <span class="d" dir="ltr" style="display:block;margin-top:.5em">planning · telemetry · simulator</span>
+        </div>
+        <div class="fix">
+          <span class="h">וולפיש · TRACK C</span>
+          <span class="d">הממשק, המפה החיה, והתשתית בענן.</span>
+          <span class="d" dir="ltr" style="display:block;margin-top:.5em">frontend · gateway · infra</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     03 · מקור · הסיפור האישי (placeholder: photo + text need to come from Guy)
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail reveal">03</div>
+    <div class="body">
+      <p class="kicker reveal">מקור</p>
+      <h2 class="reveal">מאיפה זה התחיל</h2>
+      <div class="rule reveal"></div>
+      <div class="ph-frame tall reveal">
+        <svg class="ph-icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+        <span class="ph-label" dir="ltr">PHOTO // UPLOAD</span>
+        <span class="ph-caption">כאן נכנסת תמונה שלכם במדים</span>
+      </div>
+      <p class="ph-text reveal">כאן ייכנס הסיפור האישי: מאיפה הרעיון הגיע, ולמה דווקא הפרויקט הזה.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     04 · הבעיה · מקור: PRD §1.1
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail reveal">04</div>
+    <div class="body">
+      <p class="kicker reveal">הבעיה</p>
+      <h2 class="reveal">יותר מדי בשביל ראש אחד</h2>
+      <div class="rule reveal"></div>
+      <p class="lede reveal">מפעיל אנושי מסתדר עם 3-4 רחפנים. מעבר לזה, יותר מדי משתנה בו זמנית.</p>
+      <div class="fixes three reveal">
+        <div class="fix hot">
+          <span class="h">זמן טיסה מבוזבז</span>
+          <span class="d">רחפן טס רחוק כשקרוב יותר היה פנוי.</span>
+        </div>
+        <div class="fix hot">
+          <span class="h">משימות שמתפספסות</span>
+          <span class="d">משימה דחופה מחכה בתור, כי אף אחד לא שם לב.</span>
+        </div>
+        <div class="fix hot">
+          <span class="h">רחפן שנתקע</span>
+          <span class="d">יוצא בלי מספיק סוללה לחזור.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     05 · המחיר · הערכה להמחשה, לא נתון רשמי
+     Every point states its own assumption before its conclusion: a number
+     with visible arithmetic survives a committee question, a bare number
+     doesn't.
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail reveal">05</div>
+    <div class="body">
+      <p class="kicker reveal">המחיר</p>
+      <h2 class="reveal">כמה זה עולה בפועל</h2>
+      <div class="rule reveal"></div>
+      <p class="lede reveal">הערכה להמחשה, לא נתון רשמי.</p>
+      <ul class="points reveal">
+        <li><b>מפעיל אחד</b> מסתדר עם 3-4 רחפנים, לא יותר.</li>
+        <li><b>שיבוץ לא אופטימלי</b> מוסיף כ-15% זמן טיסה מיותר.</li>
+        <li><b>על צי גדול</b>, זה שעות וסוללות מבוזבזות כל שבוע.</li>
+      </ul>
+      <p class="note reveal"><b>התוצאה:</b> העלות גדלה עם כל רחפן שמתווסף לצי.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     06 · הרעיון · בשלוש תנועות
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail reveal">06</div>
+    <div class="body">
+      <p class="kicker reveal">הרעיון</p>
+      <h2 class="reveal">שהמחשב יחליט מי טס לאן</h2>
+      <div class="rule reveal"></div>
+      <p class="lede reveal">נותנים למערכת את הצי ואת רשימת המשימות. היא מחזירה תוכנית טיסה מלאה.</p>
+      <div class="chart reveal">
+        <svg viewBox="0 0 640 130" role="img" aria-label="תרשים: הצי והמשימות נכנסים, המערכת מחליטה, יוצאת תוכנית טיסה">
+          <defs>
+            <marker id="wf6-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0 0 L10 5 L0 10 z" fill="#0a0a0a" />
+            </marker>
+          </defs>
+          <text class="t-lbl" x="540" y="18" text-anchor="middle">1</text>
+          <text class="t-lbl" x="320" y="18" text-anchor="middle">2</text>
+          <text class="t-lbl" x="100" y="18" text-anchor="middle">3</text>
+
+          <rect class="node" x="460" y="30" width="160" height="60" />
+          <text x="540" y="65" text-anchor="middle">הצי + המשימות</text>
+
+          <path class="edge" d="M460 62 L406 62" marker-end="url(#wf6-a)" />
+
+          <rect class="node-hot" x="240" y="30" width="160" height="60" />
+          <text class="t-out" x="320" y="65" text-anchor="middle">המערכת מחליטה</text>
+
+          <path class="edge" d="M240 62 L186 62" marker-end="url(#wf6-a)" />
+
+          <rect class="node" x="20" y="30" width="160" height="60" />
+          <text x="100" y="65" text-anchor="middle">תוכנית טיסה</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     07 · מהמערכת בנויה · עץ השירותים (PRD §3.1)
+     Real service names on purpose, one plain line each. The branches draw
+     themselves in on reveal, per the rehearsal note about animating this.
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail reveal">07</div>
+    <div class="body">
+      <p class="kicker reveal">מהמערכת בנויה</p>
+      <h2 class="reveal">שש חתיכות שמדברות ביניהן</h2>
+      <div class="rule reveal"></div>
+      <p class="lede reveal">במקום תוכנה אחת גדולה, שש קטנות. כל אחת יכולה ליפול ולקום לבד.</p>
+      <div class="chart reveal">
+        <svg viewBox="0 0 720 220" role="img" aria-label="עץ שירותים: השער בראש, מסתעף לשישה שירותים, עם planning כליבה">
+          <rect class="node-fill" x="310" y="10" width="100" height="34" />
+          <text class="t-out" x="360" y="32" text-anchor="middle">gateway</text>
+
+          <path class="edge edge-draw" d="M360 44 L85 150" />
+          <path class="edge edge-draw" d="M360 44 L195 150" />
+          <path class="edge edge-draw" d="M360 44 L305 150" />
+          <path class="edge edge-draw" d="M360 44 L415 150" />
+          <path class="edge edge-draw" d="M360 44 L525 150" />
+          <path class="edge edge-draw" d="M360 44 L635 150" />
+
+          <rect class="node" x="35" y="150" width="100" height="34" />
+          <text x="85" y="172" text-anchor="middle">auth</text>
+          <rect class="node" x="145" y="150" width="100" height="34" />
+          <text x="195" y="172" text-anchor="middle">fleet</text>
+          <rect class="node" x="255" y="150" width="100" height="34" />
+          <text x="305" y="172" text-anchor="middle">mission</text>
+          <rect x="365" y="150" width="100" height="34" fill="none" stroke="#ff3300" stroke-width="2.5" />
+          <text x="415" y="172" text-anchor="middle" fill="#ff3300">planning</text>
+          <rect class="node" x="475" y="150" width="100" height="34" />
+          <text x="525" y="172" text-anchor="middle">telemetry</text>
+          <rect class="node" x="585" y="150" width="100" height="34" />
+          <text x="635" y="172" text-anchor="middle">notification</text>
+        </svg>
+      </div>
+      <p class="note reveal"><b style="color:var(--accent)">planning</b> הוא המוח: הוא זה שמחליט מי טס לאן ומחשב את המסלול.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     08 · הנתונים · מה זה בעצם מונגו
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail reveal">08</div>
+    <div class="body">
+      <p class="kicker reveal">הנתונים</p>
+      <h2 class="reveal">מה זה בעצם מונגו?</h2>
+      <div class="rule reveal"></div>
+      <p class="lede reveal"><b>MongoDB</b> הוא המקום שבו כל שירות שומר מה שהוא צריך לזכור.</p>
+      <ul class="points reveal">
+        <li>לכל שירות הקלסר שלו. אחד לא נוגע במידע של השני.</li>
+        <li>לא טבלה קשיחה כמו אקסל. נוח כשהמידע משתנה מהר.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     09 · האילוצים · מה המערכת שוקלת (PRD §4.1, §6)
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail reveal">09</div>
+    <div class="body">
+      <p class="kicker reveal">האילוצים</p>
+      <h2 class="reveal">מה נכנס לחישוב</h2>
+      <div class="rule reveal"></div>
+      <ul class="points reveal">
+        <li><b>סוללה.</b> נשחקת לפי מרחק ומשקל המטען.</li>
+        <li><b>עדיפות ודדליין.</b> דחוף מקבל רחפן קודם.</li>
+        <li><b>אזורים אסורים.</b> המסלול מתחשב בהם.</li>
+        <li><b>התאמת מטען.</b> לא כל רחפן מתאים לכל משימה.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     10 · בזמן אמת · תכנון מחדש (PRD §1.2)
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail reveal">10</div>
+    <div class="body">
+      <p class="kicker reveal">בזמן אמת</p>
+      <h2 class="reveal">והתוכנית משתנה תוך כדי טיסה</h2>
+      <div class="rule reveal"></div>
+      <p class="lede reveal">תוכנית מהמראה כבר לא נכונה חמש דקות אחר כך.</p>
+      <div class="chart reveal">
+        <svg viewBox="0 0 640 190" role="img" aria-label="תרשים מעגלי: תוכנית פעילה, משהו משתנה, המערכת מתכננת מחדש, וחוזר">
+          <defs>
+            <marker id="wf10-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0 0 L10 5 L0 10 z" fill="#0a0a0a" />
+            </marker>
+          </defs>
+          <text class="t-lbl" x="540" y="18" text-anchor="middle">1</text>
+          <text class="t-lbl" x="320" y="18" text-anchor="middle">2</text>
+          <text class="t-lbl" x="100" y="18" text-anchor="middle">3</text>
+
+          <rect class="node" x="460" y="30" width="160" height="60" />
+          <text x="540" y="65" text-anchor="middle">תוכנית פעילה</text>
+
+          <path class="edge" d="M460 62 L406 62" marker-end="url(#wf10-a)" />
+
+          <rect class="node-hot" x="240" y="30" width="160" height="60" />
+          <text class="t-out" x="320" y="65" text-anchor="middle">משהו משתנה</text>
+          <text class="t-lbl" x="320" y="112" text-anchor="middle">סוללה · תקלה · משימה דחופה</text>
+
+          <path class="edge" d="M240 62 L186 62" marker-end="url(#wf10-a)" />
+
+          <rect class="node" x="20" y="30" width="160" height="60" />
+          <text x="100" y="65" text-anchor="middle">מתכננת מחדש</text>
+
+          <path class="edge" d="M100 90 C100 165, 540 165, 540 90" marker-end="url(#wf10-a)" />
+        </svg>
+      </div>
+      <p class="note reveal">המערכת מזהה לבד ומתכננת מחדש, בלי שמישהו יבקש.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     11 · יוניטי · רחפן וירטואלי (placeholder: video needs to come from the team)
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail reveal">11</div>
+    <div class="body">
+      <p class="kicker reveal">יוניטי</p>
+      <h2 class="reveal">רחפן וירטואלי, כמו אמיתי</h2>
+      <div class="rule reveal"></div>
+      <p class="lede reveal">רחפן תלת-ממדי שטס, משדר תמונה, ומגיב בזמן אמת. בלי חומרה אמיתית.</p>
+      <div class="ph-frame reveal">
+        <svg class="ph-icon" viewBox="0 0 24 24" style="fill:var(--muted); stroke:none;"><path d="M6 4l14 8-14 8V4z"/></svg>
+        <span class="ph-label" dir="ltr">VIDEO // DRONE OPERATION</span>
+        <span class="ph-caption">כאן ייכנס סרטון של הפעלת הרחפן בסימולציה</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     12 · הנראות · המפה החיה (placeholder: screenshot needs to come from the team)
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail reveal">12</div>
+    <div class="body">
+      <p class="kicker reveal">הנראות</p>
+      <h2 class="reveal">לראות את כל הצי במבט אחד</h2>
+      <div class="rule reveal"></div>
+      <p class="lede reveal">מפה אחת שמראה בזמן אמת איפה כל רחפן נמצא, כמה סוללה נשארה לו, ובאיזו משימה הוא.</p>
+      <div class="ph-frame reveal">
+        <svg class="ph-icon" viewBox="0 0 24 24"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        <span class="ph-label" dir="ltr">SCREENSHOT // LIVE MAP</span>
+        <span class="ph-caption">כאן נכנס צילום מסך של המפה החיה</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     13 · הענן · איפה זה רץ (placeholder: export architecture.drawio page 13)
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail reveal">13</div>
+    <div class="body">
+      <p class="kicker reveal">הענן</p>
+      <h2 class="reveal">איפה זה בעצם רץ</h2>
+      <div class="rule reveal"></div>
+      <p class="lede reveal">כל המערכת רצה בענן של אמזון (AWS), ברשת פרטית וסגורה.</p>
+      <div class="ph-frame reveal">
+        <svg class="ph-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><path d="M10 6.5h4M6.5 10v4M17.5 10v4M10 17.5h4"/></svg>
+        <span class="ph-label" dir="ltr">DIAGRAM // AWS LAYOUT</span>
+        <span class="ph-caption">architecture.drawio, עמוד 13: AWS Account, Region, VPC and AZ</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     14 · ארגו · פריסה אוטומטית
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail reveal">14</div>
+    <div class="body">
+      <p class="kicker reveal">ארגו</p>
+      <h2 class="reveal">מקוד למערכת רצה, לבד</h2>
+      <div class="rule reveal"></div>
+      <p class="lede reveal">בלי שאף אחד מריץ פקודות ביד.</p>
+      <div class="chart reveal">
+        <svg viewBox="0 0 640 130" role="img" aria-label="תרשים: שינוי בקוד, Argo CD, המערכת מתעדכנת לבד">
+          <defs>
+            <marker id="wf14-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0 0 L10 5 L0 10 z" fill="#0a0a0a" />
+            </marker>
+          </defs>
+          <rect class="node" x="460" y="30" width="160" height="60" />
+          <text x="540" y="65" text-anchor="middle">שינוי בקוד</text>
+
+          <path class="edge" d="M460 62 L406 62" marker-end="url(#wf14-a)" />
+
+          <rect class="node-hot" x="240" y="30" width="160" height="60" />
+          <text class="t-out" x="320" y="65" text-anchor="middle" dir="ltr">Argo CD</text>
+
+          <path class="edge" d="M240 62 L186 62" marker-end="url(#wf14-a)" />
+
+          <rect class="node" x="20" y="30" width="160" height="60" />
+          <text x="100" y="65" text-anchor="middle">מתעדכן לבד</text>
+        </svg>
+      </div>
+      <div class="fixes reveal" style="max-width:400px">
+        <div class="fix hot">
+          <span class="h" dir="ltr">Argo Rollouts</span>
+          <span class="d">משחרר גרסה חדשה בהדרגה, לא לכולם בבת אחת.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     15 · מוניטורינג · לדעת לפני שמישהו מתלונן (placeholder: export drawio page 6)
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail reveal">15</div>
+    <div class="body">
+      <p class="kicker reveal">מוניטורינג</p>
+      <h2 class="reveal">לדעת לפני שמישהו מתלונן</h2>
+      <div class="rule reveal"></div>
+      <p class="lede reveal">כל שירות מדווח על עצמו. כשמשהו חורג מהרגיל, המערכת מתריעה לבד.</p>
+      <div class="ph-frame reveal">
+        <svg class="ph-icon" viewBox="0 0 24 24"><path d="M3 17l5-6 4 4 6-9 3 4"/></svg>
+        <span class="ph-label" dir="ltr">DIAGRAM // OBSERVABILITY FLOW</span>
+        <span class="ph-caption">architecture.drawio, עמוד 6: Observability Flow</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     16 · האתגרים · הבעיות שנתקלנו בהן בדרך
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail reveal">16</div>
+    <div class="body">
+      <p class="kicker reveal">האתגרים</p>
+      <h2 class="reveal">הדברים שנשברו בדרך</h2>
+      <div class="rule reveal"></div>
+      <div class="fixes three reveal">
+        <div class="fix hot">
+          <span class="h">באגים שנכשלים בשקט</span>
+          <span class="d">משימות נעלמו בלי הודעת שגיאה. שום דבר לא קרס.</span>
+        </div>
+        <div class="fix hot">
+          <span class="h">עובד אצלי, נשבר בענן</span>
+          <span class="d">חלק מהתקלות הופיעו רק בענן, בלי סימן קודם.</span>
+        </div>
+        <div class="fix">
+          <span class="h">ואז זה תיקן את עצמו</span>
+          <span class="d">נפילה אמיתית קרתה, והמערכת תיקנה את עצמה לבד.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     17 · אבטחה · מגבלות ועמידות בתקלות
+     Row 3 is deliberately marked TBD rather than answered: real regulatory
+     claims about military use aren't something to invent.
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail reveal">17</div>
+    <div class="body">
+      <p class="kicker reveal">אבטחה</p>
+      <h2 class="reveal">מגבלות ועמידות</h2>
+      <div class="rule reveal"></div>
+      <ul class="points reveal">
+        <li><em dir="ltr" style="color:#2a8f4a">OK ·</em> הגייטווי הוא הפתח היחיד שנגיש מבחוץ.</li>
+        <li><em dir="ltr" style="color:#2a8f4a">OK ·</em> גישה לענן רק דרך זיהוי מאובטח (OIDC).</li>
+        <li><em dir="ltr" style="color:var(--accent)">TBD ·</em> <b>לשימוש צבאי:</b> מיקום המידע והרחפנים המורשים טרם הוגדרו.</li>
+        <li><em dir="ltr" style="color:#2a8f4a">OK ·</em> המערכת כבר הוכיחה שהיא מתאוששת לבד.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     18 · מה למדנו
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail reveal">18</div>
+    <div class="body">
+      <p class="kicker reveal">מה למדנו</p>
+      <h2 class="reveal">מה באמת למדנו</h2>
+      <div class="rule reveal"></div>
+      <div class="fixes three reveal">
+        <div class="fix">
+          <span class="h">שש קטנות, לא אחת גדולה</span>
+          <span class="d">לבנות שש קטנות שמדברות נכון, זה הקושי האמיתי.</span>
+        </div>
+        <div class="fix hot">
+          <span class="h">השקט הוא הסכנה</span>
+          <span class="d">באג ששקט מסוכן יותר מבאג שקורס.</span>
+        </div>
+        <div class="fix hot">
+          <span class="h">לתכנן מחדש, לא רק לתקן</span>
+          <span class="d">ששורדת בשטח מתכננת מחדש, לא רק ממשיכה.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     19 · מאחורי הקלעים (placeholder: video needs to come from the team)
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail reveal">19</div>
+    <div class="body">
+      <p class="kicker reveal">מאחורי הקלעים</p>
+      <h2 class="reveal">קצת מאחורי הקלעים</h2>
+      <div class="rule reveal"></div>
+      <div class="ph-frame reveal">
+        <svg class="ph-icon" viewBox="0 0 24 24" style="fill:var(--muted); stroke:none;"><path d="M6 4l14 8-14 8V4z"/></svg>
+        <span class="ph-label" dir="ltr">VIDEO // BEHIND THE SCENES</span>
+        <span class="ph-caption">כאן ייכנס סרטון מאחורי הקלעים מתהליך הפיתוח</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     20 · סיום
+     ========================================================================== -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="rail reveal">20</div>
+    <div class="body">
+      <img class="logo logo--close reveal" src="presentation-assets/logo-mark.png" alt="הלוגו של SwarmOps">
+      <h1 class="reveal" style="font-size:clamp(2rem,7vw,5rem)">SwarmOps</h1>
+      <div class="rule reveal"></div>
+      <p class="lede reveal" dir="ltr" style="font-size:clamp(.8rem,1.4vw,1.1rem)">END OF BRIEF // QUESTIONS</p>
+      <p class="note reveal">גיא &nbsp;·&nbsp; טוני &nbsp;·&nbsp; וולפיש</p>
+    </div>
+  </div>
+</section>
+
+
+<script>
+/* ===========================================================================
+   SLIDE PRESENTATION CONTROLLER
+   Identical logic to pitch-he.html's controller, this deck is a different
+   skin over the same slide/section structure.
+   =========================================================================== */
+class SlidePresentation {
+    constructor(){
+        this.slides = Array.from(document.querySelectorAll('.slide'));
+        this.current = 0;
+        this.progressBar = document.getElementById('progressBar');
+        this.navDotsContainer = document.getElementById('navDots');
+
+        this.setupIntersectionObserver();
+        this.setupNavDots();
+        this.setupKeyboardNav();
+        this.setupTouchNav();
+        this.setupWheelNav();
+        this.setupProgressBar();
+    }
+
+    setupIntersectionObserver(){
+        const io = new IntersectionObserver((entries)=>{
+            entries.forEach(entry=>{
+                if(entry.isIntersecting){
+                    entry.target.classList.add('visible');
+                    this.current = this.slides.indexOf(entry.target);
+                    this.updateNavDots();
+                    this.updateProgressBar();
+                }
+            });
+        },{ threshold:.5 });
+        this.slides.forEach(s=>io.observe(s));
+    }
+
+    goTo(index){
+        const i = Math.max(0, Math.min(index, this.slides.length-1));
+        this.slides[i].scrollIntoView({ behavior:'smooth' });
+        this.current = i;
+    }
+    next(){ this.goTo(this.current+1); }
+    prev(){ this.goTo(this.current-1); }
+
+    setupKeyboardNav(){
+        document.addEventListener('keydown',(e)=>{
+            if(e.target.getAttribute && e.target.getAttribute('contenteditable')) return;
+            switch(e.key){
+                case 'ArrowLeft': case 'ArrowDown': case 'PageDown':
+                    e.preventDefault(); this.next(); break;
+                case 'ArrowRight': case 'ArrowUp': case 'PageUp':
+                    e.preventDefault(); this.prev(); break;
+                case ' ':
+                    e.preventDefault(); e.shiftKey ? this.prev() : this.next(); break;
+                case 'Home':
+                    e.preventDefault(); this.goTo(0); break;
+                case 'End':
+                    e.preventDefault(); this.goTo(this.slides.length-1); break;
+            }
+        });
+    }
+
+    setupTouchNav(){
+        let startY = null;
+        document.addEventListener('touchstart',(e)=>{ startY = e.touches[0].clientY; },{passive:true});
+        document.addEventListener('touchend',(e)=>{
+            if(startY === null) return;
+            const dy = startY - e.changedTouches[0].clientY;
+            if(Math.abs(dy) > 60){ dy > 0 ? this.next() : this.prev(); }
+            startY = null;
+        },{passive:true});
+    }
+
+    setupWheelNav(){
+        let lock = false;
+        document.addEventListener('wheel',(e)=>{
+            if(lock) return;
+            if(Math.abs(e.deltaY) < 20) return;
+            lock = true;
+            setTimeout(()=>{ lock = false; }, 700);
+        },{passive:true});
+    }
+
+    setupProgressBar(){ this.updateProgressBar(); }
+    updateProgressBar(){
+        const pct = this.slides.length > 1 ? (this.current/(this.slides.length-1))*100 : 100;
+        this.progressBar.style.width = pct + '%';
+    }
+
+    setupNavDots(){
+        this.navDotsContainer.innerHTML = '';
+        this.slides.forEach((_,i)=>{
+            const b = document.createElement('button');
+            b.setAttribute('aria-label','שקופית '+(i+1));
+            b.addEventListener('click',()=>this.goTo(i));
+            this.navDotsContainer.appendChild(b);
+        });
+        this.updateNavDots();
+    }
+    updateNavDots(){
+        Array.from(this.navDotsContainer.children).forEach((b,i)=>{
+            b.classList.toggle('on', i === this.current);
+        });
+    }
+}
+
+/* ===========================================================================
+   INLINE EDITOR
+   Same as pitch-he.html, separate localStorage key so editing one deck
+   never overwrites the other's saved text.
+   =========================================================================== */
+class InlineEditor {
+    constructor(){
+        this.isActive = false;
+        this.selector = 'h1, h2, .kicker, .lede, .note, .fix .h, .fix .d, .flow .s, .flow .v, .points li, .ph-caption, .ph-text, .rail';
+        this.banner = document.getElementById('editBanner');
+        this.toggleBtn = document.getElementById('editToggle');
+        this.restore();
+    }
+
+    get elements(){ return Array.from(document.querySelectorAll(this.selector)); }
+
+    toggleEditMode(){
+        this.isActive = !this.isActive;
+        document.body.classList.toggle('edit-active', this.isActive);
+        this.banner.classList.toggle('active', this.isActive);
+        this.toggleBtn.classList.toggle('active', this.isActive);
+        this.toggleBtn.textContent = this.isActive ? '✓' : '✏️';
+
+        this.elements.forEach((el,i)=>{
+            if(this.isActive){
+                el.setAttribute('contenteditable','true');
+                el.dataset.editKey = 'swm-he-swiss-' + i;
+                el.addEventListener('input', this.save);
+            }else{
+                el.removeAttribute('contenteditable');
+                el.removeEventListener('input', this.save);
+            }
+        });
+    }
+
+    save = ()=>{
+        const data = {};
+        this.elements.forEach((el,i)=>{ data['swm-he-swiss-'+i] = el.innerHTML; });
+        try{ localStorage.setItem('swarmops-he-swiss-deck', JSON.stringify(data)); }catch(e){}
+    }
+
+    restore(){
+        let data;
+        try{ data = JSON.parse(localStorage.getItem('swarmops-he-swiss-deck')); }catch(e){ return; }
+        if(!data) return;
+        this.elements.forEach((el,i)=>{
+            const v = data['swm-he-swiss-'+i];
+            if(typeof v === 'string') el.innerHTML = v;
+        });
+    }
+
+    exportFile(){
+        const editable = Array.from(document.querySelectorAll('[contenteditable]'));
+        editable.forEach(el=>el.removeAttribute('contenteditable'));
+        document.body.classList.remove('edit-active');
+        this.toggleBtn.classList.remove('active','show');
+        this.banner.classList.remove('active','show');
+        const wasIcon = this.toggleBtn.textContent;
+        this.toggleBtn.textContent = '✏️';
+
+        const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
+        if(this.isActive){
+            document.body.classList.add('edit-active');
+            editable.forEach(el=>el.setAttribute('contenteditable','true'));
+            this.toggleBtn.classList.add('active');
+            this.banner.classList.add('active');
+            this.toggleBtn.textContent = wasIcon;
+        }
+
+        const blob = new Blob([html],{type:'text/html'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'pitch-he-swiss.html';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+}
+
+const deck = new SlidePresentation();
+const editor = new InlineEditor();
+
+const hotzone = document.querySelector('.edit-hotzone');
+const editToggle = document.getElementById('editToggle');
+let hideTimeout = null;
+
+hotzone.addEventListener('mouseenter',()=>{
+    clearTimeout(hideTimeout);
+    editToggle.classList.add('show');
+});
+hotzone.addEventListener('mouseleave',()=>{
+    hideTimeout = setTimeout(()=>{ if(!editor.isActive) editToggle.classList.remove('show'); },400);
+});
+editToggle.addEventListener('mouseenter',()=>clearTimeout(hideTimeout));
+editToggle.addEventListener('mouseleave',()=>{
+    hideTimeout = setTimeout(()=>{ if(!editor.isActive) editToggle.classList.remove('show'); },400);
+});
+editToggle.addEventListener('click',()=>editor.toggleEditMode());
+
+document.addEventListener('keydown',(e)=>{
+    if((e.key === 'e' || e.key === 'E') && !e.target.getAttribute('contenteditable')){
+        editor.toggleEditMode();
+    }
+    if((e.ctrlKey || e.metaKey) && e.key === 's'){
+        e.preventDefault();
+        editor.exportFile();
+    }
+});
+
+document.querySelector('.slide').classList.add('visible');
+</script>
+</body>
+</html>
