@@ -766,3 +766,18 @@ actual dependency of any service).
 
 M10 item 4 ("full dry run, no flaky parts") — this was the flaky part found during that dry run.
 Not yet re-confirmed with a second full dry run post-fix.
+
+**Update 2026-08-06 — self-seeding demo scenarios + a real bug found running them live.**
+`swarmops-local/seed/demo-scenarios.ts` (`npm run demo`) replaces manual curl scenario-crafting
+with three self-seeding hot-swap demos (mission hand-off, patrol hand-off, zero-battery
+grounding) — each creates its own drones/mission-or-patrol/charging station, drains a drone's
+battery via a real telemetry sequence, then polls and prints the result. Works against local
+docker-compose or a live cloud cluster.
+
+Running these against a real docker-compose stack (not just the fake-backed `pytest` suite) found
+a second real bug in the previous update's fix: `_try_acquire_solve_lock` crashed on a
+naive/aware datetime comparison against real Mongo (invisible to the fakes, which never lost
+tzinfo on a round trip) — `reconcile_loop`'s own try/except silently swallowed it every tick, so
+the trailing `run_solve()` call never ran. Fixed; see `swarmops-planning-service/STATUS.md` for
+detail. M10 item 4's "full dry run" now has a repeatable, scripted way to actually re-run — all
+three scenarios confirmed live, individually and back to back.
