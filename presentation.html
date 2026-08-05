@@ -395,9 +395,9 @@ ul.points em { font-style: normal; font-weight: 500; color: var(--muted); }
    =========================================================================== */
 .fixes {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: clamp(0.45rem, 1.1vw, 0.9rem);
-    width: 100%; margin: 0 auto; text-align: left;
+    width: 100%; max-width: 720px; margin: 0 auto; text-align: left;
 }
 .fix { border: 2px solid var(--ink); padding: clamp(0.5rem, 1.4vh, 0.9rem) clamp(0.5rem, 1vw, 0.85rem); }
 .fix .h {
@@ -664,10 +664,15 @@ body.edit-active [contenteditable]:focus { outline: 2px solid var(--accent); }
 
           <!-- the event on the wire is the locked contract shape. Label is
                left-anchored, clear of the rotor's right edge (x=103), so it
-               never sits on top of the red rotor. -->
+               never sits on top of the red rotor. Raised to y=9/21 (was
+               24/38) so it clears the telemetry-service box's top edge
+               (y=26) too — at this width ("TelemetryEvent" alone runs past
+               x=210) it was spilling into the box's top-left corner
+               regardless of x; sitting entirely above y=26 removes the
+               overlap no matter how wide the label is. -->
           <path class="edge" d="M108 56 H150" marker-end="url(#bus-a)" />
-          <text class="t-lbl" x="112" y="24" text-anchor="start">TelemetryEvent</text>
-          <text class="t-lbl" x="112" y="38" text-anchor="start">every 2s</text>
+          <text class="t-lbl" x="112" y="9" text-anchor="start">TelemetryEvent</text>
+          <text class="t-lbl" x="112" y="21" text-anchor="start">every 2s</text>
 
           <rect class="node" x="158" y="26" width="210" height="64" />
           <text x="263" y="53" text-anchor="middle" font-size="14">telemetry-service</text>
@@ -737,11 +742,11 @@ body.edit-active [contenteditable]:focus { outline: 2px solid var(--accent); }
       <h2 class="reveal">One chart, not nine</h2>
       <div class="rule reveal"></div>
       <ul class="points reveal">
-        <li><b>range + _helpers.tpl</b> generate the services.</li>
-        <li>Bitnami Mongo and RabbitMQ are <b>dependencies</b>.</li>
-        <li><em>drone-simulator</em> is the exception: no Service.</li>
+        <li>One template stamps out all 8 services, instead of <b>8 near-duplicate YAML files</b>.</li>
+        <li>Mongo and RabbitMQ aren't hand-written — they're pulled in as <b>Bitnami dependencies</b>.</li>
+        <li><em>drone-simulator</em> is the one exception: it's a background worker, so it skips the Service object entirely.</li>
       </ul>
-      <p class="note reveal"><b>services: is a map, not a list.</b> Helm replaces lists wholesale but deep-merges maps, so Argo CD's per-service overrides only compose safely once it stopped being a list.</p>
+      <p class="note reveal"><b>Why services: is a map, not a list:</b> CI bumps one service's image tag by layering a tiny override file on top. Helm merges maps key-by-key, so that touches only that one service — but it replaces lists outright, which would've wiped out the other 7.</p>
     </div>
   </div>
 </section>
@@ -1148,66 +1153,30 @@ body.edit-active [contenteditable]:focus { outline: 2px solid var(--accent); }
   <div class="slide-content">
     <div class="rail">14</div>
     <div class="body" style="max-width:min(100%,1060px)">
-      <p class="kicker reveal">Also found and fixed</p>
-      <h2 class="reveal">Six more, root-caused</h2>
+      <p class="kicker reveal">Two more stories worth telling</p>
+      <h2 class="reveal">The two that mattered</h2>
       <div class="rule reveal"></div>
       <div class="fixes reveal">
-        <div class="fix hot">
-          <span class="h">No auth on the optimizer</span>
-          <span class="d">/planning/* shipped with no JWT check at all. Found and closed on 2026-07-26. A real gap that shipped, not a hypothetical.</span>
-        </div>
-        <div class="fix hot">
-          <span class="h">OIDC trust policy</span>
-          <span class="d">GitHub's sub claim carries immutable org and repo IDs, so the pattern never matched. Root-caused in CloudTrail, not guessed.</span>
+        <div class="fix">
+          <span class="h">RabbitMQ self-healed live, by accident</span>
+          <span class="d">Minutes after fixing fleet/notification/telemetry-service's reconnect-on-drop handling, RabbitMQ's pod got rescheduled again (an Argo CD hard-refresh side effect). All three pods hit the exact failure the fix targeted, in real time — dropped, reconnected, /health correctly went 503, kubelet restarted them, clean reconnect once RabbitMQ was back. Zero manual intervention.</span>
         </div>
         <div class="fix">
-          <span class="h">Org secrets</span>
-          <span class="d">GitHub Free cannot pass org-level Actions secrets to private repos. Proved with a clean A/B flip, then moved to repo level on all nine.</span>
-        </div>
-        <div class="fix">
-          <span class="h">A 404 that is valid YAML</span>
-          <span class="d">A private repo returned a plain-text 404 body. It parsed to a map and was handed to kubectl_manifest as the manifest.</span>
-        </div>
-        <div class="fix">
-          <span class="h">Access-entry race</span>
-          <span class="d">EKS access entries take seconds to propagate. Granting one and using it in the same apply returned 403.</span>
-        </div>
-        <div class="fix">
-          <span class="h">Webhook ordering</span>
-          <span class="d">The load balancer controller's webhook intercepts every Service in the cluster. It rejected Argo CD's own before its pod was serving.</span>
+          <span class="h">Your camera-feed race, for the record</span>
+          <span class="d">Frame/tag interleaving where only one of two concurrent drone feeds ever rendered, plus a relay bug where producers received every other producer's traffic unread forever until it stalled. Real concurrency bugs, good to walk through live.</span>
         </div>
       </div>
-      <p class="note reveal">Two of these were security gaps that had already shipped. Both were closed the day they were found.</p>
+      <p class="note reveal">One's proof the resilience fix holds up under a real failure; the other's a real bug, worth walking through live.</p>
     </div>
   </div>
 </section>
 
 <!-- ==========================================================================
-     15 · GAPS
+     15 · FULL ARCHITECTURE REFERENCE
      ========================================================================== -->
 <section class="slide">
   <div class="slide-content">
     <div class="rail">15</div>
-    <div class="body">
-      <p class="kicker reveal">Closing</p>
-      <h2 class="reveal">What is still open</h2>
-      <div class="rule reveal"></div>
-      <ul class="points reveal">
-        <li>Secrets are <b>plaintext in values.yaml</b>.</li>
-        <li><b>GET / returns 504</b> at the ALB. Pod is healthy.</li>
-        <li>Argo CD Applications unconfirmed: <b>View skips CRDs</b>.</li>
-      </ul>
-      <p class="note reveal">Owned, not hidden. An examiner opening the URL finds the 504 in ten seconds. Better it comes from us.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ==========================================================================
-     16 · FULL ARCHITECTURE REFERENCE
-     ========================================================================== -->
-<section class="slide">
-  <div class="slide-content">
-    <div class="rail">16</div>
     <div class="body" style="max-width:min(100%,1240px)">
       <p class="kicker reveal">Reference</p>
       <h2 class="reveal">The whole system</h2>
@@ -1223,44 +1192,59 @@ body.edit-active [contenteditable]:focus { outline: 2px solid var(--accent); }
             </marker>
           </defs>
 
-          <!-- ============ outside AWS ============ -->
+          <!-- ==========================================================
+               Draw order matters: every box, then every connector line,
+               then every label, last. Labels are the topmost layer on
+               purpose — several connectors cross the same space a label
+               occupies (e.g. the ALB→gateway drop passes right through
+               the "EKS cluster" / "namespace: swarmops" captions), and
+               with text painted last it always sits cleanly on top
+               instead of a line slicing through it.
+               ========================================================== -->
+
+          <!-- ============ boxes ============ -->
           <rect class="node" x="0" y="26" width="132" height="42" />
-          <text x="66" y="53" text-anchor="middle">users</text>
-
           <rect class="node" x="0" y="196" width="132" height="52" />
-          <text x="66" y="220" text-anchor="middle">GitHub</text>
-          <text class="t-lbl" x="66" y="238" text-anchor="middle">9 repos · CI</text>
-
           <rect class="node" x="0" y="330" width="132" height="52" />
-          <text x="66" y="354" text-anchor="middle">Terraform</text>
-          <text class="t-lbl" x="66" y="372" text-anchor="middle">Cloud</text>
 
-          <!-- ============ AWS boundary ============ -->
           <rect x="168" y="8" width="832" height="454" fill="none" stroke="#6b6b68" stroke-width="1.5" stroke-dasharray="7 5" />
-          <text class="t-lbl" x="180" y="26">AWS · us-east-1</text>
 
           <rect class="node" x="836" y="36" width="150" height="40" />
-          <text x="911" y="62" text-anchor="middle">ECR</text>
-
           <rect class="node-fill" x="192" y="36" width="132" height="40" />
-          <text class="t-out" x="258" y="62" text-anchor="middle">ALB</text>
 
-          <!-- ============ EKS cluster ============ -->
           <rect x="184" y="98" width="800" height="352" fill="none" stroke="#0a0a0a" stroke-width="3" />
-          <text class="t-lbl" x="196" y="118">EKS cluster · private subnets</text>
-
-          <!-- namespace: swarmops -->
           <rect x="196" y="128" width="776" height="200" fill="none" stroke="#6b6b68" stroke-width="1.5" stroke-dasharray="5 4" />
-          <text class="t-lbl" x="208" y="146">namespace: swarmops</text>
 
           <rect class="node-fill" x="212" y="154" width="150" height="38" />
-          <text class="t-out" x="287" y="178" text-anchor="middle">gateway</text>
           <rect class="node" x="384" y="154" width="150" height="38" />
-          <text x="459" y="178" text-anchor="middle">frontend</text>
 
+          <rect class="node" x="208" y="228" width="96" height="38" />
+          <rect class="node" x="334" y="228" width="96" height="38" />
+          <rect class="node" x="460" y="228" width="96" height="38" />
+          <rect class="node" x="586" y="228" width="96" height="38" />
+          <rect class="node" x="712" y="228" width="96" height="38" />
+          <rect x="838" y="228" width="124" height="38" fill="none" stroke="#ff3300" stroke-width="2.5" />
+
+          <rect class="node-hot" x="208" y="282" width="250" height="36" />
+          <rect class="node" x="480" y="282" width="220" height="36" />
+          <rect class="node" x="722" y="282" width="240" height="36" />
+
+          <rect x="196" y="344" width="376" height="92" fill="none" stroke="#6b6b68" stroke-width="1.5" stroke-dasharray="5 4" />
+          <rect class="node" x="212" y="372" width="180" height="46" />
+
+          <rect x="596" y="344" width="376" height="92" fill="none" stroke="#6b6b68" stroke-width="1.5" stroke-dasharray="5 4" />
+          <rect class="node" x="612" y="372" width="164" height="46" />
+          <rect class="node" x="792" y="372" width="164" height="46" />
+
+          <!-- ============ connectors ============ -->
           <!-- gateway fans out to the six services along one rail -->
           <path class="edge" d="M287 192 V204" />
-          <path class="edge" d="M362 192 H459 V154" marker-end="url(#ar-a)" />
+          <!-- straight across at the shared mid-height of both boxes, not
+               a dogleg through the bottom-right corner: that version's
+               vertical leg ran from gateway's bottom edge to frontend's
+               top edge at x=459, i.e. straight up through the middle of
+               the frontend box itself. -->
+          <path class="edge" d="M362 173 H384" marker-end="url(#ar-a)" />
           <path class="edge" d="M256 204 H900" />
           <g>
             <path class="edge" d="M256 204 V222" marker-end="url(#ar-a)" />
@@ -1270,28 +1254,8 @@ body.edit-active [contenteditable]:focus { outline: 2px solid var(--accent); }
             <path class="edge" d="M760 204 V222" marker-end="url(#ar-a)" />
             <path class="edge" d="M900 204 V222" marker-end="url(#ar-r)" />
           </g>
-          <rect class="node" x="208" y="228" width="96" height="38" />
-          <text x="256" y="252" text-anchor="middle">auth</text>
-          <rect class="node" x="334" y="228" width="96" height="38" />
-          <text x="382" y="252" text-anchor="middle">fleet</text>
-          <rect class="node" x="460" y="228" width="96" height="38" />
-          <text x="508" y="252" text-anchor="middle">mission</text>
-          <rect class="node" x="586" y="228" width="96" height="38" />
-          <text x="634" y="252" text-anchor="middle">telemetry</text>
-          <rect class="node" x="712" y="228" width="96" height="38" />
-          <text x="760" y="252" text-anchor="middle">notify</text>
-          <rect x="838" y="228" width="124" height="38" fill="none" stroke="#ff3300" stroke-width="2.5" />
-          <text x="900" y="247" text-anchor="middle" fill="#ff3300" font-size="12">planning</text>
-          <text x="900" y="261" text-anchor="middle" fill="#ff3300" font-size="10">Rollout · canary</text>
 
           <!-- data + bus tier -->
-          <rect class="node-hot" x="208" y="282" width="250" height="36" />
-          <text class="t-out" x="333" y="306" text-anchor="middle">RabbitMQ · fanout</text>
-          <rect class="node" x="480" y="282" width="220" height="36" />
-          <text x="590" y="306" text-anchor="middle">MongoDB</text>
-          <rect class="node" x="722" y="282" width="240" height="36" />
-          <text x="842" y="306" text-anchor="middle">drone-simulator</text>
-
           <path class="edge" d="M634 266 V282" marker-end="url(#ar-a)" />
           <!-- routed BELOW the row, not through it: the direct horizontal
                version crossed straight through MongoDB's own box and label,
@@ -1302,32 +1266,77 @@ body.edit-active [contenteditable]:focus { outline: 2px solid var(--accent); }
                top border -->
           <path class="edge-hot" d="M900 266 V276 H333 V282" marker-end="url(#ar-r)" />
 
-          <!-- namespace: argocd + monitoring -->
-          <rect x="196" y="344" width="376" height="92" fill="none" stroke="#6b6b68" stroke-width="1.5" stroke-dasharray="5 4" />
-          <text class="t-lbl" x="208" y="362">namespace: argocd</text>
-          <rect class="node" x="212" y="372" width="180" height="46" />
-          <text x="302" y="400" text-anchor="middle">Argo CD</text>
-          <text class="t-lbl" x="404" y="392">syncs the</text>
-          <text class="t-lbl" x="404" y="408">whole cluster</text>
-
-          <rect x="596" y="344" width="376" height="92" fill="none" stroke="#6b6b68" stroke-width="1.5" stroke-dasharray="5 4" />
-          <text class="t-lbl" x="608" y="362">namespace: monitoring</text>
-          <rect class="node" x="612" y="372" width="164" height="46" />
-          <text x="694" y="400" text-anchor="middle">Prometheus</text>
-          <rect class="node" x="792" y="372" width="164" height="46" />
-          <text x="874" y="400" text-anchor="middle">Loki · Grafana</text>
-
           <!-- ============ cross-boundary edges ============ -->
           <path class="edge" d="M132 47 H192" marker-end="url(#ar-a)" />
           <path class="edge" d="M258 76 V154" marker-end="url(#ar-a)" />
           <path class="edge" d="M132 222 H160 V394 H212" marker-end="url(#ar-a)" />
-          <!-- 16px clear of GitHub's right edge (132), and clear above the
-               path's own horizontal run at y=222, not sitting on top of it -->
-          <text class="t-lbl" x="148" y="192">watched by</text>
-          <text class="t-lbl" x="148" y="206">Argo CD</text>
-          <path class="edge" d="M132 356 H152 V440 H560 V436" marker-end="url(#ar-a)" />
-          <text class="t-lbl" x="300" y="456">provisions VPC · EKS · IAM · ECR</text>
+          <!-- runs along the AWS boundary's own bottom edge (y=462) out to
+               the open gap between the argocd and monitoring namespace
+               boxes, then ticks up 12px onto the EKS cluster's outer
+               border. The old version cut inward to y=436 — the argocd
+               namespace box's own bottom edge — landing a 4px stub right
+               on that box's corner instead of a clean hit on the cluster
+               boundary. -->
+          <path class="edge" d="M132 356 H152 V462 H584 V450" marker-end="url(#ar-a)" />
           <path class="edge" d="M911 76 V228" marker-end="url(#ar-a)" />
+
+          <!-- ============ labels (always drawn last, always on top) ============ -->
+          <text x="66" y="53" text-anchor="middle">users</text>
+          <text x="66" y="220" text-anchor="middle">GitHub</text>
+          <text class="t-lbl" x="66" y="238" text-anchor="middle">9 repos · CI</text>
+          <text x="66" y="354" text-anchor="middle">Terraform</text>
+          <text class="t-lbl" x="66" y="372" text-anchor="middle">Cloud</text>
+
+          <text class="t-lbl" x="180" y="26">AWS · us-east-1</text>
+          <text x="911" y="62" text-anchor="middle">ECR</text>
+          <text class="t-out" x="258" y="62" text-anchor="middle">ALB</text>
+
+          <text class="t-lbl" x="196" y="118">EKS cluster · private subnets</text>
+          <text class="t-lbl" x="208" y="146">namespace: swarmops</text>
+
+          <text class="t-out" x="287" y="178" text-anchor="middle">gateway</text>
+          <text x="459" y="178" text-anchor="middle">frontend</text>
+
+          <text x="256" y="252" text-anchor="middle">auth</text>
+          <text x="382" y="252" text-anchor="middle">fleet</text>
+          <text x="508" y="252" text-anchor="middle">mission</text>
+          <text x="634" y="252" text-anchor="middle">telemetry</text>
+          <text x="760" y="252" text-anchor="middle">notify</text>
+          <text x="900" y="247" text-anchor="middle" fill="#ff3300" font-size="12">planning</text>
+          <text x="900" y="261" text-anchor="middle" fill="#ff3300" font-size="10">Rollout · canary</text>
+
+          <text class="t-out" x="333" y="306" text-anchor="middle">RabbitMQ · fanout</text>
+          <text x="590" y="306" text-anchor="middle">MongoDB</text>
+          <text x="842" y="306" text-anchor="middle">drone-simulator</text>
+
+          <text class="t-lbl" x="208" y="362">namespace: argocd</text>
+          <text x="302" y="400" text-anchor="middle">Argo CD</text>
+          <text class="t-lbl" x="404" y="392">syncs the</text>
+          <text class="t-lbl" x="404" y="408">whole cluster</text>
+
+          <text class="t-lbl" x="608" y="362">namespace: monitoring</text>
+          <text x="694" y="400" text-anchor="middle">Prometheus</text>
+          <text x="874" y="400" text-anchor="middle">Loki · Grafana</text>
+
+          <!-- moved into the open pocket of empty space between the
+               GitHub and Terraform boxes on the left rail — the old spot
+               (148,192) had this two-line label starting a hair right of
+               GitHub's own box, so it ran straight across both the
+               connector line at x=160 and the AWS boundary's dashed edge
+               at x=168 just to fit its width. -->
+          <text class="t-lbl" x="20" y="272">watched by</text>
+          <text class="t-lbl" x="20" y="288">Argo CD</text>
+          <!-- moved into the open pocket below the Terraform box (same
+               trick as "watched by / Argo CD" above) instead of the old
+               spot at (300,456), which had the label's full width jammed
+               into the 12px gap between the EKS box's bottom border and
+               the AWS boundary's bottom border — and growing the canvas
+               to fit it there instead pushed this whole slide's closing
+               note down into the fixed footer bar, worse trade. Split to
+               two lines: the full string is ~208px wide, wider than the
+               168px-wide left margin. -->
+          <text class="t-lbl" x="20" y="406">provisions VPC · EKS</text>
+          <text class="t-lbl" x="20" y="422">· IAM · ECR</text>
           <text class="t-lbl" x="920" y="120">image</text>
           <text class="t-lbl" x="920" y="136">pull</text>
         </svg>
