@@ -450,6 +450,188 @@ out-of-scope in `swarmops-deployments/STATUS.md`) now showing up as continuous s
 worth having an answer ready before demoing the Grafana dashboard, since two targets will be
 visibly down.
 
+### Update 2026-08-04 (Tony) — SPA 504 fixed, Argo CD check finally run, mock presentation prep
+
+**Yesterday's blocker is gone — permission widened, undocumented.** `OBSERVABILITY_ACCESS.md`/the
+2026-08-03 entry above both said Tony-1 is `AmazonEKSViewPolicy`, cluster-wide **read-only**, CRDs
+forbidden. Live test today: `kubectl auth can-i create/patch/delete "*" "*" -A` → **all yes**,
+server dry-run create/rollout-restart both succeeded for real. Tony-1's k8s RBAC is effectively
+cluster-admin now, not View. **Confirmed deliberate by Tony (team lead), 2026-08-05** — not an
+accidental access-entry change. Note this is *k8s RBAC only* — the separate AWS IAM identity
+behind it still can't `eks:ListNodegroups` / `eks:UpdateNodegroupConfig` (see below), so it's not
+a blanket AWS-level admin grant.
+
+**`kubectl get applications -n argocd` — run for real, first time:**
+
+| App | Sync | Health |
+|---|---|---|
+| `swarmops` | Synced | Healthy |
+| `argo-rollouts` | Synced | Healthy |
+| `loki-stack` | Synced | Healthy |
+| `kube-prometheus-stack` | Synced | **Degraded** (see below) |
+
+**SPA 504 — root cause confirmed, fixed live.** Exactly the symptom and cause from 2026-08-03
+(stale conntrack/iptables datapath between gateway's node and frontend's ClusterIP, not a config
+error — every declarative object was correct). Fix was the first thing flagged to Guy yesterday:
+`kubectl rollout restart deployment/swarmops-frontend -n swarmops`, then
+`deployment/swarmops-gateway` for the same reason. Both rolled out clean. Verified:
+`GET /` now **200 in 0.34s** (was 504 after 60s). Frontend now reachable at
+`http://k8s-swarmops-gateway-3b08f79c2f-1927114502.us-east-1.elb.amazonaws.com/` (ALB DNS, changes
+on next `infra/cluster` destroy/apply — don't hardcode it anywhere durable).
+
+**New bug found: `kube-prometheus-stack` stuck Degraded — pod-density ceiling again, different
+shape than M9's.** Not the M9 "aggregate memory/pod-count" version — this time it's an **AZ +
+per-node packing deadlock**: 4 nodes (t3.medium, 17-pod ENI cap each), 2 per AZ
+(`us-east-1a`/`us-east-1b`). 3 of 4 nodes sit at 17/17 (full); the one node with room
+(`ip-10-1-16-233`, `us-east-1b`) is the wrong AZ for Grafana's `gp3` PV (pinned `us-east-1a` via
+node affinity, RWO). New Grafana pod from a triggered rollout can't schedule anywhere → stuck
+`Pending` 14+ min, `Degraded` Application status. **Not demo-blocking**: old Grafana pod (`1/1
+Running`, pre-rollout revision) still serves the dashboard fine, zero functional impact, just a
+stuck extra pod and a red status flag in Argo CD.
+
+Real fix is the same class as M8/M9's earlier version — add a 5th node (`desired_size` 4→5,
+`aws eks update-nodegroup-config`, module already has `lifecycle.ignore_changes` on it so this
+survives the next `terraform apply` same as before). **Tony-1 cannot run this** —
+`eks:ListNodegroups`/`eks:UpdateNodegroupConfig` denied, a separate AWS IAM permission from the
+k8s RBAC widening above; the k8s API server doesn't gate node-group scaling, only AWS IAM does.
+Needs Valfish (cluster-admin) or a `node_desired_size` bump in
+`swarmops-infrastructure/infra/cluster/variables.tf` through the normal PR → TFC plan → apply path.
+Left as-is for now since it's not blocking tomorrow's mock presentation.
+
+### Update 2026-08-04, continued (Tony) — RabbitMQ reconnect-on-drop, real health checks, camera backpressure, map-bounds validation
+
+Root cause from the frozen-drone/empty-alerts incident above (RabbitMQ pod rescheduled at
+`09:19:17`, none of the plain-`amqplib` services ever recovered) is now actually fixed, not just
+worked around by a manual restart:
+
+- **`fleet-service`, `notification-service`, `telemetry-service`** — each now handles
+  `connection.on("close"/"error")` and re-runs its full connect+bind+consume setup instead of
+  sitting silently dead forever. `planning-service` needed **no fix** — it already uses
+  `aio_pika.connect_robust`, which auto-reconnects and restores consumers on its own; the manual
+  restart I gave it earlier in this incident was unnecessary caution, not a real fix for a real
+  problem there.
+- **`/health` on all three now reflects real RabbitMQ connection state** (was an unconditional
+  `200` on all three) — so kubelet's own liveness probe can now actually catch a stuck reconnect
+  and restart the pod as a backstop, instead of a dead consumer being invisible to Kubernetes
+  forever.
+- **`telemetry-service`'s camera relay (`cameraFeed.ts`) now has a backpressure guard** —
+  `client.send()` was unconditional, so a viewer that can't drain frames as fast as Unity produces
+  them queued them in-process memory unbounded. This was the *actual* OOM root cause, not just
+  the undersized memory limit fixed earlier (`swarmops-deployments#3`) — that bump bought
+  headroom, this fixes the real design gap. Frames now drop for a client past a 4MB buffered
+  threshold instead of queueing forever.
+- **Validated live, by accident**: right after deploying these three fixes, RabbitMQ's pod got
+  rescheduled *again* (apparently a side effect of an Argo CD hard-refresh touching the whole
+  `swarmops` Application, which includes the RabbitMQ chart dependency — avoid hard-refreshing
+  unless needed). All three freshly-deployed pods hit the exact failure mode this fix targets in
+  real time: connection dropped, reconnect attempted, genuinely failed while RabbitMQ was down,
+  `/health` correctly reported `503`, kubelet restarted them, they reconnected clean once RabbitMQ
+  was back. Self-healed with zero manual intervention — the loop this incident was missing.
+
+**Also fixed, same incident/day:**
+- **Mission deadline had no sane-range validation** (`swarmops-frontend`,
+  `CreateMissionDialog.tsx`) — a mistyped year (`1111` instead of `2026`) submitted a mission
+  centuries overdue with no error anywhere; this is exactly how the original "afaf" test mission
+  got its garbage deadline. Now rejects non-future dates client-side, plus a `min` on the
+  datetime-local input itself.
+- **Charging-station/no-fly-zone map-bounds validation was missing entirely** on the charging
+  station dialog, and only checked literal `(0, 0)` on the no-fly-zone one. `OperationalView`'s
+  auto-fit bounds are expand-only and never shrink back, so *any* out-of-range point (not just
+  Null Island) permanently stretches the whole map and squashes every real drone into a corner —
+  found live when a charging station landed at `(0, 0)` via a `Number("") === 0` frontend gotcha.
+  Fixed in three places: `swarmops-frontend`'s `CreateChargingStationDialog.tsx` (Tony) and
+  `CreateNoFlyZoneDialog.tsx` (Guy, same day, picked up independently after a Discord ping), plus
+  **`swarmops-fleet-service`'s `POST /fleet/charging-stations` and `POST /fleet/no-fly-zones`**
+  (Guy) — the server-side check is the one that actually matters, since nothing stops a client
+  other than this frontend from submitting a bad value the same way.
+- **Charging station seeded** — none existed on the live cluster; "North Base Charge Point"
+  (`32.75, 35.0`, operational) added near the patrol test zone.
+
+**New known gap, found investigating "why doesn't a low-battery drone on a regular mission go
+charge itself" — not a bug, a missing feature:** `planning-service`'s `_on_telemetry_trigger`
+(`src/main.py:16-28`) only runs the low-battery hand-off (`handle_patrol_low_battery`) for drones
+on **active patrol duty**. A drone flying a regular Mission `Plan` gets no automatic low-battery
+handling at all — the generic `run_solve()` re-solve that also fires doesn't touch it either,
+since a mission-assigned drone is never "idle" and so is outside `run_solve()`'s own assignment
+pool, same as a patrol drone. `POST /fleet/drones/{id}/charge` (`routes/charge_orders.py`) exists
+as a **manual** path an operator can trigger by hand, but nothing does it automatically for a
+mission (only for a patrol). Not fixed — a scope decision, not a bug, but worth having an answer
+ready if it comes up live: "patrols self-heal on low battery, missions currently need a human to
+send the drone to charge."
+
+**Follow-up, not built (Tony's request, 2026-08-04) — camera feed has no staleness/lag detection.**
+Checked `cameraFeed.ts`: frames relay blind today — no per-frame timestamp, no age check, no
+distinction between "quiet feed" and "frozen/dead feed." Two real gaps, worth splitting:
+
+1. **Staleness (is this frame even recent?).** `CameraFeedStreamer.cs` self-tags each frame
+   inline already (per `cameraFeed.ts`'s own header comment on the producer/consumer tagging
+   scheme) — add a producer-side timestamp to that tag. Consumer (frontend) computes
+   `now - frame_timestamp` and shows a "feed stale" indicator past some threshold (e.g. 2s) instead
+   of silently displaying a frozen last frame with no visual cue anything's wrong.
+2. **Lag under real backpressure.** The `bufferedAmount` guard added today (telemetry-service,
+   `a0ca1a1`) fixes the OOM by *dropping* a frame for a client that's fallen behind — but it's
+   still strict FIFO otherwise, so a client that's behind stays behind, accumulating visible lag
+   over time rather than catching back up. A "latest-frame-wins" relay policy (drop everything
+   queued except the newest frame when a client is behind, instead of relaying the backlog in
+   order) would keep the feed visually live under real packet loss/lag instead of playing catch-up
+   in slow motion. Standard pattern for live video relays; not implemented anywhere in this repo
+   today.
+
+Both are `swarmops-telemetry-service`/`swarmops-unity-simulator` (Guy's + Tony's shared surface,
+frontend needs the staleness indicator too) — flag before the actual demo defense if the camera
+feed is a focal point, not required for tomorrow's mock run.
+
+**Follow-up, not built (Tony's request, 2026-08-04) — real domain instead of the raw ALB DNS
+name.** Comes up every apply/destroy cycle: the ALB is created out-of-band by the AWS Load
+Balancer Controller reacting to the Ingress, not tracked in Terraform state, so a fresh `apply`
+gets a brand-new random hostname every time — nothing to hardcode anywhere.
+
+Real fix, not a workaround: **`external-dns`** — a k8s controller that watches the Ingress and
+auto-syncs a Route53 record to whatever the current ALB hostname is, on every apply. Survives
+destroy/apply cycles with zero manual re-pointing. Same architectural pattern already in this repo
+(IRSA role, like the LB controller has).
+
+Decided: **team already owns a domain** — delegate a subdomain (e.g. `demo.<theirdomain>`) to a
+new Route53 hosted zone rather than registering a fresh one (saves the ~$12-15/yr registration
+cost, only the ~$0.50/mo hosted zone). Needs:
+1. NS delegation at the registrar (one-time, outside Terraform) pointing the subdomain at a new
+   Route53 hosted zone.
+2. New Terraform for the hosted zone — belongs with `infra/persistent` (never-destroy class,
+   same as ECR/OIDC), not `infra/cluster`.
+3. ACM cert, DNS-validated against that zone (free).
+4. `external-dns` Helm chart + its own IRSA role scoped to `route53:ChangeResourceRecordSets` on
+   just that zone — new Application in `swarmops-deployments`, same pattern as
+   kube-prometheus-stack/Argo Rollouts.
+
+**Decision (2026-08-04 night): documented follow-up, not built tonight** — real infra addition
+(new AWS resources, new IAM role, new Argo CD Application, one Terraform apply into
+`infra/persistent`) right before the mock presentation wasn't worth the risk that night.
+
+**Update 2026-08-05 (Tony) — built and applied, superseding the above.** Valfish built this the
+next day: `aws_route53_zone.swarmops_demo` + `aws_acm_certificate.swarmops_demo` (DNS-validated)
+in `infra/persistent/domain.tf` for `swarmops.harelvalfish.dev` (delegated subdomain of Harel's
+own domain, not a fresh registration — team chose this over Tony's domain), plus the
+`external-dns` IRSA role in `infra/cluster/external-dns.tf`. Confirmed live via Terraform state:
+zone `Z06348013MIG7SM2C8BSU`, cert validated, both resources under `prevent_destroy`. **Open
+item:** confirm the one-time NS delegation at the registrar (Namecheap) is actually done — that
+step is manual, outside Terraform, and unverified as of this update.
+
+**For tomorrow's mock presentation:** app is demo-ready — all 16 `swarmops` pods healthy, ALB
+reachable, frontend now actually loads (`GET /` 200). Known non-blocking gaps to have an answer
+ready for if asked: Grafana `Degraded` status (above, cosmetic), `frontend`/`gateway` `/metrics`
+499s (documented, accepted out-of-scope since M9), plaintext secrets in `values.yaml` (per
+`PRESENTATION_PLAN.md`'s "what is not done" sheet).
+
+**M10 item 3 ("seed realistic demo data") — done, minimally.** Live cluster had zero users, no
+login possible. `swarmops-local/seed/seed.ts`'s demo creds (`demo-admin@swarmops.internal` /
+`demo-admin-password`) were never applied to the cloud cluster — only ever ran against local
+compose. Registered directly via `POST /auth/register` against the live ALB (role `admin`),
+confirmed `POST /auth/login` returns a real JWT. **Fleet/mission state checked separately** (`GET /fleet/drones`, `GET /missions` against the live
+ALB, authenticated): 1 drone exists (`Unity-Sim-1`, from Guy's simulator driving live traffic —
+not seeded data), **0 missions**. Board will look empty on login until missions are created —
+either through the UI before the run-through, or by pointing `swarmops-local/seed/seed.ts` at the
+live ALB instead of compose's gateway.
+
 ---
 
 ## M9.5 — Unity drone simulator — **Stages 0–2 DONE, ahead of previous doc text**
@@ -514,14 +696,13 @@ its tree. Stages 3–4 remain open.
    Machine B runs Unity, POSTs telemetry over HTTPS to the public gateway's `/telemetry/events`
    route (same ALB → gateway path as everything else, no new Ingress rule). Add lightweight auth
    (API key or short-lived `auth-service` token) on that endpoint before it's open to the
-   internet. Test Machine B's network path ahead of demo day, not live. **Not started — M7's ALB
-   is up now, so this is unblocked; do next if replacing the Node simulator for the actual
-   demo.**
+   internet. Test Machine B's network path ahead of demo day, not live. **DONE (2026-08-05,
+   confirmed by Tony)** — two-machine setup working: app deployed on cloud (EKS/ALB), Unity
+   running on a separate machine, telemetry flowing over HTTPS through the public gateway.
 
 **Exit:** frontend shows a drone moving under live Unity control with zero downstream contract
 changes (Stage 1 minimum bar) — **met**. Stage 2–4 are stretch within this milestone, not required to move
-on to M10 — but Stage 4 must be done before the actual demo if this replaces the Node simulator
-for it.
+on to M10. **All five stages now done.**
 
 ---
 
