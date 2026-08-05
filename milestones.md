@@ -612,9 +612,11 @@ next day: `aws_route53_zone.swarmops_demo` + `aws_acm_certificate.swarmops_demo`
 in `infra/persistent/domain.tf` for `swarmops.harelvalfish.dev` (delegated subdomain of Harel's
 own domain, not a fresh registration — team chose this over Tony's domain), plus the
 `external-dns` IRSA role in `infra/cluster/external-dns.tf`. Confirmed live via Terraform state:
-zone `Z06348013MIG7SM2C8BSU`, cert validated, both resources under `prevent_destroy`. **Open
-item:** confirm the one-time NS delegation at the registrar (Namecheap) is actually done — that
-step is manual, outside Terraform, and unverified as of this update.
+zone `Z06348013MIG7SM2C8BSU`, cert validated, both resources under `prevent_destroy`. **NS
+delegation confirmed live by Valfish, night of 2026-08-04/05** (via Discord) — the one manual,
+outside-Terraform step is done. He also reports wiring `external-dns` into
+`infra/argocd-apps`'s manifest list — it existed in `swarmops-deployments` but was never actually
+hooked into the automated bootstrap, so it wouldn't have applied on its own; fixed same session.
 
 **For tomorrow's mock presentation:** app is demo-ready — all 16 `swarmops` pods healthy, ALB
 reachable, frontend now actually loads (`GET /` 200). Known non-blocking gaps to have an answer
