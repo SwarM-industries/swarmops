@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SwarmOps · מצגת</title>
+
+<!-- Suez One = Hebrew display face. Rubik = Hebrew body. JetBrains Mono = tactical readouts. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Rubik:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+/* ===========================================================================
+   THEME
+   Colors are the real product's tokens, lifted from
+   swarmops-frontend/src/index.css. The dashboard has no light mode, so the
+   page is inverted to light while the cards keep the app's true dark surface
+   (--card #101012 on --on-card #e5e5e5). The three status hues are used
+   exactly as the app uses them: nominal / warning / critical.
+   =========================================================================== */
+:root{
+    --bg:#f2f2f0;
+    --ink:#101012;
+    --muted:#6b6b6b;
+    --card:#101012;
+    --card-raised:#17181b;
+    --on-card:#e5e5e5;
+    --on-card-dim:#9a9a9a;
+    --border:#2a2b2e;
+    --rule:rgba(16,16,18,.14);
+
+    --nominal:#22c55e;   /* flying / in-progress / ok */
+    --warning:#f59e0b;   /* charging / assigned / conflict */
+    --critical:#ef4444;  /* maintenance / alert / low battery */
+
+    --font-display:'Suez One', serif;
+    --font-body:'Rubik', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+
+    --title-size:clamp(1.5rem,5vw,4rem);
+    --h2-size:clamp(1.25rem,3.5vw,2.5rem);
+    --h3-size:clamp(1rem,2.5vw,1.75rem);
+    --body-size:clamp(.75rem,1.5vw,1.125rem);
+    --small-size:clamp(.65rem,1vw,.875rem);
+    --mono-size:clamp(.58rem,.95vw,.75rem);
+
+    --slide-padding:clamp(1rem,4vw,4rem);
+    --content-gap:clamp(.5rem,2vw,2rem);
+    --element-gap:clamp(.25rem,1vw,1rem);
+
+    --ease:cubic-bezier(.16,1,.3,1);
+    --dur:.6s;
+}
+
+/* ===========================================================================
+   VIEWPORT FITTING: MANDATORY BASE
+   Every slide is exactly one viewport tall and never scrolls internally.
+   =========================================================================== */
+*{margin:0; padding:0; box-sizing:border-box;}
+
+html,body{ height:100%; overflow-x:hidden; }
+html{ scroll-snap-type:y mandatory; scroll-behavior:smooth; }
+
+body{
+    font-family:var(--font-body);
+    background:var(--bg);
+    color:var(--ink);
+}
+
+.slide{
+    width:100vw;
+    height:100vh;
+    height:100dvh;              /* mobile browser chrome */
+    overflow:hidden;            /* CRITICAL: never scroll inside a slide */
+    scroll-snap-align:start;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    padding:var(--slide-padding);
+}
+
+.slide-content{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    max-height:100%;
+    overflow:hidden;            /* double protection */
+}
+
+img{ max-width:100%; max-height:min(50vh,400px); object-fit:contain; }
+
+/* ===========================================================================
+   PAGE FURNITURE
+   Fine technical grid + drifting drone marks, on every slide. The grid is the
+   "chart paper" the whole deck sits on; the drone marks read as radar
+   contacts, which is why they are desaturated and kept under 25% opacity.
+   =========================================================================== */
+.grid-bg{
+    position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.5;
+    background-image:
+        repeating-linear-gradient(0deg,  rgba(16,16,18,.05) 0 1px, transparent 1px 40px),
+        repeating-linear-gradient(90deg, rgba(16,16,18,.05) 0 1px, transparent 1px 40px);
+}
+
+.swarm-bg{ position:absolute; inset:0; z-index:0; pointer-events:none; }
+.swarm-bg img{
+    position:absolute;
+    top:var(--y); left:var(--x);
+    width:var(--w); height:auto; max-height:none;
+    opacity:var(--o);
+    filter:grayscale(1);
+    transform:translate(-50%,-50%) rotate(var(--r));
+}
+
+/* --- top bar: slide number + section breadcrumb ------------------------- */
+.topbar{
+    position:relative; z-index:2;
+    display:flex; justify-content:space-between; align-items:flex-start;
+    flex:none;
+}
+.num{
+    font-family:var(--font-mono); font-weight:700;
+    font-size:clamp(.8rem,1.6vw,1.15rem);
+    letter-spacing:.12em; color:var(--ink);
+}
+.nav{
+    display:flex; gap:clamp(.6em,1.4vw,1.1em);
+    font-size:var(--mono-size); font-family:var(--font-mono);
+    letter-spacing:.06em; color:var(--muted);
+}
+.nav span.on{ color:var(--nominal); font-weight:700; }
+
+/* --- bottom bar: wordmark + meta ---------------------------------------- */
+.botbar{
+    position:relative; z-index:2;
+    display:flex; justify-content:space-between; align-items:flex-end;
+    flex:none;
+    margin-top:clamp(.6rem,2vh,1.4rem);
+}
+.tag{
+    display:flex; align-items:center; gap:.5em;
+    font-family:var(--font-display);
+    font-size:clamp(.85rem,1.7vw,1.3rem);
+    color:var(--ink);
+}
+.tag img{ width:clamp(1.3rem,2.8vw,2rem); height:auto; max-height:none; filter:grayscale(1); }
+.meta{
+    font-family:var(--font-mono); font-size:var(--mono-size);
+    letter-spacing:.1em; color:var(--muted);
+}
+
+/* ===========================================================================
+   STAGE + CARD
+   The card is the deck's one strong shape: hard corners, hairline border,
+   green HUD brackets at each corner. Text inside is centered; the bars above
+   and below stay split left/right so the frame still reads as an instrument
+   panel rather than a poster.
+   =========================================================================== */
+.stage{
+    position:relative; z-index:2;
+    flex:1; display:flex; align-items:center; justify-content:center;
+    min-height:0;               /* lets the card shrink instead of overflowing */
+}
+
+.card{
+    position:relative;
+    background:var(--card); color:var(--on-card);
+    width:100%; max-width:min(92vw,1000px);
+    padding:clamp(1.2rem,4.5vh,3.2rem) clamp(1.1rem,4vw,3rem);
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+    border:1px solid var(--border);
+    box-shadow:0 30px 60px -24px rgba(0,0,0,.4);
+    background-image:linear-gradient(180deg, rgba(255,255,255,.025), transparent 40%);
+    max-height:100%;
+}
+
+/* HUD corner brackets. ::before/::after cover the top two; .bl/.br the bottom. */
+.card::before,.card::after,.card .bl,.card .br{
+    content:""; position:absolute;
+    width:clamp(12px,1.8vw,20px); height:clamp(12px,1.8vw,20px);
+    border:2px solid var(--nominal); opacity:.85;
+}
+.card::before{ top:-1px; right:-1px; border-left:none;  border-bottom:none; }
+.card::after { top:-1px; left:-1px;  border-right:none; border-bottom:none; }
+.card .bl{ bottom:-1px; right:-1px; border-left:none;  border-top:none; }
+.card .br{ bottom:-1px; left:-1px;  border-right:none; border-top:none; }
+
+/* --- readout: the mono strip above a card's content --------------------- */
+.readout{
+    display:flex; align-items:center; justify-content:center;
+    gap:.7em; margin-bottom:clamp(.7rem,2vh,1.3rem);
+}
+.readout .tick{ width:clamp(1.2rem,2.6vw,2.2rem); height:1px; background:var(--border); }
+.readout .label{
+    font-family:var(--font-mono); font-weight:700;
+    font-size:var(--mono-size); letter-spacing:.2em; color:var(--nominal);
+    white-space:nowrap;
+}
+.readout.warn .label{ color:var(--warning); }
+.readout.crit .label{ color:var(--critical); }
+
+/* --- typography inside cards -------------------------------------------- */
+h1{
+    font-family:var(--font-display); font-weight:400;
+    font-size:clamp(1.6rem,4.8vw,3.4rem); line-height:1.22;
+}
+h2{
+    font-family:var(--font-display); font-weight:400;
+    font-size:clamp(1.3rem,3.6vw,2.6rem); line-height:1.25;
+}
+.sub{
+    font-size:clamp(.8rem,1.45vw,1.08rem); font-weight:300;
+    color:var(--on-card-dim); line-height:1.65; max-width:46ch;
+    margin-top:clamp(.6rem,1.8vh,1.15rem);
+}
+.lede{
+    font-size:clamp(.9rem,1.7vw,1.25rem); font-weight:400;
+    color:var(--on-card); line-height:1.55; max-width:44ch;
+    margin-top:clamp(.6rem,1.8vh,1.15rem);
+}
+
+/* --- roster chips (team names as status pills) -------------------------- */
+.roster{
+    display:flex; align-items:center; justify-content:center;
+    gap:clamp(.35rem,1vw,.6rem); flex-wrap:wrap;
+    margin-bottom:clamp(.7rem,2vh,1.2rem);
+}
+.op{
+    display:inline-flex; align-items:center; gap:.5em;
+    font-family:var(--font-mono); font-size:var(--mono-size); letter-spacing:.03em;
+    background:var(--card-raised); border:1px solid var(--border);
+    padding:.4em .8em; color:var(--on-card); white-space:nowrap;
+}
+.dot{ width:.5em; height:.5em; border-radius:50%; display:inline-block; flex:none; }
+
+/* --- divider: hairline with a rotated square node ----------------------- */
+.divider{
+    display:flex; align-items:center; gap:.8em;
+    width:100%; max-width:340px; margin-top:clamp(.8rem,2.4vh,1.5rem);
+}
+.divider .ln{ flex:1; height:1px; background:var(--border); }
+.divider .node{ width:5px; height:5px; background:var(--nominal); transform:rotate(45deg); flex:none; }
+
+/* ===========================================================================
+   CONTENT BLOCKS
+   =========================================================================== */
+
+/* --- 3-up grid of bordered panels (team, failures, constraints) --------- */
+.tri{
+    display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:clamp(.5rem,1.4vw,1rem); width:100%;
+    margin-top:clamp(.8rem,2.4vh,1.5rem);
+}
+.panel{
+    border:1px solid var(--border); background:var(--card-raised);
+    padding:clamp(.7rem,2.2vh,1.3rem) clamp(.6rem,1.4vw,1.1rem);
+    display:flex; flex-direction:column; align-items:center; gap:.4em;
+    text-align:center;
+}
+.panel .code{
+    font-family:var(--font-mono); font-size:var(--mono-size);
+    letter-spacing:.14em; color:var(--nominal);
+}
+.panel.w .code{ color:var(--warning); }
+.panel.c .code{ color:var(--critical); }
+.panel .name{
+    font-family:var(--font-display); font-weight:400;
+    font-size:clamp(.95rem,2vw,1.45rem); color:var(--on-card); line-height:1.2;
+}
+.panel .role{
+    font-size:clamp(.68rem,1.15vw,.9rem); font-weight:300;
+    color:var(--on-card-dim); line-height:1.5;
+}
+/* Service names under a team panel. Deliberately small and dimmed: they are
+   a footnote for anyone who wants the real names, not something to read out. */
+.panel .svc{
+    font-family:var(--font-mono); font-size:clamp(.5rem,.82vw,.64rem);
+    color:var(--muted); letter-spacing:.03em; line-height:1.6;
+    border-top:1px solid var(--border); padding-top:.6em; margin-top:.2em; width:100%;
+}
+
+/* --- 6-up service grid (what the system is actually made of) ------------ */
+.hex{
+    display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:clamp(.4rem,1.1vw,.8rem); width:100%;
+    margin-top:clamp(.7rem,2.2vh,1.2rem);
+}
+.svc-card{
+    border:1px solid var(--border); background:var(--card-raised);
+    padding:clamp(.5rem,1.7vh,.95rem) clamp(.45rem,1.1vw,.85rem);
+    display:flex; flex-direction:column; align-items:center; gap:.35em;
+    text-align:center;
+}
+.svc-card.core{ border-color:var(--nominal); }   /* the optimizer, the one that matters */
+.svc-name{
+    font-family:var(--font-mono); font-weight:700;
+    font-size:clamp(.54rem,.98vw,.74rem); letter-spacing:.01em; color:var(--on-card);
+    white-space:nowrap;
+}
+.svc-card.core .svc-name{ color:var(--nominal); }
+.svc-desc{
+    font-size:clamp(.62rem,1.08vw,.84rem); font-weight:300;
+    color:var(--on-card-dim); line-height:1.45;
+}
+
+/* --- numbered step rail (the idea, in three moves) ---------------------- */
+.rail{
+    display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:clamp(.5rem,1.4vw,1rem); width:100%;
+    margin-top:clamp(.8rem,2.4vh,1.5rem);
+}
+.step{
+    border:1px solid var(--border); background:var(--card-raised);
+    padding:clamp(.7rem,2.2vh,1.2rem) clamp(.6rem,1.4vw,1rem);
+    display:flex; flex-direction:column; align-items:center; gap:.45em;
+    position:relative;
+}
+.step .n{
+    font-family:var(--font-mono); font-weight:700;
+    font-size:clamp(1rem,2.2vw,1.6rem); color:var(--nominal); line-height:1;
+}
+.step .t{
+    font-size:clamp(.72rem,1.3vw,1rem); font-weight:500; color:var(--on-card); line-height:1.4;
+}
+
+/* --- constraint list: hairline-separated rows --------------------------- */
+.rows{
+    width:100%; max-width:640px; margin-top:clamp(.7rem,2.2vh,1.3rem);
+    display:flex; flex-direction:column;
+}
+.row{
+    display:flex; align-items:center; gap:.8em;
+    padding:clamp(.45rem,1.5vh,.8rem) 0;
+    border-bottom:1px solid var(--border);
+    text-align:right;
+}
+.row:last-child{ border-bottom:none; }
+.row .mark{
+    font-family:var(--font-mono); font-size:var(--mono-size);
+    color:var(--nominal); letter-spacing:.1em; flex:none; min-width:2.4em;
+}
+.row.w .mark{ color:var(--warning); }
+.row.c .mark{ color:var(--critical); }
+.row .txt{
+    font-size:clamp(.75rem,1.35vw,1.02rem); font-weight:300;
+    color:var(--on-card); line-height:1.5;
+}
+.row .txt b{ font-weight:600; }
+
+/* --- closing slide ------------------------------------------------------ */
+.close-mark{ width:clamp(4rem,11vw,8rem); height:auto; max-height:none; margin-bottom:clamp(.6rem,2vh,1.2rem); }
+.close-word{
+    font-family:var(--font-display); font-weight:400;
+    font-size:clamp(2rem,7vw,5rem); line-height:1; letter-spacing:.01em;
+}
+
+/* ===========================================================================
+   REVEAL ANIMATION
+   Children of a slide fade up once that slide scrolls into view. Stagger is
+   by nth-child so no per-element delay has to be hand-written.
+   =========================================================================== */
+.reveal{
+    opacity:0; transform:translateY(24px);
+    transition:opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.slide.visible .reveal{ opacity:1; transform:translateY(0); }
+.slide.visible .reveal:nth-child(1){ transition-delay:.05s; }
+.slide.visible .reveal:nth-child(2){ transition-delay:.15s; }
+.slide.visible .reveal:nth-child(3){ transition-delay:.25s; }
+.slide.visible .reveal:nth-child(4){ transition-delay:.35s; }
+.slide.visible .reveal:nth-child(5){ transition-delay:.45s; }
+
+/* Card interiors stagger on their own track, and two things matter here:
+   1. Every card opens with the .bl/.br bracket spans, so its real content
+      starts at nth-child(3). Counting from 1 would hand the headline a later
+      delay than the subtitle below it and the reveal would run out of order.
+   2. The selector has to carry .slide.visible too. Without it the rule scores
+      lower than the slide-level one above and never applies at all. */
+.slide.visible .card .reveal:nth-child(3){ transition-delay:.20s; }
+.slide.visible .card .reveal:nth-child(4){ transition-delay:.30s; }
+.slide.visible .card .reveal:nth-child(5){ transition-delay:.40s; }
+.slide.visible .card .reveal:nth-child(6){ transition-delay:.50s; }
+.slide.visible .card .reveal:nth-child(7){ transition-delay:.60s; }
+.slide.visible .card .reveal:nth-child(8){ transition-delay:.70s; }
+
+/* ===========================================================================
+   PROGRESS BAR + NAV DOTS
+   =========================================================================== */
+.progress-bar{
+    position:fixed; top:0; right:0; height:2px; width:0%;
+    background:var(--nominal); z-index:9000; transition:width .2s linear;
+}
+.nav-dots{
+    position:fixed; left:clamp(.6rem,1.6vw,1.4rem); top:50%; transform:translateY(-50%);
+    display:flex; flex-direction:column; gap:clamp(.4rem,1vh,.7rem); z-index:9000;
+}
+.nav-dots button{
+    width:7px; height:7px; padding:0; border:1px solid var(--muted);
+    background:transparent; cursor:pointer; transform:rotate(45deg);
+    transition:background .2s, border-color .2s;
+}
+.nav-dots button.on{ background:var(--nominal); border-color:var(--nominal); }
+
+.hint{
+    position:fixed; bottom:clamp(.5rem,1.6vh,1rem); left:50%; transform:translateX(-50%);
+    font-family:var(--font-mono); font-size:.6rem; letter-spacing:.12em; color:var(--muted);
+    z-index:9000; opacity:.7; pointer-events:none;
+}
+
+/* ===========================================================================
+   INLINE EDITING
+   Hover the top-left hotzone or press E. Ctrl+S exports a clean copy.
+   =========================================================================== */
+.edit-hotzone{ position:fixed; top:0; left:0; width:80px; height:80px; z-index:10000; cursor:pointer; }
+.edit-toggle{
+    position:fixed; top:clamp(.5rem,1.4vh,1rem); left:clamp(.5rem,1.4vw,1rem);
+    width:36px; height:36px; border:1px solid var(--border); background:var(--card);
+    color:var(--on-card); font-size:15px; cursor:pointer; z-index:10001;
+    opacity:0; pointer-events:none; transition:opacity .3s ease;
+}
+.edit-toggle.show,.edit-toggle.active{ opacity:1; pointer-events:auto; }
+.edit-toggle.active{ border-color:var(--nominal); color:var(--nominal); }
+
+.edit-banner{
+    position:fixed; top:0; left:0; right:0; z-index:10000;
+    background:var(--nominal); color:#06210f; text-align:center;
+    font-family:var(--font-mono); font-size:.65rem; letter-spacing:.1em;
+    padding:.4em; opacity:0; pointer-events:none; transition:opacity .3s ease;
+}
+.edit-banner.active{ opacity:1; }
+body.edit-active [contenteditable]{ outline:1px dashed var(--nominal); outline-offset:3px; }
+body.edit-active [contenteditable]:focus{ outline:1px solid var(--nominal); }
+
+/* ===========================================================================
+   RESPONSIVE BREAKPOINTS
+   Aggressive scaling so nothing ever overflows a short or narrow viewport.
+   =========================================================================== */
+@media (max-height:700px){
+    :root{
+        --slide-padding:clamp(.75rem,3vw,2rem);
+        --content-gap:clamp(.4rem,1.5vw,1rem);
+        --title-size:clamp(1.25rem,4.5vw,2.5rem);
+        --h2-size:clamp(1rem,3vw,1.75rem);
+    }
+    .sub{ margin-top:.5rem; }
+}
+@media (max-height:600px){
+    :root{
+        --slide-padding:clamp(.5rem,2.5vw,1.5rem);
+        --content-gap:clamp(.3rem,1vw,.75rem);
+        --body-size:clamp(.7rem,1.2vw,.95rem);
+    }
+    .nav-dots,.hint{ display:none; }
+    .readout{ margin-bottom:.5rem; }
+    .divider{ display:none; }
+}
+@media (max-height:500px){
+    :root{ --slide-padding:clamp(.4rem,2vw,1rem); }
+    /* Keep headlines and structure legible; drop the explanatory prose. */
+    .panel .role,.sub,.svc-desc,.panel .svc{ display:none; }
+}
+@media (max-width:600px){
+    .tri,.rail{ grid-template-columns:1fr; }
+    .hex{ grid-template-columns:repeat(2,minmax(0,1fr)); }  /* 6 services stay a grid, never a 6-tall stack */
+    .nav{ display:none; }
+    .swarm-bg{ display:none; }
+}
+
+@media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{ animation-duration:.01ms !important; transition-duration:.2s !important; }
+    html{ scroll-behavior:auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<nav class="nav-dots" id="navDots" aria-label="ניווט שקופיות"></nav>
+<p class="hint" dir="ltr">← → / SPACE</p>
+
+<div class="edit-hotzone"></div>
+<button class="edit-toggle" id="editToggle" title="מצב עריכה (E)">✏️</button>
+<div class="edit-banner" id="editBanner">מצב עריכה פעיל · לחצו על טקסט כדי לערוך · Ctrl+S לשמירה</div>
+
+
+<!-- ==========================================================================
+     01 · פתיחה · הצוות והבעיה
+     ========================================================================== -->
+<section class="slide">
+    <div class="grid-bg"></div>
+    <div class="swarm-bg" aria-hidden="true">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:9%;--y:15%;--r:-22deg;--w:clamp(2rem,5vw,3.6rem);--o:.22">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:22%;--y:8%;--r:10deg;--w:clamp(1.4rem,3.4vw,2.6rem);--o:.14">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:89%;--y:13%;--r:35deg;--w:clamp(1.7rem,4.2vw,3rem);--o:.18">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:13%;--y:87%;--r:60deg;--w:clamp(1.7rem,4.2vw,3rem);--o:.18">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:92%;--y:84%;--r:-40deg;--w:clamp(1.4rem,3.4vw,2.6rem);--o:.14">
+    </div>
+
+    <div class="topbar reveal">
+        <div class="num" dir="ltr">01</div>
+        <div class="nav">
+            <span class="on">הצוות</span><span>הבעיה</span><span>הרעיון</span><span>האתגרים</span>
+        </div>
+    </div>
+
+    <div class="stage reveal">
+        <div class="card">
+            <span class="bl"></span><span class="br"></span>
+            <div class="readout reveal">
+                <span class="tick"></span>
+                <span class="label" dir="ltr">SWM-OPS // BRIEF 01</span>
+                <span class="tick"></span>
+            </div>
+            <div class="roster reveal">
+                <span class="op"><span class="dot" style="background:var(--nominal)"></span>גיא</span>
+                <span class="op"><span class="dot" style="background:var(--warning)"></span>טוני</span>
+                <span class="op"><span class="dot" style="background:var(--critical)"></span>וולפיש</span>
+            </div>
+            <h1 class="reveal">לרחפן אחד קל לתת פקודה.<br>לעשרה?</h1>
+            <p class="sub reveal">כשלכל רחפן יש סוללה, מסלול משלו והחלטה שצריך לקבל בזמן אמת, זה כבר לא סיפור של אדם אחד עם שלט.</p>
+            <div class="divider reveal"><span class="ln"></span><span class="node"></span><span class="ln"></span></div>
+        </div>
+    </div>
+
+    <div class="botbar reveal">
+        <div class="tag"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</div>
+        <div class="meta" dir="ltr">CAPSTONE 2026</div>
+    </div>
+</section>
+
+
+<!-- ==========================================================================
+     02 · הצוות · שלושה אנשים, שלושה מסלולים
+     ========================================================================== -->
+<section class="slide">
+    <div class="grid-bg"></div>
+    <div class="swarm-bg" aria-hidden="true">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:6%;--y:22%;--r:18deg;--w:clamp(1.8rem,4.4vw,3.2rem);--o:.18">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:94%;--y:76%;--r:-28deg;--w:clamp(1.5rem,3.6vw,2.7rem);--o:.15">
+    </div>
+
+    <div class="topbar reveal">
+        <div class="num" dir="ltr">02</div>
+        <div class="nav">
+            <span class="on">הצוות</span><span>הבעיה</span><span>הרעיון</span><span>האתגרים</span>
+        </div>
+    </div>
+
+    <div class="stage reveal">
+        <div class="card">
+            <span class="bl"></span><span class="br"></span>
+            <div class="readout reveal">
+                <span class="tick"></span>
+                <span class="label" dir="ltr">TEAM // 3 TRACKS</span>
+                <span class="tick"></span>
+            </div>
+            <h2 class="reveal">שלושה אנשים, שלושה מסלולים</h2>
+            <p class="sub reveal">חילקנו את המערכת לשלושה חלקים, וכל אחד לקח חלק ואחראי עליו מקצה לקצה.</p>
+            <div class="tri reveal">
+                <div class="panel w">
+                    <span class="code" dir="ltr">TRACK A</span>
+                    <span class="name">טוני</span>
+                    <span class="role">שירותי הליבה: משתמשים והרשאות, צי הרחפנים, והמשימות עצמן.</span>
+                    <span class="svc" dir="ltr">auth · fleet · mission</span>
+                </div>
+                <div class="panel">
+                    <span class="code" dir="ltr">TRACK B</span>
+                    <span class="name">גיא</span>
+                    <span class="role">האלגוריתם והמידע החי: מי טס לאן, הסימולטור, והנתונים שזורמים בזמן אמת.</span>
+                    <span class="svc" dir="ltr">planning · telemetry · simulator</span>
+                </div>
+                <div class="panel c">
+                    <span class="code" dir="ltr">TRACK C</span>
+                    <span class="name">וולפיש</span>
+                    <span class="role">מה שרואים ומה שמריץ: הממשק, המפה החיה, וכל התשתית בענן.</span>
+                    <span class="svc" dir="ltr">frontend · gateway · infra</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="botbar reveal">
+        <div class="tag"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</div>
+        <div class="meta" dir="ltr">CAPSTONE 2026</div>
+    </div>
+</section>
+
+
+<!-- ==========================================================================
+     03 · הבעיה · מקור: PRD §1.1
+     ========================================================================== -->
+<section class="slide">
+    <div class="grid-bg"></div>
+    <div class="swarm-bg" aria-hidden="true">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:8%;--y:80%;--r:-52deg;--w:clamp(1.9rem,4.6vw,3.3rem);--o:.2">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:91%;--y:18%;--r:24deg;--w:clamp(1.6rem,3.8vw,2.8rem);--o:.16">
+    </div>
+
+    <div class="topbar reveal">
+        <div class="num" dir="ltr">03</div>
+        <div class="nav">
+            <span>הצוות</span><span class="on">הבעיה</span><span>הרעיון</span><span>האתגרים</span>
+        </div>
+    </div>
+
+    <div class="stage reveal">
+        <div class="card">
+            <span class="bl"></span><span class="br"></span>
+            <div class="readout crit reveal">
+                <span class="tick"></span>
+                <span class="label" dir="ltr">PROBLEM // MANUAL DISPATCH</span>
+                <span class="tick"></span>
+            </div>
+            <h2 class="reveal">אף אחד לא באמת מצליח לעשות את זה בראש</h2>
+            <p class="lede reveal">מפעיל אנושי מסתדר עם שלושה או ארבעה רחפנים. מעבר לזה, יש יותר מדי משתנים שמשתנים בו זמנית.</p>
+            <div class="tri reveal">
+                <div class="panel c">
+                    <span class="code" dir="ltr">01</span>
+                    <span class="name">זמן טיסה מבוזבז</span>
+                    <span class="role">רחפן נשלח למשימה רחוקה כשהיה אחד קרוב יותר שפנוי.</span>
+                </div>
+                <div class="panel c">
+                    <span class="code" dir="ltr">02</span>
+                    <span class="name">משימות שמתפספסות</span>
+                    <span class="role">משימה דחופה מחכה בתור כי אף אחד לא שם לב שהיא דחופה.</span>
+                </div>
+                <div class="panel c">
+                    <span class="code" dir="ltr">03</span>
+                    <span class="name">רחפן שנתקע</span>
+                    <span class="role">יוצא לדרך בלי מספיק סוללה כדי לסיים ולחזור.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="botbar reveal">
+        <div class="tag"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</div>
+        <div class="meta" dir="ltr">CAPSTONE 2026</div>
+    </div>
+</section>
+
+
+<!-- ==========================================================================
+     04 · הרעיון · בשלוש תנועות
+     ========================================================================== -->
+<section class="slide">
+    <div class="grid-bg"></div>
+    <div class="swarm-bg" aria-hidden="true">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:7%;--y:18%;--r:32deg;--w:clamp(1.8rem,4.4vw,3.2rem);--o:.19">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:93%;--y:82%;--r:-34deg;--w:clamp(1.6rem,3.8vw,2.8rem);--o:.15">
+    </div>
+
+    <div class="topbar reveal">
+        <div class="num" dir="ltr">04</div>
+        <div class="nav">
+            <span>הצוות</span><span>הבעיה</span><span class="on">הרעיון</span><span>האתגרים</span>
+        </div>
+    </div>
+
+    <div class="stage reveal">
+        <div class="card">
+            <span class="bl"></span><span class="br"></span>
+            <div class="readout reveal">
+                <span class="tick"></span>
+                <span class="label" dir="ltr">CONCEPT // AUTO ASSIGN</span>
+                <span class="tick"></span>
+            </div>
+            <h2 class="reveal">שהמחשב יחליט מי טס לאן</h2>
+            <p class="lede reveal">נותנים למערכת את הצי ואת רשימת המשימות. היא מחזירה תוכנית טיסה מלאה.</p>
+            <div class="rail reveal">
+                <div class="step">
+                    <span class="n" dir="ltr">01</span>
+                    <span class="t">מזינים את הרחפנים הזמינים ואת המשימות הפתוחות</span>
+                </div>
+                <div class="step">
+                    <span class="n" dir="ltr">02</span>
+                    <span class="t">המערכת משבצת כל משימה לרחפן המתאים ביותר</span>
+                </div>
+                <div class="step">
+                    <span class="n" dir="ltr">03</span>
+                    <span class="t">ומחשבת לכל רחפן את המסלול היעיל ביותר</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="botbar reveal">
+        <div class="tag"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</div>
+        <div class="meta" dir="ltr">CAPSTONE 2026</div>
+    </div>
+</section>
+
+
+<!-- ==========================================================================
+     05 · מהמערכת בנויה · ששת השירותים (PRD §3.1)
+     Real service names on purpose, one plain line each. The names are here so
+     the audience can follow who built what, not so anyone has to understand
+     the internals.
+     ========================================================================== -->
+<section class="slide">
+    <div class="grid-bg"></div>
+    <div class="swarm-bg" aria-hidden="true">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:5%;--y:26%;--r:26deg;--w:clamp(1.6rem,3.8vw,2.8rem);--o:.16">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:95%;--y:74%;--r:-32deg;--w:clamp(1.5rem,3.6vw,2.6rem);--o:.14">
+    </div>
+
+    <div class="topbar reveal">
+        <div class="num" dir="ltr">05</div>
+        <div class="nav">
+            <span>הצוות</span><span>הבעיה</span><span class="on">הרעיון</span><span>האתגרים</span>
+        </div>
+    </div>
+
+    <div class="stage reveal">
+        <div class="card">
+            <span class="bl"></span><span class="br"></span>
+            <div class="readout reveal">
+                <span class="tick"></span>
+                <span class="label" dir="ltr">SYSTEM // 6 SERVICES</span>
+                <span class="tick"></span>
+            </div>
+            <h2 class="reveal">שש חתיכות שמדברות ביניהן</h2>
+            <p class="lede reveal">במקום תוכנה אחת גדולה, בנינו שש קטנות. לכל אחת תפקיד אחד, וכל אחת יכולה ליפול ולקום בלי להפיל את השאר.</p>
+            <div class="hex reveal">
+                <div class="svc-card">
+                    <span class="svc-name" dir="ltr">auth</span>
+                    <span class="svc-desc">מי נכנס למערכת ומה מותר לו לעשות בה.</span>
+                </div>
+                <div class="svc-card">
+                    <span class="svc-name" dir="ltr">fleet</span>
+                    <span class="svc-desc">הרחפנים עצמם: איפה כל אחד, כמה סוללה נשארה, ומה מצבו.</span>
+                </div>
+                <div class="svc-card">
+                    <span class="svc-name" dir="ltr">mission</span>
+                    <span class="svc-desc">המשימות: לאן צריך להגיע, כמה זה דחוף, ועד מתי.</span>
+                </div>
+                <div class="svc-card core">
+                    <span class="svc-name" dir="ltr">planning</span>
+                    <span class="svc-desc">המוח. מחליט מי טס לאן, ומחשב את המסלול.</span>
+                </div>
+                <div class="svc-card">
+                    <span class="svc-name" dir="ltr">telemetry</span>
+                    <span class="svc-desc">הזרם החי מהאוויר: מיקום וסוללה, כל הזמן.</span>
+                </div>
+                <div class="svc-card">
+                    <span class="svc-name" dir="ltr">notification</span>
+                    <span class="svc-desc">ההתראות. מודיע כשמשהו דורש תשומת לב.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="botbar reveal">
+        <div class="tag"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</div>
+        <div class="meta" dir="ltr">CAPSTONE 2026</div>
+    </div>
+</section>
+
+
+<!-- ==========================================================================
+     06 · האילוצים · מה המערכת שוקלת (PRD §4.1, §6)
+     ========================================================================== -->
+<section class="slide">
+    <div class="grid-bg"></div>
+    <div class="swarm-bg" aria-hidden="true">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:6%;--y:74%;--r:-18deg;--w:clamp(1.7rem,4.2vw,3rem);--o:.17">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:94%;--y:24%;--r:40deg;--w:clamp(1.5rem,3.6vw,2.7rem);--o:.15">
+    </div>
+
+    <div class="topbar reveal">
+        <div class="num" dir="ltr">06</div>
+        <div class="nav">
+            <span>הצוות</span><span>הבעיה</span><span class="on">הרעיון</span><span>האתגרים</span>
+        </div>
+    </div>
+
+    <div class="stage reveal">
+        <div class="card">
+            <span class="bl"></span><span class="br"></span>
+            <div class="readout warn reveal">
+                <span class="tick"></span>
+                <span class="label" dir="ltr">CONSTRAINTS // 4 INPUTS</span>
+                <span class="tick"></span>
+            </div>
+            <h2 class="reveal">מה נכנס לחישוב</h2>
+            <div class="rows reveal">
+                <div class="row">
+                    <span class="mark" dir="ltr">BAT</span>
+                    <span class="txt"><b>סוללה.</b> לא מספר קבוע. היא נשחקת לפי המרחק שנטס ולפי משקל המטען שנישא.</span>
+                </div>
+                <div class="row w">
+                    <span class="mark" dir="ltr">PRI</span>
+                    <span class="txt"><b>עדיפות ודדליין.</b> משימה דחופה מקבלת רחפן לפני משימה שיכולה לחכות.</span>
+                </div>
+                <div class="row c">
+                    <span class="mark" dir="ltr">NFZ</span>
+                    <span class="txt"><b>אזורים אסורים.</b> יש שטחים שאסור לעבור מעליהם, והמסלול חייב לקחת את זה בחשבון.</span>
+                </div>
+                <div class="row">
+                    <span class="mark" dir="ltr">PAY</span>
+                    <span class="txt"><b>התאמת מטען.</b> לא כל רחפן מסוגל לשאת כל סוג של ציוד.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="botbar reveal">
+        <div class="tag"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</div>
+        <div class="meta" dir="ltr">CAPSTONE 2026</div>
+    </div>
+</section>
+
+
+<!-- ==========================================================================
+     07 · בזמן אמת · תכנון מחדש (PRD §1.2)
+     ========================================================================== -->
+<section class="slide">
+    <div class="grid-bg"></div>
+    <div class="swarm-bg" aria-hidden="true">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:9%;--y:20%;--r:-30deg;--w:clamp(1.9rem,4.6vw,3.3rem);--o:.2">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:50%;--y:6%;--r:8deg;--w:clamp(1.2rem,2.8vw,2.1rem);--o:.12">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:91%;--y:80%;--r:46deg;--w:clamp(1.6rem,3.8vw,2.8rem);--o:.16">
+    </div>
+
+    <div class="topbar reveal">
+        <div class="num" dir="ltr">07</div>
+        <div class="nav">
+            <span>הצוות</span><span>הבעיה</span><span class="on">הרעיון</span><span>האתגרים</span>
+        </div>
+    </div>
+
+    <div class="stage reveal">
+        <div class="card">
+            <span class="bl"></span><span class="br"></span>
+            <div class="readout reveal">
+                <span class="tick"></span>
+                <span class="label" dir="ltr">LIVE // RE-PLAN ON EVENT</span>
+                <span class="tick"></span>
+            </div>
+            <h2 class="reveal">והתוכנית משתנה תוך כדי טיסה</h2>
+            <p class="lede reveal">תוכנית שנקבעת פעם אחת בהמראה כבר לא נכונה חמש דקות אחר כך. באוויר דברים משתנים.</p>
+            <div class="tri reveal">
+                <div class="panel w">
+                    <span class="code" dir="ltr">EVENT</span>
+                    <span class="name">הסוללה נגמרת מהר</span>
+                    <span class="role">רוח חזקה מהצפוי, והרחפן כבר לא יגיע ליעד ובחזרה.</span>
+                </div>
+                <div class="panel c">
+                    <span class="code" dir="ltr">EVENT</span>
+                    <span class="name">רחפן יוצא מהמשחק</span>
+                    <span class="role">תקלה באמצע משימה, והמשימה שלו נשארת פתוחה.</span>
+                </div>
+                <div class="panel">
+                    <span class="code" dir="ltr">EVENT</span>
+                    <span class="name">נכנסת משימה דחופה</span>
+                    <span class="role">משהו חדש שקורה עכשיו ולא יכול לחכות לסבב הבא.</span>
+                </div>
+            </div>
+            <p class="sub reveal">בכל אחד מהמקרים האלה המערכת מזהה לבד ומחשבת את התוכנית מחדש, בלי שאף אחד יבקש ממנה.</p>
+        </div>
+    </div>
+
+    <div class="botbar reveal">
+        <div class="tag"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</div>
+        <div class="meta" dir="ltr">CAPSTONE 2026</div>
+    </div>
+</section>
+
+
+<!-- ==========================================================================
+     08 · האתגרים · הבעיות שנתקלנו בהן בדרך
+     ========================================================================== -->
+<section class="slide">
+    <div class="grid-bg"></div>
+    <div class="swarm-bg" aria-hidden="true">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:7%;--y:76%;--r:38deg;--w:clamp(1.8rem,4.4vw,3.2rem);--o:.18">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:93%;--y:20%;--r:-26deg;--w:clamp(1.6rem,3.8vw,2.8rem);--o:.16">
+    </div>
+
+    <div class="topbar reveal">
+        <div class="num" dir="ltr">08</div>
+        <div class="nav">
+            <span>הצוות</span><span>הבעיה</span><span>הרעיון</span><span class="on">האתגרים</span>
+        </div>
+    </div>
+
+    <div class="stage reveal">
+        <div class="card">
+            <span class="bl"></span><span class="br"></span>
+            <div class="readout warn reveal">
+                <span class="tick"></span>
+                <span class="label" dir="ltr">FIELD NOTES // WHAT BROKE</span>
+                <span class="tick"></span>
+            </div>
+            <h2 class="reveal">הדברים שנשברו בדרך</h2>
+            <div class="rows reveal">
+                <div class="row c">
+                    <span class="mark" dir="ltr">SIL</span>
+                    <span class="txt"><b>באגים שנכשלים בשקט.</b> משימות פשוט נעלמו מהתשובה בלי שום הודעת שגיאה. שום דבר לא קרס, ולכן כמעט לא שמנו לב.</span>
+                </div>
+                <div class="row w">
+                    <span class="mark" dir="ltr">ENV</span>
+                    <span class="txt"><b>עובד אצלי, נשבר בענן.</b> חלק מהתקלות הופיעו רק בסביבה האמיתית, ולא היה שום סימן להן קודם.</span>
+                </div>
+                <div class="row">
+                    <span class="mark" dir="ltr">FIX</span>
+                    <span class="txt"><b>ואז זה תיקן את עצמו.</b> דקות אחרי שסיימנו לתקן התאוששות מנפילה, נפילה אמיתית קרתה. המערכת חזרה לעצמה לבד, בלי שנגענו.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="botbar reveal">
+        <div class="tag"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</div>
+        <div class="meta" dir="ltr">CAPSTONE 2026</div>
+    </div>
+</section>
+
+
+<!-- ==========================================================================
+     09 · סיום
+     ========================================================================== -->
+<section class="slide">
+    <div class="grid-bg"></div>
+    <div class="swarm-bg" aria-hidden="true">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:12%;--y:18%;--r:-24deg;--w:clamp(1.7rem,4.2vw,3rem);--o:.16">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:88%;--y:22%;--r:30deg;--w:clamp(1.5rem,3.6vw,2.7rem);--o:.14">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:16%;--y:82%;--r:52deg;--w:clamp(1.5rem,3.6vw,2.7rem);--o:.14">
+        <img src="presentation-assets/logo-mark.png" alt="" style="--x:85%;--y:80%;--r:-44deg;--w:clamp(1.7rem,4.2vw,3rem);--o:.16">
+    </div>
+
+    <div class="topbar reveal">
+        <div class="num" dir="ltr">09</div>
+        <div class="nav">
+            <span>הצוות</span><span>הבעיה</span><span>הרעיון</span><span class="on">האתגרים</span>
+        </div>
+    </div>
+
+    <div class="stage reveal">
+        <div class="slide-content" style="align-items:center;">
+            <img class="close-mark reveal" src="presentation-assets/logo-mark.png" alt="הלוגו של SwarmOps">
+            <p class="close-word reveal">SwarmOps</p>
+            <div class="readout reveal" style="margin-top:clamp(.8rem,2.4vh,1.4rem)">
+                <span class="tick"></span>
+                <span class="label" dir="ltr">END OF BRIEF // QUESTIONS</span>
+                <span class="tick"></span>
+            </div>
+            <p class="sub reveal" style="color:var(--muted); text-align:center;">גיא &nbsp;·&nbsp; טוני &nbsp;·&nbsp; וולפיש</p>
+        </div>
+    </div>
+
+    <div class="botbar reveal">
+        <div class="tag"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</div>
+        <div class="meta" dir="ltr">CAPSTONE 2026</div>
+    </div>
+</section>
+
+
+<script>
+/* ===========================================================================
+   SLIDE PRESENTATION CONTROLLER
+   Scroll-snap does the actual paging; this class handles the reveal
+   animations, keyboard/touch/wheel navigation, the progress bar and the dots.
+   =========================================================================== */
+class SlidePresentation {
+    constructor(){
+        this.slides = Array.from(document.querySelectorAll('.slide'));
+        this.current = 0;
+        this.progressBar = document.getElementById('progressBar');
+        this.navDotsContainer = document.getElementById('navDots');
+
+        this.setupIntersectionObserver();
+        this.setupNavDots();
+        this.setupKeyboardNav();
+        this.setupTouchNav();
+        this.setupWheelNav();
+        this.setupProgressBar();
+    }
+
+    /* Add .visible when a slide scrolls into view, which fires its CSS reveals. */
+    setupIntersectionObserver(){
+        const io = new IntersectionObserver((entries)=>{
+            entries.forEach(entry=>{
+                if(entry.isIntersecting){
+                    entry.target.classList.add('visible');
+                    this.current = this.slides.indexOf(entry.target);
+                    this.updateNavDots();
+                    this.updateProgressBar();
+                }
+            });
+        },{ threshold:.5 });
+        this.slides.forEach(s=>io.observe(s));
+    }
+
+    goTo(index){
+        const i = Math.max(0, Math.min(index, this.slides.length-1));
+        this.slides[i].scrollIntoView({ behavior:'smooth' });
+        this.current = i;
+    }
+    next(){ this.goTo(this.current+1); }
+    prev(){ this.goTo(this.current-1); }
+
+    setupKeyboardNav(){
+        document.addEventListener('keydown',(e)=>{
+            // Never hijack keys while the user is typing in edit mode.
+            if(e.target.getAttribute && e.target.getAttribute('contenteditable')) return;
+            switch(e.key){
+                // RTL deck, but arrows stay physical: Right goes back, Left goes forward,
+                // matching the direction the content actually flows on screen.
+                case 'ArrowLeft': case 'ArrowDown': case 'PageDown':
+                    e.preventDefault(); this.next(); break;
+                case 'ArrowRight': case 'ArrowUp': case 'PageUp':
+                    e.preventDefault(); this.prev(); break;
+                case ' ':
+                    e.preventDefault(); e.shiftKey ? this.prev() : this.next(); break;
+                case 'Home':
+                    e.preventDefault(); this.goTo(0); break;
+                case 'End':
+                    e.preventDefault(); this.goTo(this.slides.length-1); break;
+            }
+        });
+    }
+
+    setupTouchNav(){
+        let startY = null;
+        document.addEventListener('touchstart',(e)=>{ startY = e.touches[0].clientY; },{passive:true});
+        document.addEventListener('touchend',(e)=>{
+            if(startY === null) return;
+            const dy = startY - e.changedTouches[0].clientY;
+            if(Math.abs(dy) > 60){ dy > 0 ? this.next() : this.prev(); }
+            startY = null;
+        },{passive:true});
+    }
+
+    /* Scroll-snap handles the wheel natively; this only throttles runaway
+       trackpad momentum so one flick does not skip three slides. */
+    setupWheelNav(){
+        let lock = false;
+        document.addEventListener('wheel',(e)=>{
+            if(lock) return;
+            if(Math.abs(e.deltaY) < 20) return;
+            lock = true;
+            setTimeout(()=>{ lock = false; }, 700);
+        },{passive:true});
+    }
+
+    setupProgressBar(){ this.updateProgressBar(); }
+    updateProgressBar(){
+        const pct = this.slides.length > 1 ? (this.current/(this.slides.length-1))*100 : 100;
+        this.progressBar.style.width = pct + '%';
+    }
+
+    setupNavDots(){
+        // Always clear first: if this file was exported while dots existed,
+        // rebuilding without clearing would append a duplicate set.
+        this.navDotsContainer.innerHTML = '';
+        this.slides.forEach((_,i)=>{
+            const b = document.createElement('button');
+            b.setAttribute('aria-label','שקופית '+(i+1));
+            b.addEventListener('click',()=>this.goTo(i));
+            this.navDotsContainer.appendChild(b);
+        });
+        this.updateNavDots();
+    }
+    updateNavDots(){
+        Array.from(this.navDotsContainer.children).forEach((b,i)=>{
+            b.classList.toggle('on', i === this.current);
+        });
+    }
+}
+
+/* ===========================================================================
+   INLINE EDITOR
+   Click any text to rewrite it. Saves to localStorage as you type, and
+   Ctrl+S downloads a clean copy with all edit state stripped out.
+   =========================================================================== */
+class InlineEditor {
+    constructor(){
+        this.isActive = false;
+        this.selector = 'h1, h2, .sub, .lede, .name, .role, .svc, .svc-name, .svc-desc, .t, .txt, .op, .label, .meta, .close-word, .nav span, .num';
+        this.banner = document.getElementById('editBanner');
+        this.toggleBtn = document.getElementById('editToggle');
+        this.restore();
+    }
+
+    get elements(){ return Array.from(document.querySelectorAll(this.selector)); }
+
+    toggleEditMode(){
+        this.isActive = !this.isActive;
+        document.body.classList.toggle('edit-active', this.isActive);
+        this.banner.classList.toggle('active', this.isActive);
+        this.toggleBtn.classList.toggle('active', this.isActive);
+        this.toggleBtn.textContent = this.isActive ? '✓' : '✏️';
+
+        this.elements.forEach((el,i)=>{
+            if(this.isActive){
+                el.setAttribute('contenteditable','true');
+                el.dataset.editKey = 'swm-he-' + i;
+                el.addEventListener('input', this.save);
+            }else{
+                el.removeAttribute('contenteditable');
+                el.removeEventListener('input', this.save);
+            }
+        });
+    }
+
+    save = ()=>{
+        const data = {};
+        this.elements.forEach((el,i)=>{ data['swm-he-'+i] = el.innerHTML; });
+        try{ localStorage.setItem('swarmops-he-deck', JSON.stringify(data)); }catch(e){}
+    }
+
+    restore(){
+        let data;
+        try{ data = JSON.parse(localStorage.getItem('swarmops-he-deck')); }catch(e){ return; }
+        if(!data) return;
+        this.elements.forEach((el,i)=>{
+            const v = data['swm-he-'+i];
+            if(typeof v === 'string') el.innerHTML = v;
+        });
+    }
+
+    /* Strip every trace of edit mode before capturing outerHTML, otherwise the
+       exported file opens permanently stuck in edit mode: dashed outlines,
+       a checkmark button and the banner all baked in. */
+    exportFile(){
+        const editable = Array.from(document.querySelectorAll('[contenteditable]'));
+        editable.forEach(el=>el.removeAttribute('contenteditable'));
+        document.body.classList.remove('edit-active');
+        this.toggleBtn.classList.remove('active','show');
+        this.banner.classList.remove('active','show');
+        const wasIcon = this.toggleBtn.textContent;
+        this.toggleBtn.textContent = '✏️';
+
+        const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
+        // Put the user straight back where they were.
+        if(this.isActive){
+            document.body.classList.add('edit-active');
+            editable.forEach(el=>el.setAttribute('contenteditable','true'));
+            this.toggleBtn.classList.add('active');
+            this.banner.classList.add('active');
+            this.toggleBtn.textContent = wasIcon;
+        }
+
+        const blob = new Blob([html],{type:'text/html'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'pitch-he.html';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+}
+
+const deck = new SlidePresentation();
+const editor = new InlineEditor();
+
+/* --- edit mode entry points: button, hotzone, E key --------------------- */
+const hotzone = document.querySelector('.edit-hotzone');
+const editToggle = document.getElementById('editToggle');
+let hideTimeout = null;
+
+// JS-based hover with a grace period. A CSS ~ sibling selector cannot work
+// here: pointer-events:none on the button breaks the hover chain the moment
+// the cursor leaves the hotzone heading toward the button.
+hotzone.addEventListener('mouseenter',()=>{
+    clearTimeout(hideTimeout);
+    editToggle.classList.add('show');
+});
+hotzone.addEventListener('mouseleave',()=>{
+    hideTimeout = setTimeout(()=>{ if(!editor.isActive) editToggle.classList.remove('show'); },400);
+});
+editToggle.addEventListener('mouseenter',()=>clearTimeout(hideTimeout));
+editToggle.addEventListener('mouseleave',()=>{
+    hideTimeout = setTimeout(()=>{ if(!editor.isActive) editToggle.classList.remove('show'); },400);
+});
+editToggle.addEventListener('click',()=>editor.toggleEditMode());
+
+document.addEventListener('keydown',(e)=>{
+    if((e.key === 'e' || e.key === 'E') && !e.target.getAttribute('contenteditable')){
+        editor.toggleEditMode();
+    }
+    if((e.ctrlKey || e.metaKey) && e.key === 's'){
+        e.preventDefault();
+        editor.exportFile();
+    }
+});
+
+// First slide is already on screen at load, so reveal it without waiting.
+document.querySelector('.slide').classList.add('visible');
+</script>
+</body>
+</html>
