@@ -666,7 +666,7 @@ body.edit-active [contenteditable]:focus { outline: 2px solid var(--accent); }
                left-anchored, clear of the rotor's right edge (x=103), so it
                never sits on top of the red rotor. Raised to y=9/21 (was
                24/38) so it clears the telemetry-service box's top edge
-               (y=26) too — at this width ("TelemetryEvent" alone runs past
+               (y=26) too. At this width ("TelemetryEvent" alone runs past
                x=210) it was spilling into the box's top-left corner
                regardless of x; sitting entirely above y=26 removes the
                overlap no matter how wide the label is. -->
@@ -743,10 +743,10 @@ body.edit-active [contenteditable]:focus { outline: 2px solid var(--accent); }
       <div class="rule reveal"></div>
       <ul class="points reveal">
         <li>One template stamps out all 8 services, instead of <b>8 near-duplicate YAML files</b>.</li>
-        <li>Mongo and RabbitMQ aren't hand-written — they're pulled in as <b>Bitnami dependencies</b>.</li>
+        <li>Mongo and RabbitMQ aren't hand-written. They're pulled in as <b>Bitnami dependencies</b>.</li>
         <li><em>drone-simulator</em> is the one exception: it's a background worker, so it skips the Service object entirely.</li>
       </ul>
-      <p class="note reveal"><b>Why services: is a map, not a list:</b> CI bumps one service's image tag by layering a tiny override file on top. Helm merges maps key-by-key, so that touches only that one service — but it replaces lists outright, which would've wiped out the other 7.</p>
+      <p class="note reveal"><b>Why services: is a map, not a list:</b> CI bumps one service's image tag by layering a tiny override file on top. Helm merges maps key-by-key, so that touches only that one service. A list would've been replaced outright, wiping out the other 7.</p>
     </div>
   </div>
 </section>
@@ -1158,15 +1158,15 @@ body.edit-active [contenteditable]:focus { outline: 2px solid var(--accent); }
       <div class="rule reveal"></div>
       <div class="fixes reveal" style="max-width:960px">
         <div class="fix">
-          <span class="h">RabbitMQ self-healed live, by accident</span>
-          <span class="d">Minutes after fixing reconnect-on-drop across fleet/notification/telemetry-service, RabbitMQ's pod got rescheduled again — an Argo CD hard-refresh side effect. All three hit the exact failure live and self-healed. Zero manual intervention.</span>
+          <span class="h">RabbitMQ healed itself, live</span>
+          <span class="d">We taught three services to auto-reconnect if RabbitMQ drops. Minutes later, RabbitMQ's pod got rescheduled for real. All three reconnected on their own. Nobody touched a keyboard.</span>
         </div>
         <div class="fix">
-          <span class="h">The camera-feed race, for the record</span>
-          <span class="d">A frame/tag interleaving race where only one of two concurrent drone feeds ever rendered, plus a relay bug where producers received each other's traffic unread forever until it stalled. Real concurrency bugs, worth walking through live.</span>
+          <span class="h">The solver failed silently</span>
+          <span class="d">Two bugs, same root cause: statuses weren't synced across services. A busy drone could get double-booked. A mission with no drones free just vanished instead of showing as infeasible. Both fixed and verified live.</span>
         </div>
       </div>
-      <p class="note reveal">One's proof the resilience fix holds up under a real failure; the other's a real bug, worth walking through live.</p>
+      <p class="note reveal">One is proof the fix holds up in a real failure. The other is a bug that fails quietly, which is exactly why it's worth showing live.</p>
     </div>
   </div>
 </section>
@@ -1195,7 +1195,7 @@ body.edit-active [contenteditable]:focus { outline: 2px solid var(--accent); }
           <!-- ==========================================================
                Draw order matters: every box, then every connector line,
                then every label, last. Labels are the topmost layer on
-               purpose — several connectors cross the same space a label
+               purpose: several connectors cross the same space a label
                occupies (e.g. the ALB→gateway drop passes right through
                the "EKS cluster" / "namespace: swarmops" captions), and
                with text painted last it always sits cleanly on top
@@ -1273,8 +1273,8 @@ body.edit-active [contenteditable]:focus { outline: 2px solid var(--accent); }
           <!-- runs along the AWS boundary's own bottom edge (y=462) out to
                the open gap between the argocd and monitoring namespace
                boxes, then ticks up 12px onto the EKS cluster's outer
-               border. The old version cut inward to y=436 — the argocd
-               namespace box's own bottom edge — landing a 4px stub right
+               border. The old version cut inward to y=436, the argocd
+               namespace box's own bottom edge, landing a 4px stub right
                on that box's corner instead of a clean hit on the cluster
                boundary. -->
           <path class="edge" d="M132 356 H152 V462 H584 V450" marker-end="url(#ar-a)" />
@@ -1319,7 +1319,7 @@ body.edit-active [contenteditable]:focus { outline: 2px solid var(--accent); }
           <text x="874" y="400" text-anchor="middle">Loki · Grafana</text>
 
           <!-- moved into the open pocket of empty space between the
-               GitHub and Terraform boxes on the left rail — the old spot
+               GitHub and Terraform boxes on the left rail. The old spot
                (148,192) had this two-line label starting a hair right of
                GitHub's own box, so it ran straight across both the
                connector line at x=160 and the AWS boundary's dashed edge
@@ -1330,7 +1330,7 @@ body.edit-active [contenteditable]:focus { outline: 2px solid var(--accent); }
                trick as "watched by / Argo CD" above) instead of the old
                spot at (300,456), which had the label's full width jammed
                into the 12px gap between the EKS box's bottom border and
-               the AWS boundary's bottom border — and growing the canvas
+               the AWS boundary's bottom border, and growing the canvas
                to fit it there instead pushed this whole slide's closing
                note down into the fixed footer bar, worse trade. Split to
                two lines: the full string is ~208px wide, wider than the
