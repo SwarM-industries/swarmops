@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SwarmOps · מצגת</title>
+
+<!-- Heebo, one family at two extremes of weight (900 display / 300 body).
+     Deliberately NOT Archivo Black like presentation.html: Archivo carries no
+     Hebrew glyphs, so Hebrew set in it silently falls back to a system font
+     and loses the whole typographic identity. Heebo is Hebrew + Latin in one
+     family, so the Hebrew copy and the English service names sit together
+     without a second typeface. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+<style>
+/* ===========================================================================
+   TOKENS
+   Warm paper, near-black ink, one signal red. A single muted green appears
+   only as a status marker on the security sheet, never as decoration.
+   =========================================================================== */
+:root{
+    --paper:  #f4f2ee;
+    --ink:    #111110;
+    --muted:  #6d6c68;
+    --hair:   #cfccc5;
+    --accent: #ff3300;
+    --ok:     #2f6b3f;
+
+    --font: 'Heebo', sans-serif;
+    --ease: cubic-bezier(.16,1,.3,1);
+    --dur: .65s;
+
+    --pad: clamp(1rem, 3.2vw, 3.2rem);
+    --gap: clamp(.45rem, 1.5vh, 1rem);
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+/* ===========================================================================
+   VIEWPORT BASE
+   Every sheet is exactly one viewport tall and never scrolls internally.
+   =========================================================================== */
+html,body{ height:100%; overflow-x:hidden; }
+html{ scroll-snap-type:y mandatory; scroll-behavior:smooth; }
+
+body{
+    background:var(--paper); color:var(--ink);
+    font-family:var(--font); font-weight:400;
+    -webkit-font-smoothing:antialiased;
+}
+
+.slide{
+    width:100vw; height:100vh; height:100dvh;
+    overflow:hidden;                 /* CRITICAL: never scroll inside a sheet */
+    scroll-snap-align:start;
+    position:relative;
+    display:grid;
+    grid-template-rows:1fr auto;
+    padding:var(--pad);
+    padding-bottom:clamp(1.5rem,3.6vh,2.2rem);
+}
+
+/* ===========================================================================
+   SHEET FURNITURE
+   A big red section number at the start edge, the wordmark at the end edge,
+   and a hairline over both. That bar is the only fixed structure; everything
+   above it is free to change shape sheet to sheet.
+
+   The bar is authored first in the markup (it names the sheet, so it reads
+   first to a screen reader) but placed in the second grid row, so no explicit
+   row assignment on .main would leave auto-placement putting the bar back on
+   top. Both rows are therefore assigned by hand.
+   =========================================================================== */
+.head{
+    grid-row:2;
+    display:flex; align-items:baseline; justify-content:space-between;
+    gap:1rem; padding-top:clamp(.35rem,1vh,.7rem);
+    border-top:1px solid var(--hair);
+}
+.num{
+    font-weight:900; font-size:clamp(1.5rem,3.6vw,2.8rem); line-height:1;
+    color:var(--accent); font-variant-numeric:tabular-nums; letter-spacing:-.02em;
+}
+.mark{
+    display:flex; align-items:center; gap:.45em;
+    font-weight:700; font-size:clamp(.8rem,1.4vw,1.1rem); color:var(--muted);
+    letter-spacing:.02em; white-space:nowrap;
+}
+.mark img{ width:clamp(1.1rem,2.2vw,1.7rem); height:auto; opacity:.75; }
+
+/* main region: centred, but never taller than the row it sits in */
+.main{
+    grid-row:1;
+    min-height:0;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    text-align:center;
+    gap:var(--gap);
+}
+
+/* ===========================================================================
+   TYPE
+   Hierarchy comes from size and weight only.
+   =========================================================================== */
+.kicker{
+    font-weight:700; font-size:clamp(1rem,1.8vw,1.45rem);
+    letter-spacing:.14em; color:var(--muted);
+}
+h1{
+    font-weight:900; line-height:1.02; letter-spacing:-.035em;
+    font-size:clamp(2.9rem,8.8vw,7rem);
+    text-wrap:balance;
+}
+h2{
+    font-weight:900; line-height:1.05; letter-spacing:-.03em;
+    font-size:clamp(2.3rem,6.4vw,5rem);
+    max-width:19ch; text-wrap:balance;
+}
+.rule{
+    height:clamp(6px,.9vh,9px); width:clamp(90px,12vw,165px);
+    background:var(--accent); flex:none;
+}
+.lede{
+    font-weight:300; line-height:1.35;
+    font-size:clamp(1.35rem,2.9vw,2.35rem);
+    max-width:32ch; color:var(--ink);
+}
+.note{
+    font-weight:400; line-height:1.4;
+    font-size:clamp(1.05rem,1.9vw,1.55rem);
+    max-width:40ch; color:var(--muted);
+}
+.note b{ color:var(--ink); font-weight:700; }
+.byline{
+    font-weight:700; font-size:clamp(1.15rem,2.2vw,1.8rem); letter-spacing:.02em;
+}
+
+/* ===========================================================================
+   POINTS
+   Start-aligned inside a centred sheet: ragged-centre body copy is harder to
+   scan than a flush edge, even when the sheet itself is symmetric.
+   =========================================================================== */
+ul.points{ list-style:none; display:flex; flex-direction:column; gap:clamp(.5rem,1.5vh,1.05rem); text-align:start; }
+ul.points li{
+    font-weight:300; line-height:1.3;
+    font-size:clamp(1.3rem,2.6vw,2.05rem);
+    max-width:30ch;
+    padding-inline-start:.9em; position:relative;
+}
+ul.points li::before{
+    content:""; position:absolute; inset-inline-start:0; top:.58em;
+    width:.32em; height:.32em; background:var(--accent);
+}
+ul.points b{ font-weight:700; }
+
+/* status-marked points (security sheet) */
+ul.points li.st{ padding-inline-start:0; display:flex; gap:.65em; align-items:baseline; }
+ul.points li.st::before{ display:none; }
+.tagpill{
+    flex:none; font-weight:700; letter-spacing:.1em;
+    font-size:clamp(.7rem,1.2vw,.95rem);
+    padding:.3em .65em; border:2px solid currentColor; line-height:1;
+}
+.tagpill.ok{ color:var(--ok); }
+.tagpill.tbd{ color:var(--accent); }
+
+/* ===========================================================================
+   CARDS
+   Hard-edged bordered boxes. Red border marks the failure/risk cards.
+   =========================================================================== */
+.cards{
+    display:grid; gap:clamp(.5rem,1.2vw,1rem);
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    width:100%; max-width:1120px; text-align:start;
+}
+.cards.two{ grid-template-columns:repeat(2,minmax(0,1fr)); max-width:800px; }
+.card{
+    border:2px solid var(--ink);
+    padding:clamp(.75rem,2.2vh,1.25rem) clamp(.7rem,1.4vw,1.15rem);
+}
+.card .h{
+    display:block; font-weight:900; line-height:1.12;
+    font-size:clamp(1.2rem,2.15vw,1.75rem); margin-bottom:.35em;
+}
+.card .d{
+    display:block; font-weight:300; line-height:1.3; color:var(--muted);
+    font-size:clamp(1rem,1.65vw,1.35rem);
+}
+.card.risk{ border-color:var(--accent); }
+.card.risk .h{ color:var(--accent); }
+
+/* ===========================================================================
+   PEOPLE
+   Real photographs, uniform 3:4 frame. tony.jpg and valfish.jpg are already
+   3:4 so they are uncropped; guy2.jpg is far taller than 3:4 with the subject
+   low in frame, so its focal point is pulled down rather than centre-cropping
+   the subject out of the picture.
+   =========================================================================== */
+.people{
+    display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:clamp(.6rem,1.6vw,1.4rem);
+    width:100%; max-width:920px;
+}
+.person{ display:flex; flex-direction:column; gap:.5em; }
+.person img{
+    display:block; width:100%; aspect-ratio:3/4; object-fit:cover;
+    max-height:min(42vh,340px); max-width:100%;
+    border:2px solid var(--ink); filter:grayscale(1) contrast(1.05);
+}
+.person img.low{ object-position:center 58%; }
+.p-name{ font-weight:900; font-size:clamp(1.3rem,2.5vw,2rem); line-height:1.1; }
+.p-role{ font-weight:400; font-size:clamp(1rem,1.7vw,1.35rem); color:var(--accent); line-height:1.25; }
+
+/* ===========================================================================
+   STRIP
+   The field photographs. Square frames on purpose: the sources are all 3:4
+   portrait, and a square crop keeps the subject (airframe, or the screen of
+   the controller) while costing far less vertical room than four portraits
+   in a row would.
+
+   Left in colour while the portraits above are greyscale. That is the whole
+   distinction being drawn: the people are the team, these are the equipment
+   and the live telemetry they were reading in the field.
+   =========================================================================== */
+.strip{
+    display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:clamp(.45rem,1.2vw,.9rem);
+    width:100%; max-width:940px;
+}
+.strip img{
+    display:block; width:100%; aspect-ratio:1/1; object-fit:cover;
+    max-height:min(26vh,215px); max-width:100%;
+    border:2px solid var(--ink);
+}
+.strip img.low{ object-position:center 62%; }
+
+/* ===========================================================================
+   FIGURES
+   Flow diagrams. Thick strokes, real arrowheads, big labels, readable from
+   the back of a room.
+
+   Wires are always drawn solid. An earlier version animated them in by
+   stroke-dash, with one hardcoded dash length shared by every path; any path
+   longer than that number was silently truncated mid-render, arrowhead left
+   floating in space. Motion now rides ON TOP of a solid wire as a travelling
+   pulse whose dash length is measured per path at runtime, so a wire can
+   never be missing no matter its geometry.
+   =========================================================================== */
+.figure{ width:100%; max-width:min(100%,880px); }
+.figure svg{ width:100%; height:auto; display:block; overflow:visible; }
+.figure text{ font-family:var(--font); font-weight:700; font-size:22px; fill:var(--ink); }
+.figure .t-out{ fill:var(--paper); }
+.figure .t-sm{ font-weight:500; font-size:17px; fill:var(--muted); }
+.figure .box{ fill:var(--paper); stroke:var(--ink); stroke-width:2.5; }
+.figure .box-fill{ fill:var(--ink); stroke:none; }
+.figure .box-hot{ fill:var(--accent); stroke:none; }
+.figure .box-line-hot{ fill:var(--paper); stroke:var(--accent); stroke-width:3; }
+.figure .wire{ fill:none; stroke:var(--ink); stroke-width:2.5; }
+/* the travelling highlight, cloned from each wire by script */
+.figure .pulse{ fill:none; stroke:var(--accent); stroke-width:6; stroke-linecap:round; pointer-events:none; }
+
+/* Nodes rise once as the sheet arrives; the pulses then loop forever. */
+.figure .node{ opacity:0; transform:translateY(10px); transition:opacity .5s var(--ease), transform .5s var(--ease); }
+.slide.visible .figure .node{ opacity:1; transform:translateY(0); }
+.slide.visible .figure .node.n1{ transition-delay:.16s; }
+.slide.visible .figure .node.n2{ transition-delay:.26s; }
+.slide.visible .figure .node.n3{ transition-delay:.36s; }
+.slide.visible .figure .node.n4{ transition-delay:.46s; }
+.slide.visible .figure .node.n5{ transition-delay:.56s; }
+.slide.visible .figure .node.n6{ transition-delay:.66s; }
+.slide.visible .figure .node.n7{ transition-delay:.76s; }
+
+@media (max-height:780px){ .figure{ max-width:min(100%,720px); } }
+@media (max-height:640px){ .figure{ max-width:min(100%,580px); } }
+
+/* ===========================================================================
+   ASSET SLOTS
+   Dashed frames marking content that still has to be dropped in. Everything
+   else in the deck is a solid rule or border, so dashed reads instantly as
+   "not finished" even from across a room.
+   =========================================================================== */
+.slot{
+    width:100%; max-width:660px; aspect-ratio:16/9;
+    border:3px dashed var(--hair);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:.6em; padding:1rem; text-align:center;
+}
+.slot svg{ width:clamp(1.9rem,3.8vw,3rem); height:auto; stroke:var(--muted); fill:none; stroke-width:1.4; }
+.slot .s-label{
+    font-weight:900; letter-spacing:.12em; color:var(--accent);
+    font-size:clamp(.85rem,1.45vw,1.15rem);
+}
+.slot .s-note{
+    font-weight:300; color:var(--muted); line-height:1.35; max-width:32ch;
+    font-size:clamp(.95rem,1.55vw,1.25rem);
+}
+
+/* ===========================================================================
+   TITLE + CLOSING
+   =========================================================================== */
+/* Mark stacked over name, tight, so the two read as one lockup rather than
+   as two separate stacked elements. Matches the real logo.png, which stacks
+   the same way. */
+.lockup{ display:flex; flex-direction:column; align-items:center; gap:clamp(.25rem,1vh,.7rem); }
+.lockup img{ width:clamp(84px,10.5vw,160px); height:auto; }
+.lockup .wordmark{ font-size:clamp(3.2rem,10vw,7.2rem); line-height:.92; }
+
+.logo-sm{ width:clamp(70px,9vw,120px); height:auto; opacity:.85; }
+.wordmark{ font-weight:900; font-size:clamp(2.8rem,8.5vw,6rem); line-height:1; letter-spacing:-.03em; }
+
+/* ===========================================================================
+   REVEAL
+   =========================================================================== */
+.reveal{ opacity:0; transform:translateY(22px); transition:opacity var(--dur) var(--ease), transform var(--dur) var(--ease); }
+.slide.visible .reveal{ opacity:1; transform:translateY(0); }
+.slide.visible .main > .reveal:nth-child(1){ transition-delay:.06s; }
+.slide.visible .main > .reveal:nth-child(2){ transition-delay:.14s; }
+.slide.visible .main > .reveal:nth-child(3){ transition-delay:.22s; }
+.slide.visible .main > .reveal:nth-child(4){ transition-delay:.30s; }
+.slide.visible .main > .reveal:nth-child(5){ transition-delay:.38s; }
+.slide.visible .main > .reveal:nth-child(6){ transition-delay:.46s; }
+
+/* ===========================================================================
+   CHROME
+   =========================================================================== */
+.progress{ position:fixed; top:0; right:0; height:3px; width:0%; background:var(--accent); z-index:900; transition:width .25s linear; }
+.dots{ position:fixed; inset-inline-start:clamp(.5rem,1.4vw,1.1rem); top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:clamp(.3rem,.8vh,.55rem); z-index:900; }
+.dots button{ width:8px; height:8px; padding:0; border:2px solid var(--hair); background:transparent; cursor:pointer; border-radius:50%; transition:background .2s, border-color .2s, transform .2s; }
+.dots button.on{ background:var(--accent); border-color:var(--accent); transform:scale(1.25); }
+/* Sits at the TOP now: the bar moved to the foot of the sheet, and the
+   wordmark end of it lands exactly where this used to be. Top-start is taken
+   by the edit button, so this goes top-end. */
+.hint{ position:fixed; top:clamp(.5rem,1.4vh,1rem); inset-inline-end:clamp(.7rem,2vw,1.6rem); font-weight:500; font-size:.7rem; letter-spacing:.1em; color:var(--muted); opacity:.6; z-index:900; pointer-events:none; }
+
+/* ===========================================================================
+   EDIT MODE
+   =========================================================================== */
+.edit-zone{ position:fixed; top:0; inset-inline-start:0; width:74px; height:74px; z-index:1000; cursor:pointer; }
+.edit-btn{
+    position:fixed; top:clamp(.5rem,1.3vh,.9rem); inset-inline-start:clamp(.5rem,1.3vw,.9rem);
+    width:38px; height:38px; border:2px solid var(--ink); background:var(--paper);
+    color:var(--ink); font-size:15px; cursor:pointer; z-index:1001;
+    opacity:0; pointer-events:none; transition:opacity .3s ease;
+}
+.edit-btn.show,.edit-btn.on{ opacity:1; pointer-events:auto; }
+.edit-btn.on{ border-color:var(--accent); color:var(--accent); }
+.edit-bar{
+    position:fixed; top:0; inset-inline:0; z-index:1000;
+    background:var(--accent); color:#fff; text-align:center;
+    font-weight:700; font-size:.75rem; letter-spacing:.06em; padding:.45em;
+    opacity:0; pointer-events:none; transition:opacity .3s ease;
+}
+.edit-bar.on{ opacity:1; }
+body.editing [contenteditable]{ outline:1px dashed var(--accent); outline-offset:3px; }
+body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
+
+/* ===========================================================================
+   RESPONSIVE
+   Aggressive on short viewports: prose is the first thing to go, structure
+   and headlines are the last.
+   =========================================================================== */
+@media (max-height:820px){
+    :root{ --pad:clamp(.85rem,2.6vw,2.2rem); }
+    h1{ font-size:clamp(2.4rem,7vw,5rem); }
+    h2{ font-size:clamp(1.9rem,5.2vw,3.6rem); }
+    .lede{ font-size:clamp(1.15rem,2.3vw,1.8rem); }
+    ul.points li{ font-size:clamp(1.1rem,2.2vw,1.7rem); }
+}
+@media (max-height:680px){
+    .person img{ max-height:30vh; }
+    .strip img{ max-height:19vh; }
+    .note{ font-size:clamp(.9rem,1.4vw,1.15rem); }
+    ul.points li{ font-size:clamp(1rem,1.9vw,1.4rem); }
+    .card .h{ font-size:clamp(1rem,1.8vw,1.35rem); }
+    .card .d{ font-size:clamp(.85rem,1.35vw,1.08rem); }
+    .lede{ font-size:clamp(1rem,1.9vw,1.45rem); }
+}
+@media (max-height:560px){
+    .dots,.hint{ display:none; }
+    .card .d,.slot .s-note{ display:none; }
+    .slot{ aspect-ratio:21/9; }
+    .lede{ font-size:clamp(.95rem,1.7vw,1.2rem); }
+    .strip img{ max-height:15vh; }
+}
+@media (max-width:820px){
+    .cards,.cards.two{ grid-template-columns:1fr; }
+    .people{ grid-template-columns:repeat(3,minmax(0,1fr)); gap:.5rem; }
+    /* Names stay, roles go: three names still identify the team, three roles
+       at this width wrap to four lines each and push the photos off-sheet. */
+    .p-role{ display:none; }
+    .strip{ grid-template-columns:repeat(4,minmax(0,1fr)); gap:.35rem; }
+}
+
+@media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{ animation-duration:.01ms !important; transition-duration:.15s !important; }
+    html{ scroll-behavior:auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<nav class="dots" id="dots" aria-label="ניווט שקופיות"></nav>
+<p class="hint" dir="ltr">← → / SPACE</p>
+
+<div class="edit-zone"></div>
+<button class="edit-btn" id="editBtn" title="מצב עריכה (E)">✏️</button>
+<div class="edit-bar" id="editBar">מצב עריכה · לחצו על טקסט כדי לערוך · Ctrl+S ייצוא · Ctrl+Shift+Del איפוס</div>
+
+
+<!-- ==========================================================================
+     01 · פתיחה
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">01</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">פרויקט גמר · 2026</p>
+    <div class="lockup reveal">
+      <img src="presentation-assets/logo-mark.png" alt="הלוגו של SwarmOps">
+      <span class="wordmark">SwarmOps</span>
+    </div>
+    <div class="rule reveal"></div>
+    <p class="lede reveal">המערכת שמחליטה מי טס לאן, ומעדכנת את עצמה תוך כדי טיסה.</p>
+    <p class="byline reveal">גיא &nbsp;·&nbsp; טוני &nbsp;·&nbsp; וולפיש</p>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     02 · הצוות
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">02</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">הצוות</p>
+    <h2 class="reveal">שלושה אנשים, שלושה תפקידים</h2>
+    <div class="rule reveal"></div>
+    <div class="people reveal">
+      <figure class="person">
+        <img src="presentation-assets/tony.jpg" alt="טוני">
+        <figcaption>
+          <span class="p-name">טוני</span><br>
+          <span class="p-role">צלף</span>
+        </figcaption>
+      </figure>
+      <figure class="person">
+        <img class="low" src="presentation-assets/guy2.jpg" alt="גיא">
+        <figcaption>
+          <span class="p-name">גיא</span><br>
+          <span class="p-role">חובש קרבי, חילוץ והצלה</span>
+        </figcaption>
+      </figure>
+      <figure class="person">
+        <img src="presentation-assets/valfish.jpg" alt="וולפיש">
+        <figcaption>
+          <span class="p-name">וולפיש</span><br>
+          <span class="p-role">מפעיל טנק</span>
+        </figcaption>
+      </figure>
+    </div>
+    <p class="note reveal">שלושתנו שירתנו בסדיר, כל אחד בעולם אחר.</p>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     03 · הרקע
+     Where the idea actually came from. The closing line is the hinge into
+     sheet 04: it states the limit they each hit in the field, which is the
+     exact problem the whole system exists to remove.
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">03</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">הרקע</p>
+    <h2 class="reveal">את הרחפנים פגשנו בשטח</h2>
+    <div class="rule reveal"></div>
+    <p class="lede reveal">בכל אחד מהתפקידים האלה ראינו רחפנים עובדים. לא בכיתה.</p>
+    <div class="strip reveal">
+      <img src="presentation-assets/drones/drone1.jpeg" alt="רחפן בשטח">
+      <img src="presentation-assets/drones/drone2.jpeg" alt="מסך שליטה בראייה תרמית">
+      <img src="presentation-assets/drones/drone3.jpeg" alt="מסך שליטה עם נתוני טיסה">
+      <img class="low" src="presentation-assets/drones/drone4.jpeg" alt="רחפן לפני שיגור בלילה">
+    </div>
+    <p class="note reveal">רחפן אחד, מפעיל אחד, <b>תשומת לב מלאה</b>. אף אחד לא תיאם עשרה בו זמנית.</p>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     04 · הבעיה (PRD §1.1)
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">04</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">הבעיה</p>
+    <h2 class="reveal">יותר מדי בשביל ראש אחד</h2>
+    <div class="rule reveal"></div>
+    <p class="lede reveal">מפעיל מסתדר עם 3-4 רחפנים. מעבר לזה, יותר מדי משתנה בבת אחת.</p>
+    <div class="cards reveal">
+      <div class="card risk">
+        <span class="h">זמן טיסה מבוזבז</span>
+        <span class="d">רחפן טס רחוק כשקרוב יותר היה פנוי.</span>
+      </div>
+      <div class="card risk">
+        <span class="h">משימות שמתפספסות</span>
+        <span class="d">משימה דחופה מחכה בתור.</span>
+      </div>
+      <div class="card risk">
+        <span class="h">רחפן שנתקע</span>
+        <span class="d">יוצא בלי מספיק סוללה לחזור.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     05 · המחיר
+     The chain is the argument: each step is a consequence of the one before
+     it, so the cost claim at the end is something the room watched being
+     built rather than a number asserted on its own.
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">05</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">המחיר</p>
+    <h2 class="reveal">איך העלות מצטברת</h2>
+    <div class="rule reveal"></div>
+    <div class="figure reveal">
+      <svg viewBox="0 0 720 170" role="img" aria-label="שרשרת: עוד רחפנים מובילים ליותר החלטות, לשיבוץ שגוי, ולעלות מיותרת">
+        <defs>
+          <marker id="a5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="#111110" />
+          </marker>
+        </defs>
+
+        <g class="node n1">
+          <rect class="box" x="570" y="30" width="150" height="72" />
+          <text x="645" y="73" text-anchor="middle">עוד רחפנים</text>
+        </g>
+        <path class="wire" d="M566 66 H538" marker-end="url(#a5)" />
+
+        <g class="node n2">
+          <rect class="box" x="380" y="30" width="150" height="72" />
+          <text x="455" y="73" text-anchor="middle">יותר החלטות</text>
+        </g>
+        <path class="wire" d="M376 66 H348" marker-end="url(#a5)" />
+
+        <g class="node n3">
+          <rect class="box" x="190" y="30" width="150" height="72" />
+          <text x="265" y="73" text-anchor="middle">שיבוץ שגוי</text>
+        </g>
+        <path class="wire" d="M186 66 H158" marker-end="url(#a5)" />
+
+        <g class="node n4">
+          <rect class="box-hot" x="0" y="30" width="150" height="72" />
+          <text class="t-out" x="75" y="73" text-anchor="middle">עלות מיותרת</text>
+        </g>
+
+        <text class="t-sm node n4" x="75" y="132" text-anchor="middle">שעות וסוללות</text>
+        <text class="t-sm node n1" x="645" y="132" text-anchor="middle">הצי גדל</text>
+      </svg>
+    </div>
+    <p class="note reveal"><b>הערכה להמחשה:</b> שיבוץ לא אופטימלי מוסיף כ-15% זמן טיסה מיותר.</p>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     06 · הרעיון
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">06</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">הרעיון</p>
+    <h2 class="reveal">שהמחשב יחליט מי טס לאן</h2>
+    <div class="rule reveal"></div>
+    <div class="figure reveal">
+      <svg viewBox="0 0 680 175" role="img" aria-label="הצי והמשימות נכנסים, המערכת מחליטה, ויוצאת תוכנית טיסה">
+        <defs>
+          <marker id="a6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="#111110" />
+          </marker>
+        </defs>
+
+        <g class="node n1">
+          <rect class="box" x="490" y="26" width="190" height="86" />
+          <text x="585" y="60" text-anchor="middle">הצי</text>
+          <text x="585" y="90" text-anchor="middle">והמשימות</text>
+        </g>
+        <path class="wire" d="M486 69 H446" marker-end="url(#a6)" />
+
+        <g class="node n2">
+          <rect class="box-hot" x="245" y="26" width="196" height="86" />
+          <text class="t-out" x="343" y="77" text-anchor="middle">המערכת מחליטה</text>
+        </g>
+        <path class="wire" d="M241 69 H201" marker-end="url(#a6)" />
+
+        <g class="node n3">
+          <rect class="box" x="8" y="26" width="188" height="86" />
+          <text x="102" y="77" text-anchor="middle">תוכנית טיסה</text>
+        </g>
+
+        <text class="t-sm node n1" x="585" y="142" text-anchor="middle">מה שיש</text>
+        <text class="t-sm node n2" x="343" y="142" text-anchor="middle">שיבוץ ומסלול</text>
+        <text class="t-sm node n3" x="102" y="142" text-anchor="middle">מוכן להמראה</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     07 · המערכת (PRD §3.1)
+     Real service names, one plain line each. The names are here so the room
+     can follow who built what, not so anyone has to understand the internals.
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">07</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">מהמערכת בנויה</p>
+    <h2 class="reveal">שש חתיכות שמדברות ביניהן</h2>
+    <div class="rule reveal"></div>
+    <p class="lede reveal">במקום תוכנה אחת גדולה, שש קטנות. כל אחת יכולה ליפול ולקום לבד.</p>
+    <div class="figure reveal">
+      <svg viewBox="0 0 700 205" role="img" aria-label="עץ שירותים: שער כניסה אחד בראש, מסתעף לשישה שירותים">
+        <g class="node n1">
+          <rect class="box-fill" x="265" y="4" width="170" height="56" />
+          <text class="t-out" x="350" y="39" text-anchor="middle">שער כניסה</text>
+        </g>
+
+        <path class="wire" d="M350 60 V96 H62 V134" />
+        <path class="wire" d="M350 60 V96 H177 V134" />
+        <path class="wire" d="M350 60 V96 H292 V134" />
+        <path class="wire" d="M350 60 V96 H407 V134" />
+        <path class="wire" d="M350 60 V96 H522 V134" />
+        <path class="wire" d="M350 60 V96 H637 V134" />
+
+        <g class="node n2"><rect class="box" x="10" y="134" width="105" height="52" /><text x="62" y="167" text-anchor="middle" dir="ltr">auth</text></g>
+        <g class="node n3"><rect class="box" x="125" y="134" width="105" height="52" /><text x="177" y="167" text-anchor="middle" dir="ltr">fleet</text></g>
+        <g class="node n4"><rect class="box" x="240" y="134" width="105" height="52" /><text x="292" y="167" text-anchor="middle" dir="ltr">mission</text></g>
+        <g class="node n5"><rect class="box-line-hot" x="355" y="134" width="105" height="52" /><text x="407" y="167" text-anchor="middle" dir="ltr" fill="#ff3300">planning</text></g>
+        <g class="node n6"><rect class="box" x="470" y="134" width="105" height="52" /><text x="522" y="167" text-anchor="middle" dir="ltr">telemetry</text></g>
+        <g class="node n7"><rect class="box" x="585" y="134" width="105" height="52" /><text x="637" y="167" text-anchor="middle" dir="ltr">notify</text></g>
+      </svg>
+    </div>
+    <p class="note reveal"><b style="color:#ff3300">planning</b> הוא המוח: הוא מחליט מי טס לאן.</p>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     08 · הנתונים
+     Plain-language answer to a rehearsal note: "MongoDB" gets said out loud
+     and nobody in the room knows what it means. The picture carries the one
+     idea that matters, that the stores are separate.
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">08</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">הנתונים</p>
+    <h2 class="reveal">מה זה בעצם מונגו?</h2>
+    <div class="rule reveal"></div>
+    <p class="lede reveal">המקום שבו כל שירות שומר את מה שהוא צריך לזכור.</p>
+    <div class="figure reveal">
+      <svg viewBox="0 0 660 210" role="img" aria-label="שלושה שירותים, לכל אחד מסד הנתונים הנפרד שלו">
+        <defs>
+          <marker id="a8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="#111110" />
+          </marker>
+        </defs>
+
+        <!-- fleet -->
+        <g class="node n1">
+          <rect class="box" x="440" y="4" width="160" height="52" />
+          <text x="520" y="37" text-anchor="middle" dir="ltr">fleet</text>
+        </g>
+        <path class="wire" d="M520 56 V96" marker-end="url(#a8)" />
+        <g class="node n4">
+          <ellipse class="box" cx="520" cy="118" rx="62" ry="15" />
+          <path class="box" d="M458 118 V158 A62 15 0 0 0 582 158 V118" />
+          <text class="t-sm" x="520" y="192" text-anchor="middle">הקלסר שלו</text>
+        </g>
+
+        <!-- mission -->
+        <g class="node n2">
+          <rect class="box" x="250" y="4" width="160" height="52" />
+          <text x="330" y="37" text-anchor="middle" dir="ltr">mission</text>
+        </g>
+        <path class="wire" d="M330 56 V96" marker-end="url(#a8)" />
+        <g class="node n5">
+          <ellipse class="box" cx="330" cy="118" rx="62" ry="15" />
+          <path class="box" d="M268 118 V158 A62 15 0 0 0 392 158 V118" />
+          <text class="t-sm" x="330" y="192" text-anchor="middle">הקלסר שלו</text>
+        </g>
+
+        <!-- planning -->
+        <g class="node n3">
+          <rect class="box-line-hot" x="60" y="4" width="160" height="52" />
+          <text x="140" y="37" text-anchor="middle" dir="ltr" fill="#ff3300">planning</text>
+        </g>
+        <path class="wire" d="M140 56 V96" marker-end="url(#a8)" />
+        <g class="node n6">
+          <ellipse class="box" cx="140" cy="118" rx="62" ry="15" />
+          <path class="box" d="M78 118 V158 A62 15 0 0 0 202 158 V118" />
+          <text class="t-sm" x="140" y="192" text-anchor="middle">הקלסר שלו</text>
+        </g>
+      </svg>
+    </div>
+    <p class="note reveal">אחד לא נוגע במידע של השני.</p>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     09 · האילוצים (PRD §4.1, §6)
+     Four inputs converging on one output: the shape itself says "all of this
+     at once", which is the entire argument for why a person cannot do it.
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">09</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">האילוצים</p>
+    <h2 class="reveal">מה נכנס לחישוב</h2>
+    <div class="rule reveal"></div>
+    <div class="figure reveal">
+      <svg viewBox="0 0 700 250" role="img" aria-label="ארבעה אילוצים מתכנסים לתוכנית טיסה אחת">
+        <defs>
+          <marker id="a9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="#111110" />
+          </marker>
+        </defs>
+
+        <g class="node n1"><rect class="box" x="470" y="4"   width="225" height="48" /><text x="582" y="34"  text-anchor="middle">סוללה</text></g>
+        <g class="node n2"><rect class="box" x="470" y="64"  width="225" height="48" /><text x="582" y="94"  text-anchor="middle">עדיפות ודדליין</text></g>
+        <g class="node n3"><rect class="box" x="470" y="124" width="225" height="48" /><text x="582" y="154" text-anchor="middle">אזורים אסורים</text></g>
+        <g class="node n4"><rect class="box" x="470" y="184" width="225" height="48" /><text x="582" y="214" text-anchor="middle">התאמת מטען</text></g>
+
+        <path class="wire" d="M466 28  C380 28,  350 118, 264 118" marker-end="url(#a9)" />
+        <path class="wire" d="M466 88  C400 88,  350 118, 264 118" marker-end="url(#a9)" />
+        <path class="wire" d="M466 148 C400 148, 350 118, 264 118" marker-end="url(#a9)" />
+        <path class="wire" d="M466 208 C380 208, 350 118, 264 118" marker-end="url(#a9)" />
+
+        <g class="node n5">
+          <rect class="box-hot" x="30" y="82" width="230" height="72" />
+          <text class="t-out" x="145" y="126" text-anchor="middle">תוכנית טיסה</text>
+        </g>
+        <text class="t-sm node n5" x="145" y="180" text-anchor="middle">הכל נשקל יחד</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     10 · בזמן אמת (PRD §1.2)
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">10</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">בזמן אמת</p>
+    <h2 class="reveal">התוכנית משתנה תוך כדי טיסה</h2>
+    <div class="rule reveal"></div>
+    <div class="figure reveal">
+      <svg viewBox="0 0 680 250" role="img" aria-label="מעגל: תוכנית פעילה, משהו משתנה, תכנון מחדש, וחוזר לתוכנית">
+        <defs>
+          <marker id="a10" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="#111110" />
+          </marker>
+        </defs>
+
+        <g class="node n1">
+          <rect class="box" x="480" y="16" width="196" height="82" />
+          <text x="578" y="63" text-anchor="middle">תוכנית פעילה</text>
+        </g>
+        <path class="wire" d="M476 57 H440" marker-end="url(#a10)" />
+
+        <g class="node n2">
+          <rect class="box-hot" x="242" y="16" width="194" height="82" />
+          <text class="t-out" x="339" y="63" text-anchor="middle">משהו משתנה</text>
+        </g>
+        <path class="wire" d="M238 57 H202" marker-end="url(#a10)" />
+
+        <g class="node n3">
+          <rect class="box" x="8" y="16" width="190" height="82" />
+          <text x="103" y="63" text-anchor="middle">תכנון מחדש</text>
+        </g>
+
+        <text class="t-sm node n2" x="339" y="126" text-anchor="middle">סוללה · תקלה · משימה דחופה</text>
+
+        <!-- the loop back: this return leg is the entire point of the sheet -->
+        <path class="wire" d="M103 98 V186 H578 V102" marker-end="url(#a10)" />
+        <text class="t-sm node n3" x="340" y="222" text-anchor="middle">וחוזר חלילה, בלי שאף אחד מבקש</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     11 · הסימולטור (slot: drone-operation video)
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">11</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">הסימולטור</p>
+    <h2 class="reveal">רחפן וירטואלי, כמו אמיתי</h2>
+    <div class="rule reveal"></div>
+    <p class="lede reveal">טס, משדר תמונה, ומגיב בזמן אמת. בלי חומרה אמיתית.</p>
+    <div class="slot reveal">
+      <svg viewBox="0 0 24 24" style="fill:var(--muted); stroke:none;"><path d="M6 4l14 8-14 8V4z"/></svg>
+      <span class="s-label" dir="ltr">VIDEO</span>
+      <span class="s-note">סרטון של הפעלת הרחפן בסימולציה</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     12 · הנראות (slot: live map screenshot)
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">12</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">הנראות</p>
+    <h2 class="reveal">כל הצי במבט אחד</h2>
+    <div class="rule reveal"></div>
+    <p class="lede reveal">איפה כל רחפן, כמה סוללה נשארה, ובאיזו משימה הוא.</p>
+    <div class="slot reveal">
+      <svg viewBox="0 0 24 24"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+      <span class="s-label" dir="ltr">SCREENSHOT</span>
+      <span class="s-note">צילום מסך של המפה החיה</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     13 · הענן (slot: architecture.drawio page 13)
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">13</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">הענן</p>
+    <h2 class="reveal">איפה זה בעצם רץ</h2>
+    <div class="rule reveal"></div>
+    <p class="lede reveal">הכל רץ בענן של אמזון, ברשת פרטית וסגורה.</p>
+    <div class="slot reveal">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><path d="M10 6.5h4M6.5 10v4M17.5 10v4M10 17.5h4"/></svg>
+      <span class="s-label" dir="ltr">DIAGRAM</span>
+      <span class="s-note">architecture.drawio, עמוד 13</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     14 · העלות
+     Every figure here is from swarmops-infrastructure/COST_NOTES.md, not
+     invented: $236-267/mo baseline, ~$140-145/mo tuned, ~$5-15 actually
+     spent. The bars are drawn to true linear scale, which is why the last
+     one is barely a sliver. That contrast IS the point of the sheet, so it
+     is left honest rather than scaled up to look tidier.
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">14</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">העלות</p>
+    <h2 class="reveal">כמה זה עלה לנו</h2>
+    <div class="rule reveal"></div>
+    <div class="figure reveal">
+      <!-- Bars share a right edge at x=690 and grow left, at a true linear
+           scale of 600px per $250. Every edge-anchored label carries an
+           explicit direction:ltr: SVG resolves text-anchor against the text
+           direction, so under this document's RTL "end" would otherwise
+           anchor the LEFT edge and throw the labels off-canvas. -->
+      <svg viewBox="0 0 700 250" role="img" aria-label="השוואת עלויות: ברירת מחדל כ-250 דולר לחודש, אחרי כיוונון כ-140 דולר לחודש, ובפועל שולמו כ-10 דולר בסך הכל">
+        <text class="t-sm node n1" x="690" y="22" text-anchor="end" style="direction:ltr">ברירת מחדל, לחודש</text>
+        <g class="node n1">
+          <rect x="90" y="30" width="600" height="40" fill="#111110" />
+          <text x="80" y="58" text-anchor="end" style="direction:ltr">$250</text>
+        </g>
+
+        <text class="t-sm node n2" x="690" y="108" text-anchor="end" style="direction:ltr">אחרי כיוונון, לחודש</text>
+        <g class="node n2">
+          <rect x="354" y="116" width="336" height="40" fill="#8c8a84" />
+          <text x="344" y="144" text-anchor="end" style="direction:ltr">$140</text>
+        </g>
+
+        <text class="t-sm node n3" x="690" y="194" text-anchor="end" style="direction:ltr" fill="#ff3300">מה ששילמנו, סך הכל</text>
+        <g class="node n3">
+          <rect x="666" y="202" width="24" height="40" fill="#ff3300" />
+          <text x="656" y="230" text-anchor="end" style="direction:ltr" fill="#ff3300">$10</text>
+        </g>
+      </svg>
+    </div>
+    <p class="note reveal">המנוף הוא <b>הזמן, לא התעריף</b>. כיבינו את הסביבה בסוף כל יום עבודה.</p>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     15 · הפריסה
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">15</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">הפריסה</p>
+    <h2 class="reveal">מקוד למערכת רצה, לבד</h2>
+    <div class="rule reveal"></div>
+    <div class="figure reveal">
+      <svg viewBox="0 0 680 175" role="img" aria-label="שינוי בקוד, ארגו מזהה, המערכת מתעדכנת לבד">
+        <defs>
+          <marker id="a14" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="#111110" />
+          </marker>
+        </defs>
+
+        <g class="node n1">
+          <rect class="box" x="490" y="26" width="190" height="86" />
+          <text x="585" y="77" text-anchor="middle">שינוי בקוד</text>
+        </g>
+        <path class="wire" d="M486 69 H446" marker-end="url(#a14)" />
+
+        <g class="node n2">
+          <rect class="box-hot" x="245" y="26" width="196" height="86" />
+          <text class="t-out" x="343" y="77" text-anchor="middle" dir="ltr">Argo</text>
+        </g>
+        <path class="wire" d="M241 69 H201" marker-end="url(#a14)" />
+
+        <g class="node n3">
+          <rect class="box" x="8" y="26" width="188" height="86" />
+          <text x="102" y="77" text-anchor="middle">מתעדכן לבד</text>
+        </g>
+
+        <text class="t-sm node n2" x="343" y="142" text-anchor="middle">משווה כל הזמן בין הקוד למה שרץ</text>
+      </svg>
+    </div>
+    <p class="note reveal">גרסה חדשה יוצאת <b>בהדרגה</b>, לא לכולם בבת אחת.</p>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     16 · ניטור (slot: architecture.drawio page 6)
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">16</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">ניטור</p>
+    <h2 class="reveal">לדעת לפני שמישהו מתלונן</h2>
+    <div class="rule reveal"></div>
+    <p class="lede reveal">כל שירות מדווח על עצמו. כשמשהו חורג, המערכת מתריעה לבד.</p>
+    <div class="slot reveal">
+      <svg viewBox="0 0 24 24"><path d="M3 17l5-6 4 4 6-9 3 4"/></svg>
+      <span class="s-label" dir="ltr">DIAGRAM</span>
+      <span class="s-note">architecture.drawio, עמוד 6</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     17 · האתגרים
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">17</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">האתגרים</p>
+    <h2 class="reveal">הדברים שנשברו בדרך</h2>
+    <div class="rule reveal"></div>
+    <div class="cards reveal">
+      <div class="card risk">
+        <span class="h">באגים שקטים</span>
+        <span class="d">משימות נעלמו בלי הודעת שגיאה.</span>
+      </div>
+      <div class="card risk">
+        <span class="h">עובד אצלי, נשבר בענן</span>
+        <span class="d">תקלות שהופיעו רק בענן, בלי סימן קודם.</span>
+      </div>
+      <div class="card">
+        <span class="h">ואז זה תיקן את עצמו</span>
+        <span class="d">נפילה אמיתית קרתה, והמערכת חזרה לבד.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     18 · אבטחה
+     The TBD row is deliberately left open rather than answered: real
+     regulatory claims about military use are not something to invent.
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">18</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">אבטחה</p>
+    <h2 class="reveal">מגבלות ועמידות</h2>
+    <div class="rule reveal"></div>
+    <ul class="points reveal">
+      <li class="st"><span class="tagpill ok" dir="ltr">OK</span><span>הגייטווי הוא הפתח היחיד שנגיש מבחוץ.</span></li>
+      <li class="st"><span class="tagpill ok" dir="ltr">OK</span><span>גישה לענן רק דרך זיהוי מאובטח.</span></li>
+      <li class="st"><span class="tagpill ok" dir="ltr">OK</span><span>המערכת כבר הוכיחה שהיא מתאוששת לבד.</span></li>
+      <li class="st"><span class="tagpill tbd" dir="ltr">TBD</span><span><b>לשימוש צבאי:</b> מיקום המידע והרחפנים המורשים טרם הוגדרו.</span></li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     19 · מה למדנו
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">19</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">סיכום</p>
+    <h2 class="reveal">מה באמת למדנו</h2>
+    <div class="rule reveal"></div>
+    <div class="cards reveal">
+      <div class="card">
+        <span class="h">שש קטנות, לא אחת גדולה</span>
+        <span class="d">הקושי הוא לגרום להן לדבר נכון ביניהן.</span>
+      </div>
+      <div class="card risk">
+        <span class="h">השקט הוא הסכנה</span>
+        <span class="d">באג ששקט מסוכן יותר מבאג שקורס.</span>
+      </div>
+      <div class="card risk">
+        <span class="h">לתכנן מחדש, לא רק לתקן</span>
+        <span class="d">ששורדת בשטח מתכננת מחדש.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     20 · מאחורי הקלעים (slot: behind-the-scenes video)
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">20</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">מאחורי הקלעים</p>
+    <h2 class="reveal">איך זה נראה מבפנים</h2>
+    <div class="rule reveal"></div>
+    <div class="slot reveal">
+      <svg viewBox="0 0 24 24" style="fill:var(--muted); stroke:none;"><path d="M6 4l14 8-14 8V4z"/></svg>
+      <span class="s-label" dir="ltr">VIDEO</span>
+      <span class="s-note">סרטון מאחורי הקלעים מתהליך הפיתוח</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     21 · סיום
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">21</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <img class="logo-sm reveal" src="presentation-assets/logo-mark.png" alt="הלוגו של SwarmOps">
+    <p class="wordmark reveal">SwarmOps</p>
+    <div class="rule reveal"></div>
+    <p class="lede reveal">תודה. נשמח לשאלות.</p>
+    <p class="byline reveal">גיא &nbsp;·&nbsp; טוני &nbsp;·&nbsp; וולפיש</p>
+  </div>
+</section>
+
+
+<script>
+/* ===========================================================================
+   DECK CONTROLLER
+   Scroll-snap does the paging; this adds the reveal trigger, keyboard/touch
+   navigation, the progress bar and the dots.
+   =========================================================================== */
+class Deck {
+    constructor(){
+        this.slides = Array.from(document.querySelectorAll('.slide'));
+        this.i = 0;
+        this.bar = document.getElementById('progress');
+        this.dots = document.getElementById('dots');
+        this.observe();
+        this.buildDots();
+        this.keys();
+        this.touch();
+    }
+
+    observe(){
+        const io = new IntersectionObserver(entries=>{
+            entries.forEach(e=>{
+                if(e.isIntersecting){
+                    e.target.classList.add('visible');
+                    this.i = this.slides.indexOf(e.target);
+                    this.sync();
+                }
+            });
+        },{ threshold:.5 });
+        this.slides.forEach(s=>io.observe(s));
+    }
+
+    go(n){
+        const i = Math.max(0, Math.min(n, this.slides.length-1));
+        this.slides[i].scrollIntoView({ behavior:'smooth' });
+        this.i = i;
+    }
+    next(){ this.go(this.i+1); }
+    prev(){ this.go(this.i-1); }
+
+    keys(){
+        document.addEventListener('keydown', e=>{
+            if(e.target.isContentEditable) return;   // never hijack keys while typing
+            switch(e.key){
+                // Arrows stay physical rather than logical: on an RTL deck the
+                // content still advances leftward on screen, so Left = forward
+                // is what the eye expects.
+                case 'ArrowLeft': case 'ArrowDown': case 'PageDown':
+                    e.preventDefault(); this.next(); break;
+                case 'ArrowRight': case 'ArrowUp': case 'PageUp':
+                    e.preventDefault(); this.prev(); break;
+                case ' ':
+                    e.preventDefault(); e.shiftKey ? this.prev() : this.next(); break;
+                case 'Home': e.preventDefault(); this.go(0); break;
+                case 'End':  e.preventDefault(); this.go(this.slides.length-1); break;
+            }
+        });
+    }
+
+    touch(){
+        let y = null;
+        document.addEventListener('touchstart', e=>{ y = e.touches[0].clientY; }, {passive:true});
+        document.addEventListener('touchend', e=>{
+            if(y === null) return;
+            const dy = y - e.changedTouches[0].clientY;
+            if(Math.abs(dy) > 60){ dy > 0 ? this.next() : this.prev(); }
+            y = null;
+        }, {passive:true});
+    }
+
+    buildDots(){
+        // Always clear first: if the file was exported while dots existed,
+        // rebuilding without clearing would append a second set on top.
+        this.dots.innerHTML = '';
+        this.slides.forEach((_,i)=>{
+            const b = document.createElement('button');
+            b.setAttribute('aria-label','שקופית '+(i+1));
+            b.addEventListener('click',()=>this.go(i));
+            this.dots.appendChild(b);
+        });
+        this.sync();
+    }
+
+    sync(){
+        const pct = this.slides.length > 1 ? (this.i/(this.slides.length-1))*100 : 100;
+        this.bar.style.width = pct + '%';
+        Array.from(this.dots.children).forEach((b,n)=> b.classList.toggle('on', n === this.i));
+    }
+}
+
+/* ===========================================================================
+   FLOW PULSES
+
+   Every wire gets a clone stacked on top of it, dashed so that exactly one
+   short segment is visible, then animated along the path forever. The wire
+   underneath is never dashed, so the diagram is complete and correct even
+   before any script runs.
+
+   The dash length is measured from the path itself with getTotalLength().
+   The previous version used one hardcoded dash length for every path, which
+   silently truncated anything longer than that number: the loop-back arrow on
+   the re-planning sheet is 617 units long against a 520 dash, so its last leg
+   simply never rendered and its arrowhead floated unattached.
+   =========================================================================== */
+const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function flowPulses(){
+    if(REDUCED) return;   // honour the OS setting: solid wires, no motion
+
+    document.querySelectorAll('.figure').forEach(fig=>{
+        const wires = fig.querySelectorAll('.wire');
+        wires.forEach((wire, i)=>{
+            let len = 0;
+            try{ len = wire.getTotalLength(); }catch(e){ return; }
+            if(!len) return;
+
+            const pulse = wire.cloneNode(false);
+            pulse.setAttribute('class','pulse');
+            pulse.removeAttribute('marker-end');   // one arrowhead per wire, on the solid one
+
+            // A short travelling segment, with a gap long enough that only one
+            // is ever on the wire at a time.
+            const dash = Math.max(18, Math.min(52, len * 0.28));
+            pulse.style.strokeDasharray = dash + ' ' + (len + dash);
+            wire.parentNode.insertBefore(pulse, wire.nextSibling);
+
+            // Constant speed regardless of path length, so a long loop-back
+            // does not crawl while a short connector races.
+            pulse.animate(
+                [{ strokeDashoffset: dash }, { strokeDashoffset: -len }],
+                {
+                    duration: 900 + len * 3.2,
+                    delay: i * 220,
+                    iterations: Infinity,
+                    easing: 'linear'
+                }
+            );
+        });
+    });
+}
+
+/* ===========================================================================
+   INLINE EDITOR
+
+   The previous deck stored edits under a flat running index ('key-0',
+   'key-1', ...). That silently corrupts the moment the deck changes shape:
+   after slides were added and later removed, index N no longer pointed at
+   the same element, so restore() sprayed saved text into whatever happened
+   to sit at that position. Headlines landed in captions and captions in
+   headlines.
+
+   Two changes make that failure impossible here:
+     1. Keys are scoped per slide ("4.2" = third editable on the fifth
+        sheet), so an edit on one sheet can never leak onto another.
+     2. A fingerprint of the deck's shape is saved alongside the text. If the
+        structure no longer matches, the whole payload is discarded rather
+        than applied to the wrong elements.
+   =========================================================================== */
+const STORE = 'swarmops-pitch-v1';
+const EDITABLE = 'h1, h2, .kicker, .lede, .note, .byline, .wordmark, '
+               + '.points li, .card .h, .card .d, .p-name, .p-role, '
+               + '.s-label, .s-note, .num';
+
+class Editor {
+    constructor(deck){
+        this.deck = deck;
+        this.on = false;
+        this.bar = document.getElementById('editBar');
+        this.btn = document.getElementById('editBtn');
+        this.map = this.index();
+        this.restore();
+    }
+
+    /* [key, element] pairs, where the key is scoped to its own slide. */
+    index(){
+        const pairs = [];
+        this.deck.slides.forEach((slide, s)=>{
+            Array.from(slide.querySelectorAll(EDITABLE)).forEach((el, n)=>{
+                pairs.push([s + '.' + n, el]);
+            });
+        });
+        return pairs;
+    }
+
+    /* Shape of the deck: slide count and per-slide editable counts. Any
+       structural edit changes this string and invalidates old saves. */
+    fingerprint(){
+        const per = this.deck.slides.map(s=>s.querySelectorAll(EDITABLE).length);
+        return this.deck.slides.length + ':' + per.join(',');
+    }
+
+    toggle(){
+        this.on = !this.on;
+        document.body.classList.toggle('editing', this.on);
+        this.bar.classList.toggle('on', this.on);
+        this.btn.classList.toggle('on', this.on);
+        this.btn.textContent = this.on ? '✓' : '✏️';
+        this.map.forEach(([,el])=>{
+            if(this.on){
+                el.setAttribute('contenteditable','true');
+                el.addEventListener('input', this.save);
+            }else{
+                el.removeAttribute('contenteditable');
+                el.removeEventListener('input', this.save);
+            }
+        });
+    }
+
+    save = ()=>{
+        const text = {};
+        this.map.forEach(([k, el])=>{ text[k] = el.innerHTML; });
+        try{
+            localStorage.setItem(STORE, JSON.stringify({ fp:this.fingerprint(), text }));
+        }catch(e){ /* private mode or quota: editing still works, just not persisted */ }
+    }
+
+    restore(){
+        let saved;
+        try{ saved = JSON.parse(localStorage.getItem(STORE)); }catch(e){ return; }
+        if(!saved || !saved.text) return;
+
+        // Refuse to apply a payload written against a different deck shape.
+        if(saved.fp !== this.fingerprint()){
+            console.warn('SwarmOps: saved edits came from a different version of this deck and were ignored. Ctrl+Shift+Del clears them.');
+            return;
+        }
+        this.map.forEach(([k, el])=>{
+            if(typeof saved.text[k] === 'string') el.innerHTML = saved.text[k];
+        });
+    }
+
+    reset(){
+        try{ localStorage.removeItem(STORE); }catch(e){}
+        location.reload();
+    }
+
+    /* Strip every trace of edit mode before capturing outerHTML, or the saved
+       file opens permanently stuck in it: dashed outlines, a checkmark button
+       and the banner all baked in. */
+    export(){
+        const live = Array.from(document.querySelectorAll('[contenteditable]'));
+        live.forEach(el=>el.removeAttribute('contenteditable'));
+        document.body.classList.remove('editing');
+        this.btn.classList.remove('on','show');
+        this.bar.classList.remove('on');
+        const icon = this.btn.textContent;
+        this.btn.textContent = '✏️';
+
+        // Drop the generated pulse clones so the export is the authored
+        // markup, not markup plus one render's worth of scratch elements.
+        const clones = Array.from(document.querySelectorAll('.figure .pulse'));
+        clones.forEach(c=>c.remove());
+
+        const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
+        if(this.on){
+            document.body.classList.add('editing');
+            live.forEach(el=>el.setAttribute('contenteditable','true'));
+            this.btn.classList.add('on');
+            this.bar.classList.add('on');
+            this.btn.textContent = icon;
+        }
+        flowPulses();   // put the motion back on the live page
+
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([html], {type:'text/html'}));
+        a.download = 'pitch.html';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+}
+
+const deck = new Deck();
+const editor = new Editor(deck);
+flowPulses();
+
+/* --- entry points: hover corner, button, E key -------------------------- */
+const zone = document.querySelector('.edit-zone');
+const btn = document.getElementById('editBtn');
+let hide = null;
+
+// JS hover with a grace period. A CSS sibling selector cannot work here:
+// pointer-events:none on the button breaks the hover chain the instant the
+// cursor leaves the corner heading toward it.
+zone.addEventListener('mouseenter', ()=>{ clearTimeout(hide); btn.classList.add('show'); });
+zone.addEventListener('mouseleave', ()=>{ hide = setTimeout(()=>{ if(!editor.on) btn.classList.remove('show'); }, 400); });
+btn.addEventListener('mouseenter', ()=> clearTimeout(hide));
+btn.addEventListener('mouseleave', ()=>{ hide = setTimeout(()=>{ if(!editor.on) btn.classList.remove('show'); }, 400); });
+btn.addEventListener('click', ()=> editor.toggle());
+
+document.addEventListener('keydown', e=>{
+    if((e.key === 'e' || e.key === 'E') && !e.target.isContentEditable){ editor.toggle(); }
+    if((e.ctrlKey || e.metaKey) && e.key === 's'){ e.preventDefault(); editor.export(); }
+    // Escape hatch if saved text ever looks wrong.
+    if((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'Delete'){ e.preventDefault(); editor.reset(); }
+});
+
+// The first sheet is already on screen at load, so reveal it without waiting.
+document.querySelector('.slide').classList.add('visible');
+</script>
+</body>
+</html>
