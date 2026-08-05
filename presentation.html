@@ -1156,14 +1156,14 @@ body.edit-active [contenteditable]:focus { outline: 2px solid var(--accent); }
       <p class="kicker reveal">Two more stories worth telling</p>
       <h2 class="reveal">The two that mattered</h2>
       <div class="rule reveal"></div>
-      <div class="fixes reveal">
+      <div class="fixes reveal" style="max-width:960px">
         <div class="fix">
           <span class="h">RabbitMQ self-healed live, by accident</span>
-          <span class="d">Minutes after fixing fleet/notification/telemetry-service's reconnect-on-drop handling, RabbitMQ's pod got rescheduled again (an Argo CD hard-refresh side effect). All three pods hit the exact failure the fix targeted, in real time — dropped, reconnected, /health correctly went 503, kubelet restarted them, clean reconnect once RabbitMQ was back. Zero manual intervention.</span>
+          <span class="d">Minutes after fixing reconnect-on-drop across fleet/notification/telemetry-service, RabbitMQ's pod got rescheduled again — an Argo CD hard-refresh side effect. All three hit the exact failure live and self-healed. Zero manual intervention.</span>
         </div>
         <div class="fix">
-          <span class="h">Your camera-feed race, for the record</span>
-          <span class="d">Frame/tag interleaving where only one of two concurrent drone feeds ever rendered, plus a relay bug where producers received every other producer's traffic unread forever until it stalled. Real concurrency bugs, good to walk through live.</span>
+          <span class="h">The camera-feed race, for the record</span>
+          <span class="d">A frame/tag interleaving race where only one of two concurrent drone feeds ever rendered, plus a relay bug where producers received each other's traffic unread forever until it stalled. Real concurrency bugs, worth walking through live.</span>
         </div>
       </div>
       <p class="note reveal">One's proof the resilience fix holds up under a real failure; the other's a real bug, worth walking through live.</p>
