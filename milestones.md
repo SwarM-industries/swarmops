@@ -737,3 +737,32 @@ per `TALK_TRACK_GUY.md`'s position that these are gaps to own rather than hide. 
 disagrees, that's one sheet to cut, flagged in the plan.
 
 `presentation.html` itself is **not built** — the plan is the deliverable at this point.
+
+**Superseded 2026-08-06.** `presentation.html` (and a per-person working copy,
+`presentation.tony.html`) now exist and have real commits (layout/responsiveness/content
+passes) — the deck moved from "planned" to "actively being built" sometime after the note above.
+Note above kept for the plan's own content/rationale, which is still accurate; only the "not
+built" status line was stale.
+
+**Update 2026-08-06 — mock-presentation bug fixed: low-battery mission hand-off didn't
+reassign, plus charging-station capacity dropped.** Mock presentation (2026-08-05) surfaced a
+real gap: a mission drone going low-battery mid-flight correctly got pulled off its mission and
+routed to a charging station, but the vacated mission never got reassigned to a new idle drone.
+Root cause and fix live in `swarmops-planning-service/STATUS.md`'s own 2026-08-06 entry and
+`M10-addons.md` (this repo's root) — short version: `src/reconcile.py`'s 30s polling backstop
+(the only low-battery trigger that reliably fires in the live cluster) was missing the trailing
+`run_solve()` call that the RabbitMQ event path already had. Fixed, plus two concurrency/
+correctness issues an independent review caught before the fix shipped (a potential no-op solve
+storm, and an unguarded multi-replica race on `run_solve()` — now behind a short-lived Mongo
+lock). `swarmops-planning-service`'s `pytest` suite grew three regression tests, 8/8 green.
+
+Second, unrelated fix bundled in the same pass: charging-station `capacity` is no longer
+required/enforced anywhere (team decision — "assume infinity"; it was already unenforced
+everywhere in the backend, just still a required input on creation). Touched
+`swarmops-fleet-service` (schema + route, plus its first-ever test suite — was at zero test
+tooling before this), `swarmops-frontend` (removed the now-meaningless input from the
+create-station dialog), `swarmops-local` (seed data), and `swarmops-contracts` (doc-only, not an
+actual dependency of any service).
+
+M10 item 4 ("full dry run, no flaky parts") — this was the flaky part found during that dry run.
+Not yet re-confirmed with a second full dry run post-fix.
