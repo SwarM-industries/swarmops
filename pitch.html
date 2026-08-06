@@ -308,6 +308,15 @@ ul.points li.st::before{ display:none; }
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     gap:.6em; padding:1rem; text-align:center;
 }
+/* Two (or more) slots sharing one row -- e.g. the simulator sheet's FPV feed
+   next to its third-person view. Same dashed-box language as a lone .slot,
+   just handing width control to the grid instead of each box's own cap. */
+.slots{
+    display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:clamp(.7rem,1.8vw,1.4rem);
+    width:100%; max-width:880px;
+}
+.slots .slot{ max-width:none; }
 .slot svg{ width:clamp(1.9rem,3.8vw,3rem); height:auto; stroke:var(--muted); fill:none; stroke-width:1.4; }
 .slot .s-label{
     font-weight:900; letter-spacing:.12em; color:var(--accent);
@@ -846,10 +855,17 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
     <h2 class="reveal">רחפן וירטואלי, כמו אמיתי</h2>
     <div class="rule reveal"></div>
     <p class="lede reveal">טס, משדר תמונה, ומגיב בזמן אמת. בלי חומרה אמיתית.</p>
-    <div class="slot reveal">
-      <svg viewBox="0 0 24 24" style="fill:var(--muted); stroke:none;"><path d="M6 4l14 8-14 8V4z"></path></svg>
-      <span class="s-label" dir="ltr">VIDEO</span>
-      <span class="s-note">סרטון של הפעלת הרחפן בסימולציה</span>
+    <div class="slots reveal">
+      <div class="slot">
+        <svg viewBox="0 0 24 24" style="fill:var(--muted); stroke:none;"><path d="M6 4l14 8-14 8V4z"></path></svg>
+        <span class="s-label" dir="ltr">VIDEO</span>
+        <span class="s-note">מבט מצלמת הרחפן</span>
+      </div>
+      <div class="slot">
+        <svg viewBox="0 0 24 24" style="fill:var(--muted); stroke:none;"><path d="M6 4l14 8-14 8V4z"></path></svg>
+        <span class="s-label" dir="ltr">VIDEO</span>
+        <span class="s-note">מבט חיצוני מתוך יוניטי</span>
+      </div>
     </div>
   </div>
 </section>
