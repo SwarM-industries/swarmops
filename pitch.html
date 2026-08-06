@@ -266,7 +266,7 @@ ul.points li.st::before{ display:none; }
 .figure .box-hot{ fill:var(--accent); stroke:none; }
 .figure .box-line-hot{ fill:var(--paper); stroke:var(--accent); stroke-width:3; }
 /* The stacked-disk rings inside a database cylinder. Lighter than .box so the
-   silhouette still reads first, and deliberately not .wire — the pulse
+   silhouette still reads first, and deliberately not .wire: the pulse
    animation walks every .wire and these are not paths anything travels along. */
 .figure .disk{ fill:none; stroke:var(--ink); stroke-width:2; opacity:.45; }
 .figure .wire{ fill:none; stroke:var(--ink); stroke-width:2.5; }
@@ -1063,13 +1063,73 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
 
 
 <!-- ==========================================================================
-     18 · אבטחה
+     18 · ההגנה
+     Defence in depth, drawn as literal nested walls rather than a flow: the
+     point is that passing one layer gets you nothing, which a left-to-right
+     arrow chain would actually contradict. Pairs with sheet 19, which owns
+     what is still open. Every claim here is real: private subnets with only
+     the gateway exposed (plan.md), JWT verified independently by each
+     service including planning-service (verify_jwt.py), and OIDC-only AWS
+     auth with no static keys committed anywhere. The plaintext shared
+     secrets in values.yaml are a known gap and are NOT claimed as solved on
+     this sheet; do not add a row implying secrets management is handled.
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">18</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">אבטחה</p>
+    <h2 class="reveal">איך המערכת מוגנת</h2>
+    <div class="rule reveal"></div>
+    <p class="lede reveal">שלוש שכבות. מי שעבר אחת עדיין רחוק מהמידע.</p>
+    <div class="figure reveal">
+      <svg viewBox="0 0 700 250" role="img" aria-label="שלוש שכבות הגנה מקוננות: רשת פרטית עם שער אחד, טוקן חתום בכל בקשה, ובמרכז המידע">
+        <defs>
+          <marker id="a18" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="#111110" />
+          </marker>
+        </defs>
+
+        <!-- Traffic arrives from the right, which is "from outside" in an RTL
+             reading order, and stops short of the outer wall. The arrowhead
+             scales with stroke-width, so the path ends at 612 rather than at
+             the wall's 600, or the head would sit on top of the border. -->
+        <g class="node n1">
+          <text class="t-sm" x="652" y="112" text-anchor="middle">מבחוץ</text>
+          <path class="wire" d="M666 125 H612" marker-end="url(#a18)" />
+        </g>
+
+        <g class="node n2">
+          <rect class="box" x="40" y="6" width="560" height="238" />
+          <text x="320" y="37" text-anchor="middle">רשת פרטית, שער אחד</text>
+        </g>
+
+        <g class="node n3">
+          <rect class="box" x="100" y="52" width="440" height="146" />
+          <text x="320" y="80" text-anchor="middle">טוקן חתום בכל בקשה</text>
+        </g>
+
+        <g class="node n4">
+          <rect class="box-hot" x="175" y="92" width="290" height="66" />
+          <text class="t-out" x="320" y="134" text-anchor="middle">המידע</text>
+        </g>
+      </svg>
+    </div>
+    <p class="note reveal">כל שירות בודק בעצמו ולא סומך על השכן. גם הכניסה לענן היא זהות זמנית, בלי מפתחות שמורים.</p>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     19 · אבטחה
      The TBD row is deliberately left open rather than answered: real
      regulatory claims about military use are not something to invent.
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">18</span>
+    <span class="num">19</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
@@ -1087,11 +1147,11 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
 
 
 <!-- ==========================================================================
-     19 · מה למדנו
+     20 · מה למדנו
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">19</span>
+    <span class="num">20</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
@@ -1117,11 +1177,11 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
 
 
 <!-- ==========================================================================
-     20 · מאחורי הקלעים (slot: behind-the-scenes video)
+     21 · מאחורי הקלעים (slot: behind-the-scenes video)
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">20</span>
+    <span class="num">21</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
@@ -1138,11 +1198,11 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
 
 
 <!-- ==========================================================================
-     21 · סיום
+     22 · סיום
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">21</span>
+    <span class="num">22</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">

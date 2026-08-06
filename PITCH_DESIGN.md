@@ -25,7 +25,7 @@ for reference only. `pitch.html` is the one in active use.
 
 ## 1. What this is, structurally
 
-One HTML file. Inline `<style>`, inline `<script>`, 21 `<section class="slide">`
+One HTML file. Inline `<style>`, inline `<script>`, 22 `<section class="slide">`
 elements. Scroll-snap does the paging (native, no library); a small JS
 controller adds keyboard/touch nav, a progress bar, nav dots, and an inline
 text editor.
@@ -78,7 +78,10 @@ Fonts preview, which defaults to Latin sample text.
 `--accent` is spent carefully: emphasis in headings, the risk border on
 `.card.risk`, the moving pulse on diagram wires, the `TBD` tag on the
 security sheet. `--ok` (green) appears in exactly one place, the `OK` tags
-on slide 18, and nowhere else. Don't start using it as a second accent.
+on slide 19, and nowhere else. Don't start using it as a second accent.
+Slide 18 is the other half of that security pair and deliberately does
+**not** use `--ok`: it's a diagram sheet, and spreading the green across
+both would cost the pill its "this specific line is verified" meaning.
 
 ---
 
@@ -89,10 +92,10 @@ on slide 18, and nowhere else. Don't start using it as a second accent.
 | `.lockup` | 01 | Logo mark stacked over wordmark, tight gap so it reads as one unit |
 | `.people` | 02 | 3-up grayscale photo grid, name + role under each |
 | `.strip` | 03 | 4-up square color photo grid (field equipment photos) |
-| `.cards` / `.card` / `.card.risk` | 04, 17, 19 | Bordered boxes; `.risk` is a red border for failure/danger items |
-| `.figure` | 05, 06, 07, 08, 09, 10, 15 | Animated SVG flow diagrams, see §4 |
-| `ul.points` / `li.st` + `.tagpill` | 09, 18 | Bulleted list; `.st` variant adds an `OK`/`TBD` status pill |
-| `.slot` | 11, 12, 13, 16, 20 | Dashed placeholder frame for unfinished assets (video/screenshot/diagram) |
+| `.cards` / `.card` / `.card.risk` | 04, 17, 20 | Bordered boxes; `.risk` is a red border for failure/danger items |
+| `.figure` | 05, 06, 07, 08, 09, 10, 14, 15, 18 | Animated SVG flow diagrams, see §4 |
+| `ul.points` / `li.st` + `.tagpill` | 19 | Bulleted list; `.st` variant adds an `OK`/`TBD` status pill |
+| `.slot` | 11, 12, 13, 16, 21 | Dashed placeholder frame for unfinished assets (video/screenshot/diagram) |
 
 `.cards` defaults to 3 columns; add `.two` for a 2-column layout (defined in
 CSS, not currently used by any slide).
@@ -226,7 +229,7 @@ then re-attaches both if you were still mid-edit.
 
 ---
 
-## 6. Slide map (21 slides)
+## 6. Slide map (22 slides)
 
 Numbering appears in two places per slide that must stay in sync: the
 visible `<span class="num">NN</span>` badge and the `<!-- NN · ... -->`
@@ -251,18 +254,23 @@ HTML comment above the section. Renumbering a slide means editing both.
 | 15 | הפריסה | ✅ | Argo deploy-flow diagram |
 | 16 | ניטור | ⬜ slot | Needs: `architecture.drawio` page 6 export |
 | 17 | האתגרים | ✅ | 3 real bugs/incidents, risk-carded |
-| 18 | אבטחה | ✅ | 3 `OK` rows plus 1 deliberately unanswered `TBD` (military-use data/regulatory question; do not fill this in with invented claims) |
-| 19 | מה למדנו | ✅ | 3 lesson cards |
-| 20 | מאחורי הקלעים | ⬜ slot | Needs: behind-the-scenes video |
-| 21 | סיום | ✅ | Closing/thank-you |
+| 18 | אבטחה (ההגנה) | ✅ | Nested-walls diagram: private network with one gate, signed token per request, data at the core. Claims are limited to what's actually built (see the section comment in the file) |
+| 19 | אבטחה (מגבלות) | ✅ | 3 `OK` rows plus 1 deliberately unanswered `TBD` (military-use data/regulatory question; do not fill this in with invented claims) |
+| 20 | מה למדנו | ✅ | 3 lesson cards |
+| 21 | מאחורי הקלעים | ⬜ slot | Needs: behind-the-scenes video |
+| 22 | סיום | ✅ | Closing/thank-you |
 
-**5 open `.slot` placeholders** (11, 12, 13, 16, 20). Dashed borders,
+Sheets 18 and 19 are a deliberate pair sharing the `אבטחה` kicker: 18 is
+what the system does defend against, 19 is what's still open. If you edit
+one, check the other still reads as its counterpart.
+
+**5 open `.slot` placeholders** (11, 12, 13, 16, 21). Dashed borders,
 visually distinct from every other border in the deck on purpose, so an
 unfinished slide is obvious even skimming past quickly. Fill by replacing
 the `.slot` div's contents with real media; keep the same aspect-ratio
 container (`.slot` is `16/9`) or adjust deliberately.
 
-**Slide 18's `TBD` row is intentional**, not an oversight. It flags a real
+**Slide 19's `TBD` row is intentional**, not an oversight. It flags a real
 open question (military-use data location, plus which drones are
 authorized) that nobody on the team has an actual answer to yet. Don't
 paper over it with a plausible-sounding but unverified claim. Leave it
