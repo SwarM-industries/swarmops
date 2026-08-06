@@ -235,7 +235,7 @@ HTML comment above the section. Renumbering a slide means editing both.
 | # | Hebrew title | Real content? | Notes |
 |---|---|---|---|
 | 01 | פתיחה | ✅ | Title/lockup slide |
-| 02 | הצוות | ✅ | 3 team photos, army roles (not project roles): טוני = צלף, גיא = חובש קרבי, חילוץ והצלה, וולפיש = מפעיל טנק |
+| 02 | הצוות | ✅ | 3 team photos, army roles (not project roles): טוני = צלף, גיא = חובש קרבי, חילוץ והצלה, והראל = מפעיל טנק |
 | 03 | הרקע | ✅ | 4 field-equipment photos, hinges into the problem slide |
 | 04 | הבעיה | ✅ | 3 risk cards (PRD §1.1) |
 | 05 | המחיר | ✅ | Cost-chain diagram plus a real assumption (roughly 15% wasted flight time) in the note |
