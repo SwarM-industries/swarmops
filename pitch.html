@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
+<html lang="he" dir="rtl"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SwarmOps · מצגת</title>
@@ -12,8 +11,8 @@
      family, so the Hebrew copy and the English service names sit together
      without a second typeface. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet">
 
 <style>
 /* ===========================================================================
@@ -181,9 +180,14 @@ ul.points li.st::before{ display:none; }
     border:2px solid var(--ink);
     padding:clamp(.75rem,2.2vh,1.25rem) clamp(.7rem,1.4vw,1.15rem);
 }
+/* nowrap keeps the headline on one line; fitCardHeadings() shrinks it until
+   it actually fits. Deliberately no overflow:hidden/ellipsis here -- hiding
+   part of a headline behind "..." is worse than any sizing glitch, so the
+   text stays fully visible and the script is what makes it fit. */
 .card .h{
     display:block; font-weight:900; line-height:1.12;
     font-size:clamp(1.2rem,2.15vw,1.75rem); margin-bottom:.35em;
+    white-space:nowrap;
 }
 .card .d{
     display:block; font-weight:300; line-height:1.3; color:var(--muted);
@@ -368,6 +372,18 @@ ul.points li.st::before{ display:none; }
 body.editing [contenteditable]{ outline:1px dashed var(--accent); outline-offset:3px; }
 body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
 
+/* Diagram labels are plain SVG <text> -- native contenteditable on SVG is
+   too unreliable across browsers, so these open the .svg-edit-box overlay
+   below instead. Same dashed hint as regular editable text, for parity. */
+body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px; cursor:pointer; }
+.svg-edit-box{
+    position:fixed; z-index:1002; min-width:2ch;
+    background:var(--paper); color:var(--ink);
+    border:2px solid var(--accent); border-radius:2px;
+    padding:.1em .4em; outline:none; white-space:nowrap;
+    text-align:center; box-shadow:0 4px 16px rgba(0,0,0,.28);
+}
+
 /* ===========================================================================
    RESPONSIVE
    Aggressive on short viewports: prose is the first thing to go, structure
@@ -411,10 +427,10 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
 }
 </style>
 </head>
-<body>
+<body class="">
 
-<div class="progress" id="progress"></div>
-<nav class="dots" id="dots" aria-label="ניווט שקופיות"></nav>
+<div class="progress" id="progress" style="width: 33.3333%;"></div>
+<nav class="dots" id="dots" aria-label="ניווט שקופיות"><button aria-label="שקופית 1" class=""></button><button aria-label="שקופית 2" class=""></button><button aria-label="שקופית 3" class=""></button><button aria-label="שקופית 4" class=""></button><button aria-label="שקופית 5" class=""></button><button aria-label="שקופית 6" class=""></button><button aria-label="שקופית 7" class=""></button><button aria-label="שקופית 8" class="on"></button><button aria-label="שקופית 9"></button><button aria-label="שקופית 10"></button><button aria-label="שקופית 11"></button><button aria-label="שקופית 12"></button><button aria-label="שקופית 13"></button><button aria-label="שקופית 14"></button><button aria-label="שקופית 15"></button><button aria-label="שקופית 16"></button><button aria-label="שקופית 17"></button><button aria-label="שקופית 18"></button><button aria-label="שקופית 19"></button><button aria-label="שקופית 20"></button><button aria-label="שקופית 21"></button><button aria-label="שקופית 22"></button></nav>
 <p class="hint" dir="ltr">← → / SPACE</p>
 
 <div class="edit-zone"></div>
@@ -425,7 +441,7 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
 <!-- ==========================================================================
      01 · פתיחה
      ========================================================================== -->
-<section class="slide">
+<section class="slide visible">
   <div class="head">
     <span class="num">01</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
@@ -437,7 +453,7 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
       <span class="wordmark">SwarmOps</span>
     </div>
     <div class="rule reveal"></div>
-    <p class="lede reveal">המערכת שמחליטה מי טס לאן, ומעדכנת את עצמה תוך כדי טיסה.</p>
+    <p class="lede reveal">מערכת שליטה ובקרה מרכזית לרחפנים</p>
     <p class="byline reveal">גיא &nbsp;·&nbsp; טוני &nbsp;·&nbsp; הראל</p>
   </div>
 </section>
@@ -446,7 +462,7 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
 <!-- ==========================================================================
      02 · הצוות
      ========================================================================== -->
-<section class="slide">
+<section class="slide visible">
   <div class="head">
     <span class="num">02</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
@@ -481,7 +497,7 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
         </figcaption>
       </figure>
     </div>
-    <p class="note reveal">שלושתנו שירתנו בסדיר, כל אחד בעולם אחר.</p>
+    <p class="note reveal">שלושתנו שירתנו בתפקיד קרבי, כל אחד בתפקיד אחר.</p>
   </div>
 </section>
 
@@ -492,7 +508,7 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
      sheet 04: it states the limit they each hit in the field, which is the
      exact problem the whole system exists to remove.
      ========================================================================== -->
-<section class="slide">
+<section class="slide visible">
   <div class="head">
     <span class="num">03</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
@@ -501,14 +517,14 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
     <p class="kicker reveal">הרקע</p>
     <h2 class="reveal">את הרחפנים פגשנו בשטח</h2>
     <div class="rule reveal"></div>
-    <p class="lede reveal">בכל אחד מהתפקידים האלה ראינו רחפנים עובדים. לא בכיתה.</p>
+    <p class="lede reveal">בכל אחד מהתפקידים האלה נפגשנו עם רחפנים/מפעילי רחפנים.</p>
     <div class="strip reveal">
       <img src="presentation-assets/drones/drone1.jpeg" alt="רחפן בשטח">
       <img src="presentation-assets/drones/drone2.jpeg" alt="מסך שליטה בראייה תרמית">
       <img src="presentation-assets/drones/drone3.jpeg" alt="מסך שליטה עם נתוני טיסה">
       <img class="low" src="presentation-assets/drones/drone4.jpeg" alt="רחפן לפני שיגור בלילה">
     </div>
-    <p class="note reveal">רחפן אחד, מפעיל אחד, <b>תשומת לב מלאה</b>. אף אחד לא תיאם עשרה בו זמנית.</p>
+    <p class="note reveal">ובנוסף, כולנו פגשנו את אותן הבעיות בדיוק.</p>
   </div>
 </section>
 
@@ -516,7 +532,7 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
 <!-- ==========================================================================
      04 · הבעיה (PRD §1.1)
      ========================================================================== -->
-<section class="slide">
+<section class="slide visible">
   <div class="head">
     <span class="num">04</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
@@ -525,19 +541,19 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
     <p class="kicker reveal">הבעיה</p>
     <h2 class="reveal">יותר מדי בשביל ראש אחד</h2>
     <div class="rule reveal"></div>
-    <p class="lede reveal">מפעיל מסתדר עם 3-4 רחפנים. מעבר לזה, יותר מדי משתנה בבת אחת.</p>
+    <p class="lede reveal">מפעיל רחפן יכול להתרכז ברחפן אחד באוויר. מעבר לזה, יותר מדי משתנה בבת אחת.<br>הפוקוס נעלם ואיכות המשימה נפגעת.</p>
     <div class="cards reveal">
       <div class="card risk">
-        <span class="h">זמן טיסה מבוזבז</span>
-        <span class="d">רחפן טס רחוק כשקרוב יותר היה פנוי.</span>
+        <span class="h">רחפן באוויר = לוחם מושבת</span>
+        <span class="d">ברגע שלוחם מטיס רחפן ידנית, הוא למעשה מעכב את הצוות שצריך לשמור עליו.</span>
       </div>
       <div class="card risk">
-        <span class="h">משימות שמתפספסות</span>
-        <span class="d">משימה דחופה מחכה בתור.</span>
+        <span class="h">חוסר תיאום בין צוותים</span>
+        <span class="d">לוחם מצוות א' מטיס רחפן בתא השטח, לוחם מצוות ב' מטיס גם הוא רחפן באותו תא השטח.&nbsp;<br>אף אחד מהם לא מודע לשני.&nbsp;</span>
       </div>
       <div class="card risk">
-        <span class="h">רחפן שנתקע</span>
-        <span class="d">יוצא בלי מספיק סוללה לחזור.</span>
+        <span class="h">חוסר ניצול של מלוא המשאבים</span>
+        <span class="d">אף מפעיל רחפן לא באמת מממש את מלוא היכולות שלו כאשר הוא מפעיל רחפן אחד בלבד.</span>
       </div>
     </div>
   </div>
@@ -550,7 +566,7 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
      it, so the cost claim at the end is something the room watched being
      built rather than a number asserted on its own.
      ========================================================================== -->
-<section class="slide">
+<section class="slide visible">
   <div class="head">
     <span class="num">05</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
@@ -559,39 +575,44 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
     <p class="kicker reveal">המחיר</p>
     <h2 class="reveal">איך העלות מצטברת</h2>
     <div class="rule reveal"></div>
+    <p class="lede reveal">כל רחפן שמתווסף מוסיף החלטות. מרגע מסוים מפעיל אחד לא מספיק, והטעויות עולות בזמן טיסה ובסוללות.</p>
     <div class="figure reveal">
       <svg viewBox="0 0 720 170" role="img" aria-label="שרשרת: עוד רחפנים מובילים ליותר החלטות, לשיבוץ שגוי, ולעלות מיותרת">
         <defs>
           <marker id="a5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-            <path d="M0 0 L10 5 L0 10 z" fill="#111110" />
+            <path d="M0 0 L10 5 L0 10 z" fill="#111110"></path>
           </marker>
         </defs>
 
         <g class="node n1">
-          <rect class="box" x="570" y="30" width="150" height="72" />
+          <rect class="box" x="570" y="30" width="150" height="72"></rect>
           <text x="645" y="73" text-anchor="middle">עוד רחפנים</text>
         </g>
-        <path class="wire" d="M566 66 H538" marker-end="url(#a5)" />
+        <path class="wire" d="M566 66 H538" marker-end="url(#a5)"></path>
 
         <g class="node n2">
-          <rect class="box" x="380" y="30" width="150" height="72" />
+          <rect class="box" x="380" y="30" width="150" height="72"></rect>
           <text x="455" y="73" text-anchor="middle">יותר החלטות</text>
         </g>
-        <path class="wire" d="M376 66 H348" marker-end="url(#a5)" />
+        <path class="wire" d="M376 66 H348" marker-end="url(#a5)"></path>
 
         <g class="node n3">
-          <rect class="box" x="190" y="30" width="150" height="72" />
+          <rect class="box" x="190" y="30" width="150" height="72"></rect>
           <text x="265" y="73" text-anchor="middle">שיבוץ שגוי</text>
         </g>
-        <path class="wire" d="M186 66 H158" marker-end="url(#a5)" />
+        <path class="wire" d="M186 66 H158" marker-end="url(#a5)"></path>
 
         <g class="node n4">
-          <rect class="box-hot" x="0" y="30" width="150" height="72" />
+          <rect class="box-hot" x="0" y="30" width="150" height="72"></rect>
           <text class="t-out" x="75" y="73" text-anchor="middle">עלות מיותרת</text>
         </g>
 
-        <text class="t-sm node n4" x="75" y="132" text-anchor="middle">שעות וסוללות</text>
+        <!-- One plain-language caption per box: the chain has to read on its
+             own to someone who has never scheduled a drone. -->
         <text class="t-sm node n1" x="645" y="132" text-anchor="middle">הצי גדל</text>
+        <text class="t-sm node n2" x="455" y="132" text-anchor="middle">מי טס לאן, ומתי</text>
+        <text class="t-sm node n3" x="265" y="132" text-anchor="middle">לא הרחפן הנכון</text>
+        <text class="t-sm node n4" x="75" y="132" text-anchor="middle">שעות טיסה וסוללות</text>
       </svg>
     </div>
     <p class="note reveal"><b>הערכה להמחשה:</b> שיבוץ לא אופטימלי מוסיף כ-15% זמן טיסה מיותר.</p>
@@ -602,7 +623,7 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
 <!-- ==========================================================================
      06 · הרעיון
      ========================================================================== -->
-<section class="slide">
+<section class="slide visible">
   <div class="head">
     <span class="num">06</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
@@ -611,35 +632,36 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
     <p class="kicker reveal">הרעיון</p>
     <h2 class="reveal">שהמחשב יחליט מי טס לאן</h2>
     <div class="rule reveal"></div>
+    <p class="lede reveal">במקום שמפעיל ישבץ ידנית, המערכת מקבלת את כל התמונה ומחזירה תוכנית מוכנה תוך שניות.</p>
     <div class="figure reveal">
       <svg viewBox="0 0 680 175" role="img" aria-label="הצי והמשימות נכנסים, המערכת מחליטה, ויוצאת תוכנית טיסה">
         <defs>
           <marker id="a6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-            <path d="M0 0 L10 5 L0 10 z" fill="#111110" />
+            <path d="M0 0 L10 5 L0 10 z" fill="#111110"></path>
           </marker>
         </defs>
 
         <g class="node n1">
-          <rect class="box" x="490" y="26" width="190" height="86" />
+          <rect class="box" x="490" y="26" width="190" height="86"></rect>
           <text x="585" y="60" text-anchor="middle">הצי</text>
           <text x="585" y="90" text-anchor="middle">והמשימות</text>
         </g>
-        <path class="wire" d="M486 69 H446" marker-end="url(#a6)" />
+        <path class="wire" d="M486 69 H446" marker-end="url(#a6)"></path>
 
         <g class="node n2">
-          <rect class="box-hot" x="245" y="26" width="196" height="86" />
+          <rect class="box-hot" x="245" y="26" width="196" height="86"></rect>
           <text class="t-out" x="343" y="77" text-anchor="middle">המערכת מחליטה</text>
         </g>
-        <path class="wire" d="M241 69 H201" marker-end="url(#a6)" />
+        <path class="wire" d="M241 69 H201" marker-end="url(#a6)"></path>
 
         <g class="node n3">
-          <rect class="box" x="8" y="26" width="188" height="86" />
+          <rect class="box" x="8" y="26" width="188" height="86"></rect>
           <text x="102" y="77" text-anchor="middle">תוכנית טיסה</text>
         </g>
 
-        <text class="t-sm node n1" x="585" y="142" text-anchor="middle">מה שיש</text>
-        <text class="t-sm node n2" x="343" y="142" text-anchor="middle">שיבוץ ומסלול</text>
-        <text class="t-sm node n3" x="102" y="142" text-anchor="middle">מוכן להמראה</text>
+        <text class="t-sm node n1" x="585" y="142" text-anchor="middle">מי פנוי ומה צריך</text>
+        <text class="t-sm node n2" x="343" y="142" text-anchor="middle">מי לוקח כל משימה</text>
+        <text class="t-sm node n3" x="102" y="142" text-anchor="middle">מסלול לכל רחפן</text>
       </svg>
     </div>
   </div>
@@ -651,7 +673,7 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
      Real service names, one plain line each. The names are here so the room
      can follow who built what, not so anyone has to understand the internals.
      ========================================================================== -->
-<section class="slide">
+<section class="slide visible">
   <div class="head">
     <span class="num">07</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
@@ -664,23 +686,23 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
     <div class="figure reveal">
       <svg viewBox="0 0 700 205" role="img" aria-label="עץ שירותים: שער כניסה אחד בראש, מסתעף לשישה שירותים">
         <g class="node n1">
-          <rect class="box-fill" x="265" y="4" width="170" height="56" />
+          <rect class="box-fill" x="265" y="4" width="170" height="56"></rect>
           <text class="t-out" x="350" y="39" text-anchor="middle">שער כניסה</text>
         </g>
 
-        <path class="wire" d="M350 60 V96 H62 V134" />
-        <path class="wire" d="M350 60 V96 H177 V134" />
-        <path class="wire" d="M350 60 V96 H292 V134" />
-        <path class="wire" d="M350 60 V96 H407 V134" />
-        <path class="wire" d="M350 60 V96 H522 V134" />
-        <path class="wire" d="M350 60 V96 H637 V134" />
+        <path class="wire" d="M350 60 V96 H62 V134"></path>
+        <path class="wire" d="M350 60 V96 H177 V134"></path>
+        <path class="wire" d="M350 60 V96 H292 V134"></path>
+        <path class="wire" d="M350 60 V96 H407 V134"></path>
+        <path class="wire" d="M350 60 V96 H522 V134"></path>
+        <path class="wire" d="M350 60 V96 H637 V134"></path>
 
-        <g class="node n2"><rect class="box" x="10" y="134" width="105" height="52" /><text x="62" y="167" text-anchor="middle" dir="ltr">auth</text></g>
-        <g class="node n3"><rect class="box" x="125" y="134" width="105" height="52" /><text x="177" y="167" text-anchor="middle" dir="ltr">fleet</text></g>
-        <g class="node n4"><rect class="box" x="240" y="134" width="105" height="52" /><text x="292" y="167" text-anchor="middle" dir="ltr">mission</text></g>
-        <g class="node n5"><rect class="box-line-hot" x="355" y="134" width="105" height="52" /><text x="407" y="167" text-anchor="middle" dir="ltr" fill="#ff3300">planning</text></g>
-        <g class="node n6"><rect class="box" x="470" y="134" width="105" height="52" /><text x="522" y="167" text-anchor="middle" dir="ltr">telemetry</text></g>
-        <g class="node n7"><rect class="box" x="585" y="134" width="105" height="52" /><text x="637" y="167" text-anchor="middle" dir="ltr">notify</text></g>
+        <g class="node n2"><rect class="box" x="10" y="134" width="105" height="52"></rect><text x="62" y="167" text-anchor="middle" dir="ltr">auth</text></g>
+        <g class="node n3"><rect class="box" x="125" y="134" width="105" height="52"></rect><text x="177" y="167" text-anchor="middle" dir="ltr">fleet</text></g>
+        <g class="node n4"><rect class="box" x="240" y="134" width="105" height="52"></rect><text x="292" y="167" text-anchor="middle" dir="ltr">mission</text></g>
+        <g class="node n5"><rect class="box-line-hot" x="355" y="134" width="105" height="52"></rect><text x="407" y="167" text-anchor="middle" dir="ltr" fill="#ff3300">planning</text></g>
+        <g class="node n6"><rect class="box" x="470" y="134" width="105" height="52"></rect><text x="522" y="167" text-anchor="middle" dir="ltr">telemetry</text></g>
+        <g class="node n7"><rect class="box" x="585" y="134" width="105" height="52"></rect><text x="637" y="167" text-anchor="middle" dir="ltr">notify</text></g>
       </svg>
     </div>
     <p class="note reveal"><b style="color:#ff3300">planning</b> הוא המוח: הוא מחליט מי טס לאן.</p>
@@ -689,85 +711,13 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
 
 
 <!-- ==========================================================================
-     08 · הנתונים
-     Plain-language answer to a rehearsal note: "MongoDB" gets said out loud
-     and nobody in the room knows what it means. The picture carries the one
-     idea that matters, that the stores are separate.
-     ========================================================================== -->
-<section class="slide">
-  <div class="head">
-    <span class="num">08</span>
-    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
-  </div>
-  <div class="main">
-    <p class="kicker reveal">הנתונים</p>
-    <h2 class="reveal">מה זה בעצם מונגו?</h2>
-    <div class="rule reveal"></div>
-    <p class="lede reveal">המקום שבו כל שירות שומר את מה שהוא צריך לזכור.</p>
-    <div class="figure reveal">
-      <svg viewBox="0 0 660 210" role="img" aria-label="שלושה שירותים, לכל אחד מסד הנתונים הנפרד שלו">
-        <defs>
-          <marker id="a8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-            <path d="M0 0 L10 5 L0 10 z" fill="#111110" />
-          </marker>
-        </defs>
-
-        <!-- fleet -->
-        <g class="node n1">
-          <rect class="box" x="440" y="4" width="160" height="52" />
-          <text x="520" y="37" text-anchor="middle" dir="ltr">fleet</text>
-        </g>
-        <path class="wire" d="M520 56 V96" marker-end="url(#a8)" />
-        <g class="node n4">
-          <ellipse class="box" cx="520" cy="118" rx="62" ry="15" />
-          <path class="box" d="M458 118 V158 A62 15 0 0 0 582 158 V118" />
-          <path class="disk" d="M458 131 A62 15 0 0 0 582 131" />
-          <path class="disk" d="M458 145 A62 15 0 0 0 582 145" />
-          <text class="t-sm" x="520" y="192" text-anchor="middle">הקלסר שלו</text>
-        </g>
-
-        <!-- mission -->
-        <g class="node n2">
-          <rect class="box" x="250" y="4" width="160" height="52" />
-          <text x="330" y="37" text-anchor="middle" dir="ltr">mission</text>
-        </g>
-        <path class="wire" d="M330 56 V96" marker-end="url(#a8)" />
-        <g class="node n5">
-          <ellipse class="box" cx="330" cy="118" rx="62" ry="15" />
-          <path class="box" d="M268 118 V158 A62 15 0 0 0 392 158 V118" />
-          <path class="disk" d="M268 131 A62 15 0 0 0 392 131" />
-          <path class="disk" d="M268 145 A62 15 0 0 0 392 145" />
-          <text class="t-sm" x="330" y="192" text-anchor="middle">הקלסר שלו</text>
-        </g>
-
-        <!-- planning -->
-        <g class="node n3">
-          <rect class="box-line-hot" x="60" y="4" width="160" height="52" />
-          <text x="140" y="37" text-anchor="middle" dir="ltr" fill="#ff3300">planning</text>
-        </g>
-        <path class="wire" d="M140 56 V96" marker-end="url(#a8)" />
-        <g class="node n6">
-          <ellipse class="box" cx="140" cy="118" rx="62" ry="15" />
-          <path class="box" d="M78 118 V158 A62 15 0 0 0 202 158 V118" />
-          <path class="disk" d="M78 131 A62 15 0 0 0 202 131" />
-          <path class="disk" d="M78 145 A62 15 0 0 0 202 145" />
-          <text class="t-sm" x="140" y="192" text-anchor="middle">הקלסר שלו</text>
-        </g>
-      </svg>
-    </div>
-    <p class="note reveal">אחד לא נוגע במידע של השני.</p>
-  </div>
-</section>
-
-
-<!-- ==========================================================================
-     09 · האילוצים (PRD §4.1, §6)
+     08 · האילוצים (PRD §4.1, §6)
      Four inputs converging on one output: the shape itself says "all of this
      at once", which is the entire argument for why a person cannot do it.
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">09</span>
+    <span class="num">08</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
@@ -778,22 +728,22 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
       <svg viewBox="0 0 700 250" role="img" aria-label="ארבעה אילוצים מתכנסים לתוכנית טיסה אחת">
         <defs>
           <marker id="a9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-            <path d="M0 0 L10 5 L0 10 z" fill="#111110" />
+            <path d="M0 0 L10 5 L0 10 z" fill="#111110"></path>
           </marker>
         </defs>
 
-        <g class="node n1"><rect class="box" x="470" y="4"   width="225" height="48" /><text x="582" y="34"  text-anchor="middle">סוללה</text></g>
-        <g class="node n2"><rect class="box" x="470" y="64"  width="225" height="48" /><text x="582" y="94"  text-anchor="middle">עדיפות ודדליין</text></g>
-        <g class="node n3"><rect class="box" x="470" y="124" width="225" height="48" /><text x="582" y="154" text-anchor="middle">אזורים אסורים</text></g>
-        <g class="node n4"><rect class="box" x="470" y="184" width="225" height="48" /><text x="582" y="214" text-anchor="middle">התאמת מטען</text></g>
+        <g class="node n1"><rect class="box" x="470" y="4" width="225" height="48"></rect><text x="582" y="34" text-anchor="middle">סוללה</text></g>
+        <g class="node n2"><rect class="box" x="470" y="64" width="225" height="48"></rect><text x="582" y="94" text-anchor="middle">עדיפות ודדליין</text></g>
+        <g class="node n3"><rect class="box" x="470" y="124" width="225" height="48"></rect><text x="582" y="154" text-anchor="middle">אזורים אסורים</text></g>
+        <g class="node n4"><rect class="box" x="470" y="184" width="225" height="48"></rect><text x="582" y="214" text-anchor="middle">התאמת מטען</text></g>
 
-        <path class="wire" d="M466 28  C380 28,  350 118, 264 118" marker-end="url(#a9)" />
-        <path class="wire" d="M466 88  C400 88,  350 118, 264 118" marker-end="url(#a9)" />
-        <path class="wire" d="M466 148 C400 148, 350 118, 264 118" marker-end="url(#a9)" />
-        <path class="wire" d="M466 208 C380 208, 350 118, 264 118" marker-end="url(#a9)" />
+        <path class="wire" d="M466 28  C380 28,  350 118, 264 118" marker-end="url(#a9)"></path>
+        <path class="wire" d="M466 88  C400 88,  350 118, 264 118" marker-end="url(#a9)"></path>
+        <path class="wire" d="M466 148 C400 148, 350 118, 264 118" marker-end="url(#a9)"></path>
+        <path class="wire" d="M466 208 C380 208, 350 118, 264 118" marker-end="url(#a9)"></path>
 
         <g class="node n5">
-          <rect class="box-hot" x="30" y="82" width="230" height="72" />
+          <rect class="box-hot" x="30" y="82" width="230" height="72"></rect>
           <text class="t-out" x="145" y="126" text-anchor="middle">תוכנית טיסה</text>
         </g>
         <text class="t-sm node n5" x="145" y="180" text-anchor="middle">הכל נשקל יחד</text>
@@ -804,11 +754,11 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
 
 
 <!-- ==========================================================================
-     10 · בזמן אמת (PRD §1.2)
+     09 · בזמן אמת (PRD §1.2)
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">10</span>
+    <span class="num">09</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
@@ -819,31 +769,31 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
       <svg viewBox="0 0 680 250" role="img" aria-label="מעגל: תוכנית פעילה, משהו משתנה, תכנון מחדש, וחוזר לתוכנית">
         <defs>
           <marker id="a10" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-            <path d="M0 0 L10 5 L0 10 z" fill="#111110" />
+            <path d="M0 0 L10 5 L0 10 z" fill="#111110"></path>
           </marker>
         </defs>
 
         <g class="node n1">
-          <rect class="box" x="480" y="16" width="196" height="82" />
+          <rect class="box" x="480" y="16" width="196" height="82"></rect>
           <text x="578" y="63" text-anchor="middle">תוכנית פעילה</text>
         </g>
-        <path class="wire" d="M476 57 H440" marker-end="url(#a10)" />
+        <path class="wire" d="M476 57 H440" marker-end="url(#a10)"></path>
 
         <g class="node n2">
-          <rect class="box-hot" x="242" y="16" width="194" height="82" />
+          <rect class="box-hot" x="242" y="16" width="194" height="82"></rect>
           <text class="t-out" x="339" y="63" text-anchor="middle">משהו משתנה</text>
         </g>
-        <path class="wire" d="M238 57 H202" marker-end="url(#a10)" />
+        <path class="wire" d="M238 57 H202" marker-end="url(#a10)"></path>
 
         <g class="node n3">
-          <rect class="box" x="8" y="16" width="190" height="82" />
+          <rect class="box" x="8" y="16" width="190" height="82"></rect>
           <text x="103" y="63" text-anchor="middle">תכנון מחדש</text>
         </g>
 
         <text class="t-sm node n2" x="339" y="126" text-anchor="middle">סוללה · תקלה · משימה דחופה</text>
 
         <!-- the loop back: this return leg is the entire point of the sheet -->
-        <path class="wire" d="M103 98 V186 H578 V102" marker-end="url(#a10)" />
+        <path class="wire" d="M103 98 V186 H578 V102" marker-end="url(#a10)"></path>
         <text class="t-sm node n3" x="340" y="222" text-anchor="middle">וחוזר חלילה, בלי שאף אחד מבקש</text>
       </svg>
     </div>
@@ -852,11 +802,11 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
 
 
 <!-- ==========================================================================
-     11 · הסימולטור (slot: drone-operation video)
+     10 · הסימולטור (slot: drone-operation video)
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">11</span>
+    <span class="num">10</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
@@ -865,7 +815,7 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
     <div class="rule reveal"></div>
     <p class="lede reveal">טס, משדר תמונה, ומגיב בזמן אמת. בלי חומרה אמיתית.</p>
     <div class="slot reveal">
-      <svg viewBox="0 0 24 24" style="fill:var(--muted); stroke:none;"><path d="M6 4l14 8-14 8V4z"/></svg>
+      <svg viewBox="0 0 24 24" style="fill:var(--muted); stroke:none;"><path d="M6 4l14 8-14 8V4z"></path></svg>
       <span class="s-label" dir="ltr">VIDEO</span>
       <span class="s-note">סרטון של הפעלת הרחפן בסימולציה</span>
     </div>
@@ -874,11 +824,11 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
 
 
 <!-- ==========================================================================
-     12 · הנראות (slot: live map screenshot)
+     11 · הנראות (slot: live map screenshot)
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">12</span>
+    <span class="num">11</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
@@ -887,7 +837,7 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
     <div class="rule reveal"></div>
     <p class="lede reveal">איפה כל רחפן, כמה סוללה נשארה, ובאיזו משימה הוא.</p>
     <div class="slot reveal">
-      <svg viewBox="0 0 24 24"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"></path><circle cx="12" cy="9" r="2.5"></circle></svg>
       <span class="s-label" dir="ltr">SCREENSHOT</span>
       <span class="s-note">צילום מסך של המפה החיה</span>
     </div>
@@ -896,11 +846,11 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
 
 
 <!-- ==========================================================================
-     13 · הענן (slot: architecture.drawio page 13)
+     12 · הענן (slot: architecture.drawio page 13)
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">13</span>
+    <span class="num">12</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
@@ -909,7 +859,7 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
     <div class="rule reveal"></div>
     <p class="lede reveal">הכל רץ בענן של אמזון, ברשת פרטית וסגורה.</p>
     <div class="slot reveal">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><path d="M10 6.5h4M6.5 10v4M17.5 10v4M10 17.5h4"/></svg>
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><path d="M10 6.5h4M6.5 10v4M17.5 10v4M10 17.5h4"></path></svg>
       <span class="s-label" dir="ltr">DIAGRAM</span>
       <span class="s-note">architecture.drawio, עמוד 13</span>
     </div>
@@ -918,7 +868,7 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
 
 
 <!-- ==========================================================================
-     14 · העלות
+     13 · העלות
      Every figure here is from swarmops-infrastructure/COST_NOTES.md, not
      invented: $236-267/mo baseline, ~$140-145/mo tuned, ~$5-15 actually
      spent. The bars are drawn to true linear scale, which is why the last
@@ -927,7 +877,7 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">14</span>
+    <span class="num">13</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
@@ -943,19 +893,19 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
       <svg viewBox="0 0 700 250" role="img" aria-label="השוואת עלויות: ברירת מחדל כ-250 דולר לחודש, אחרי כיוונון כ-140 דולר לחודש, ובפועל שולמו כ-10 דולר בסך הכל">
         <text class="t-sm node n1" x="690" y="22" text-anchor="end" style="direction:ltr">ברירת מחדל, לחודש</text>
         <g class="node n1">
-          <rect x="90" y="30" width="600" height="40" fill="#111110" />
+          <rect x="90" y="30" width="600" height="40" fill="#111110"></rect>
           <text x="80" y="58" text-anchor="end" style="direction:ltr">$250</text>
         </g>
 
         <text class="t-sm node n2" x="690" y="108" text-anchor="end" style="direction:ltr">אחרי כיוונון, לחודש</text>
         <g class="node n2">
-          <rect x="354" y="116" width="336" height="40" fill="#8c8a84" />
+          <rect x="354" y="116" width="336" height="40" fill="#8c8a84"></rect>
           <text x="344" y="144" text-anchor="end" style="direction:ltr">$140</text>
         </g>
 
         <text class="t-sm node n3" x="690" y="194" text-anchor="end" style="direction:ltr" fill="#ff3300">מה ששילמנו, סך הכל</text>
         <g class="node n3">
-          <rect x="666" y="202" width="24" height="40" fill="#ff3300" />
+          <rect x="666" y="202" width="24" height="40" fill="#ff3300"></rect>
           <text x="656" y="230" text-anchor="end" style="direction:ltr" fill="#ff3300">$10</text>
         </g>
       </svg>
@@ -966,56 +916,61 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
 
 
 <!-- ==========================================================================
-     15 · הפריסה
+     14 · הפריסה
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">15</span>
+    <span class="num">14</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
     <p class="kicker reveal">הפריסה</p>
     <h2 class="reveal">מקוד למערכת רצה, לבד</h2>
     <div class="rule reveal"></div>
+    <p class="lede reveal">אף אחד לא מתקין גרסאות ידנית על השרת. כותבים קוד, והמערכת מסנכרנת את עצמה אליו.</p>
     <div class="figure reveal">
       <svg viewBox="0 0 680 175" role="img" aria-label="שינוי בקוד, ארגו מזהה, המערכת מתעדכנת לבד">
         <defs>
           <marker id="a14" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-            <path d="M0 0 L10 5 L0 10 z" fill="#111110" />
+            <path d="M0 0 L10 5 L0 10 z" fill="#111110"></path>
           </marker>
         </defs>
 
         <g class="node n1">
-          <rect class="box" x="490" y="26" width="190" height="86" />
+          <rect class="box" x="490" y="26" width="190" height="86"></rect>
           <text x="585" y="77" text-anchor="middle">שינוי בקוד</text>
         </g>
-        <path class="wire" d="M486 69 H446" marker-end="url(#a14)" />
+        <path class="wire" d="M486 69 H446" marker-end="url(#a14)"></path>
 
         <g class="node n2">
-          <rect class="box-hot" x="245" y="26" width="196" height="86" />
+          <rect class="box-hot" x="245" y="26" width="196" height="86"></rect>
           <text class="t-out" x="343" y="77" text-anchor="middle" dir="ltr">Argo</text>
         </g>
-        <path class="wire" d="M241 69 H201" marker-end="url(#a14)" />
+        <path class="wire" d="M241 69 H201" marker-end="url(#a14)"></path>
 
         <g class="node n3">
-          <rect class="box" x="8" y="26" width="188" height="86" />
+          <rect class="box" x="8" y="26" width="188" height="86"></rect>
           <text x="102" y="77" text-anchor="middle">מתעדכן לבד</text>
         </g>
 
-        <text class="t-sm node n2" x="343" y="142" text-anchor="middle">משווה כל הזמן בין הקוד למה שרץ</text>
+        <!-- The old single caption ran ~29 characters wide, past the 242-unit
+             gap between box centres. One short caption per box instead. -->
+        <text class="t-sm node n1" x="585" y="142" text-anchor="middle">הצוות כותב שינוי</text>
+        <text class="t-sm node n2" x="343" y="142" text-anchor="middle">משווה קוד למה שרץ</text>
+        <text class="t-sm node n3" x="102" y="142" text-anchor="middle">בלי שנוגעים בשרת</text>
       </svg>
     </div>
-    <p class="note reveal">גרסה חדשה יוצאת <b>בהדרגה</b>, לא לכולם בבת אחת.</p>
+    <p class="note reveal">גרסה חדשה יוצאת <b>בהדרגה</b>: קודם לחלק קטן. אם המדידה מראה בעיה, היא נעצרת וחוזרת אחורה לבד.</p>
   </div>
 </section>
 
 
 <!-- ==========================================================================
-     16 · ניטור (slot: architecture.drawio page 6)
+     15 · ניטור (slot: architecture.drawio page 6)
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">16</span>
+    <span class="num">15</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
@@ -1024,7 +979,7 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
     <div class="rule reveal"></div>
     <p class="lede reveal">כל שירות מדווח על עצמו. כשמשהו חורג, המערכת מתריעה לבד.</p>
     <div class="slot reveal">
-      <svg viewBox="0 0 24 24"><path d="M3 17l5-6 4 4 6-9 3 4"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M3 17l5-6 4 4 6-9 3 4"></path></svg>
       <span class="s-label" dir="ltr">DIAGRAM</span>
       <span class="s-note">architecture.drawio, עמוד 6</span>
     </div>
@@ -1033,37 +988,7 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
 
 
 <!-- ==========================================================================
-     17 · האתגרים
-     ========================================================================== -->
-<section class="slide">
-  <div class="head">
-    <span class="num">17</span>
-    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
-  </div>
-  <div class="main">
-    <p class="kicker reveal">האתגרים</p>
-    <h2 class="reveal">הדברים שנשברו בדרך</h2>
-    <div class="rule reveal"></div>
-    <div class="cards reveal">
-      <div class="card risk">
-        <span class="h">באגים שקטים</span>
-        <span class="d">משימות נעלמו בלי הודעת שגיאה.</span>
-      </div>
-      <div class="card risk">
-        <span class="h">עובד אצלי, נשבר בענן</span>
-        <span class="d">תקלות שהופיעו רק בענן, בלי סימן קודם.</span>
-      </div>
-      <div class="card">
-        <span class="h">ואז זה תיקן את עצמו</span>
-        <span class="d">נפילה אמיתית קרתה, והמערכת חזרה לבד.</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ==========================================================================
-     18 · ההגנה
+     16 · ההגנה
      Defence in depth, drawn as literal nested walls rather than a flow: the
      point is that passing one layer gets you nothing, which a left-to-right
      arrow chain would actually contradict. Pairs with sheet 19, which owns
@@ -1076,19 +1001,19 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">18</span>
+    <span class="num">16</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
     <p class="kicker reveal">אבטחה</p>
     <h2 class="reveal">איך המערכת מוגנת</h2>
     <div class="rule reveal"></div>
-    <p class="lede reveal">שלוש שכבות. מי שעבר אחת עדיין רחוק מהמידע.</p>
+    <p class="lede reveal">שלוש שכבות, אחת בתוך השנייה. מי שעבר את החיצונית עדיין רחוק מהמידע.</p>
     <div class="figure reveal">
-      <svg viewBox="0 0 700 250" role="img" aria-label="שלוש שכבות הגנה מקוננות: רשת פרטית עם שער אחד, טוקן חתום בכל בקשה, ובמרכז המידע">
+      <svg viewBox="0 0 700 250" role="img" aria-label="שלוש שכבות הגנה מקוננות: רשת סגורה עם שער אחד, כל פנייה חייבת להזדהות, ובמרכז המידע">
         <defs>
           <marker id="a18" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-            <path d="M0 0 L10 5 L0 10 z" fill="#111110" />
+            <path d="M0 0 L10 5 L0 10 z" fill="#111110"></path>
           </marker>
         </defs>
 
@@ -1098,38 +1023,38 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
              the wall's 600, or the head would sit on top of the border. -->
         <g class="node n1">
           <text class="t-sm" x="652" y="112" text-anchor="middle">מבחוץ</text>
-          <path class="wire" d="M666 125 H612" marker-end="url(#a18)" />
+          <path class="wire" d="M666 125 H612" marker-end="url(#a18)"></path>
         </g>
 
         <g class="node n2">
-          <rect class="box" x="40" y="6" width="560" height="238" />
-          <text x="320" y="37" text-anchor="middle">רשת פרטית, שער אחד</text>
+          <rect class="box" x="40" y="6" width="560" height="238"></rect>
+          <text x="320" y="37" text-anchor="middle">רשת סגורה, שער אחד</text>
         </g>
 
         <g class="node n3">
-          <rect class="box" x="100" y="52" width="440" height="146" />
-          <text x="320" y="80" text-anchor="middle">טוקן חתום בכל בקשה</text>
+          <rect class="box" x="100" y="52" width="440" height="146"></rect>
+          <text x="320" y="80" text-anchor="middle">כל פנייה חייבת להזדהות</text>
         </g>
 
         <g class="node n4">
-          <rect class="box-hot" x="175" y="92" width="290" height="66" />
+          <rect class="box-hot" x="175" y="92" width="290" height="66"></rect>
           <text class="t-out" x="320" y="134" text-anchor="middle">המידע</text>
         </g>
       </svg>
     </div>
-    <p class="note reveal">כל שירות בודק בעצמו ולא סומך על השכן. גם הכניסה לענן היא זהות זמנית, בלי מפתחות שמורים.</p>
+    <p class="note reveal">כל שירות בודק בעצמו מי פונה אליו, ולא סומך על השכן. גם אנחנו נכנסים לענן בהרשאה זמנית, בלי סיסמאות שמורות.</p>
   </div>
 </section>
 
 
 <!-- ==========================================================================
-     19 · אבטחה
+     17 · אבטחה
      The TBD row is deliberately left open rather than answered: real
      regulatory claims about military use are not something to invent.
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">19</span>
+    <span class="num">17</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
@@ -1137,21 +1062,21 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
     <h2 class="reveal">מגבלות ועמידות</h2>
     <div class="rule reveal"></div>
     <ul class="points reveal">
-      <li class="st"><span class="tagpill ok" dir="ltr">OK</span><span>הגייטווי הוא הפתח היחיד שנגיש מבחוץ.</span></li>
-      <li class="st"><span class="tagpill ok" dir="ltr">OK</span><span>גישה לענן רק דרך זיהוי מאובטח.</span></li>
-      <li class="st"><span class="tagpill ok" dir="ltr">OK</span><span>המערכת כבר הוכיחה שהיא מתאוששת לבד.</span></li>
-      <li class="st"><span class="tagpill tbd" dir="ltr">TBD</span><span><b>לשימוש צבאי:</b> מיקום המידע והרחפנים המורשים טרם הוגדרו.</span></li>
+      <li class="st"><span class="tagpill ok" dir="ltr">OK</span><span>רק שער אחד חשוף לאינטרנט. כל שאר השירותים סגורים מבחוץ.</span></li>
+      <li class="st"><span class="tagpill ok" dir="ltr">OK</span><span>הכניסה לענן היא בהרשאה זמנית, בלי סיסמה קבועה ששמורה בקוד.</span></li>
+      <li class="st"><span class="tagpill ok" dir="ltr">OK</span><span>אם מישהו משנה משהו בשרת ידנית, המערכת מחזירה את עצמה למה שכתוב בקוד.</span></li>
+      <li class="st"><span class="tagpill tbd" dir="ltr">TBD</span><span><b>לשימוש צבאי:</b> עוד לא הגדרנו איפה המידע יישמר ואילו רחפנים מורשים להתחבר.</span></li>
     </ul>
   </div>
 </section>
 
 
 <!-- ==========================================================================
-     20 · מה למדנו
+     18 · מה למדנו
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">20</span>
+    <span class="num">18</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
@@ -1161,15 +1086,15 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
     <div class="cards reveal">
       <div class="card">
         <span class="h">שש קטנות, לא אחת גדולה</span>
-        <span class="d">הקושי הוא לגרום להן לדבר נכון ביניהן.</span>
+        <span class="d">בנינו שש מערכות נפרדות. הקושי האמיתי הוא לגרום להן לדבר נכון ביניהן.</span>
       </div>
       <div class="card risk">
         <span class="h">השקט הוא הסכנה</span>
-        <span class="d">באג ששקט מסוכן יותר מבאג שקורס.</span>
+        <span class="d">כשמשהו קורס, מיד יודעים. כשמשהו טועה בשקט, מגלים מאוחר מדי.</span>
       </div>
       <div class="card risk">
         <span class="h">לתכנן מחדש, לא רק לתקן</span>
-        <span class="d">ששורדת בשטח מתכננת מחדש.</span>
+        <span class="d">מערכת ששורדת בשטח לא קולעת נכון בפעם הראשונה. היא מתכננת מחדש כשהמציאות משתנה.</span>
       </div>
     </div>
   </div>
@@ -1177,11 +1102,11 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
 
 
 <!-- ==========================================================================
-     21 · מאחורי הקלעים (slot: behind-the-scenes video)
+     19 · מאחורי הקלעים (slot: behind-the-scenes video)
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">21</span>
+    <span class="num">19</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
@@ -1189,7 +1114,7 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
     <h2 class="reveal">איך זה נראה מבפנים</h2>
     <div class="rule reveal"></div>
     <div class="slot reveal">
-      <svg viewBox="0 0 24 24" style="fill:var(--muted); stroke:none;"><path d="M6 4l14 8-14 8V4z"/></svg>
+      <svg viewBox="0 0 24 24" style="fill:var(--muted); stroke:none;"><path d="M6 4l14 8-14 8V4z"></path></svg>
       <span class="s-label" dir="ltr">VIDEO</span>
       <span class="s-note">סרטון מאחורי הקלעים מתהליך הפיתוח</span>
     </div>
@@ -1198,11 +1123,11 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
 
 
 <!-- ==========================================================================
-     22 · סיום
+     20 · סיום
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">22</span>
+    <span class="num">20</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
@@ -1308,15 +1233,31 @@ class Deck {
    FLOW PULSES
 
    Every wire gets a clone stacked on top of it, dashed so that exactly one
-   short segment is visible, then animated along the path forever. The wire
-   underneath is never dashed, so the diagram is complete and correct even
-   before any script runs.
+   short segment is visible, then animated along the path. The wire underneath
+   is never dashed, so the diagram is complete and correct even before any
+   script runs.
 
-   The dash length is measured from the path itself with getTotalLength().
-   The previous version used one hardcoded dash length for every path, which
-   silently truncated anything longer than that number: the loop-back arrow on
-   the re-planning sheet is 617 units long against a 520 dash, so its last leg
-   simply never rendered and its arrowhead floated unattached.
+   One pulse is in flight at a time, per figure, in wire order. Each wire's
+   clone runs the WHOLE cycle with iterations:Infinity and is placed inside it
+   by keyframe OFFSET, sitting at opacity 0 until its turn. Every clone in a
+   figure therefore shares one clock and the order can never drift, which a
+   per-wire `delay` cannot promise: those each loop on their own duration, so
+   wires of different lengths slide out of phase within a few laps and two
+   pulses end up on screen at once.
+
+   The pulse stops short of the arrowhead rather than running through it. A
+   marker is painted at the path's end and scales with stroke-width, so a
+   pulse travelling the full length ploughs straight through the head and the
+   two smear together. The clearance is derived from the marker's own geometry
+   (markerWidth 5, scaled by stroke-width) instead of a guessed constant, so it
+   stays correct if either value is ever changed. Clearance is never traded
+   away for travel distance: a minimum-travel floor here would quietly push the
+   shortest connectors back into their heads.
+
+   Lengths are measured per path with getTotalLength(). An earlier version
+   shared one hardcoded dash length across every path and silently truncated
+   anything longer: the loop-back arrow on the re-planning sheet is 647 units
+   against a 520 dash, so its last leg never rendered at all.
    =========================================================================== */
 const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -1324,34 +1265,113 @@ function flowPulses(){
     if(REDUCED) return;   // honour the OS setting: solid wires, no motion
 
     document.querySelectorAll('.figure').forEach(fig=>{
-        const wires = fig.querySelectorAll('.wire');
-        wires.forEach((wire, i)=>{
+        // Measure first: the cycle length is the sum of every leg, so nothing
+        // can be scheduled until all of them are known.
+        const legs = [];
+        fig.querySelectorAll('.wire').forEach(wire=>{
             let len = 0;
             try{ len = wire.getTotalLength(); }catch(e){ return; }
-            if(!len) return;
+            if(len > 0) legs.push({ wire, len });
+        });
+        if(!legs.length) return;
 
+        const GAP = 140, TAIL = 700;
+        let t = 0;
+        legs.forEach(leg=>{
+            leg.start = t;
+            leg.dur = 900 + leg.len * 3.2;   // the original pace, unchanged
+            t += leg.dur + GAP;
+        });
+        const cycle = t + TAIL;              // a beat of stillness, then again
+        const EPS = 1e-4;
+
+        legs.forEach(({ wire, len, start, dur })=>{
             const pulse = wire.cloneNode(false);
             pulse.setAttribute('class','pulse');
             pulse.removeAttribute('marker-end');   // one arrowhead per wire, on the solid one
 
+            // Room to leave for the head: markerWidth is 5 and markers scale
+            // with stroke-width by default, plus a little daylight so the two
+            // never touch. Wires without a head only need the daylight.
+            const sw = parseFloat(getComputedStyle(wire).strokeWidth) || 2.5;
+            const head = wire.getAttribute('marker-end') ? sw * 5 + 5 : 4;
+
             // A short travelling segment, with a gap long enough that only one
             // is ever on the wire at a time.
-            const dash = Math.max(18, Math.min(52, len * 0.28));
+            const dash = Math.max(8, Math.min(52, len * 0.30));
             pulse.style.strokeDasharray = dash + ' ' + (len + dash);
             wire.parentNode.insertBefore(pulse, wire.nextSibling);
 
-            // Constant speed regardless of path length, so a long loop-back
-            // does not crawl while a short connector races.
-            pulse.animate(
-                [{ strokeDashoffset: dash }, { strokeDashoffset: -len }],
-                {
-                    duration: 900 + len * 3.2,
-                    delay: i * 220,
-                    iterations: Infinity,
-                    easing: 'linear'
-                }
-            );
+            // With this dash pattern the segment's leading edge sits at
+            // (dash - strokeDashoffset), so running the offset from `dash` down
+            // to `dash - stop` walks that edge from the wire's start to `stop`.
+            const stop = Math.max(4, len - head);
+            const off  = p=> dash - stop * p;
+
+            // This leg's slot inside the shared cycle.
+            const from = Math.max(EPS, start / cycle);
+            const to   = Math.min(1 - EPS, (start + dur) / cycle);
+            const at   = p=> from + (to - from) * p;
+
+            pulse.animate([
+                { offset:0,        strokeDashoffset:off(0),   opacity:0 },
+                { offset:from,     strokeDashoffset:off(0),   opacity:0 },
+                { offset:at(.12),  strokeDashoffset:off(.12), opacity:1 },
+                { offset:at(.84),  strokeDashoffset:off(.84), opacity:1 },
+                { offset:to,       strokeDashoffset:off(1),   opacity:0 },
+                { offset:1,        strokeDashoffset:off(1),   opacity:0 }
+            ], { duration:cycle, iterations:Infinity, easing:'linear' });
         });
+    });
+}
+
+/* ===========================================================================
+   CARD HEADLINE FIT
+   .card .h is white-space:nowrap so it never wraps, but its font-size is a
+   fixed clamp() shared by every card -- fine for short text, but a longer
+   headline (typed later, in-browser, by anyone) would just overflow. Re-measure
+   and shrink per element instead of hand-tuning a size for whatever text
+   happens to be there today.
+   =========================================================================== */
+function fitCardHeadings(){
+    const range = document.createRange();
+
+    document.querySelectorAll('.card .h').forEach(el=>{
+        // Back to the authored CSS before measuring, or each pass would
+        // compound the previous pass's shrink.
+        el.style.fontSize = '';
+        el.style.whiteSpace = '';
+
+        const avail = el.clientWidth;
+        if(!avail) return;   // not laid out yet; a later pass will catch it
+
+        // Measure the text itself via a Range rather than scrollWidth: a
+        // Range reports the true rendered extent regardless of how the box
+        // handles overflow, so this cannot silently read back "already fits".
+        const textWidth = ()=>{
+            range.selectNodeContents(el);
+            return range.getBoundingClientRect().width;
+        };
+
+        let size = parseFloat(getComputedStyle(el).fontSize);
+        if(!size || textWidth() <= avail) return;
+
+        // Proportional first guess, then small corrections: glyph widths do
+        // not scale perfectly linearly, so one division usually lands close
+        // but not exactly.
+        const floor = size * 0.6;
+        size = Math.max(floor, size * avail / textWidth());
+        el.style.fontSize = size + 'px';
+
+        let guard = 0;
+        while(textWidth() > avail && size > floor && guard++ < 24){
+            size = Math.max(floor, size - 0.5);
+            el.style.fontSize = size + 'px';
+        }
+
+        // Genuinely too long even at the floor: wrap it rather than clip it.
+        // Two readable lines beat one truncated one.
+        if(textWidth() > avail) el.style.whiteSpace = 'normal';
     });
 }
 
@@ -1375,7 +1395,7 @@ function flowPulses(){
 const STORE = 'swarmops-pitch-v1';
 const EDITABLE = 'h1, h2, .kicker, .lede, .note, .byline, .wordmark, '
                + '.points li, .card .h, .card .d, .p-name, .p-role, '
-               + '.s-label, .s-note, .num';
+               + '.s-label, .s-note, .num, .figure text';
 
 class Editor {
     constructor(deck){
@@ -1384,6 +1404,7 @@ class Editor {
         this.bar = document.getElementById('editBar');
         this.btn = document.getElementById('editBtn');
         this.map = this.index();
+        this.activeOverlay = null;   // { box, el } while a diagram-text popup is open
         this.restore();
     }
 
@@ -1406,13 +1427,19 @@ class Editor {
     }
 
     toggle(){
+        if(this.activeOverlay) this.commitSvgEdit();
         this.on = !this.on;
         document.body.classList.toggle('editing', this.on);
         this.bar.classList.toggle('on', this.on);
         this.btn.classList.toggle('on', this.on);
         this.btn.textContent = this.on ? '✓' : '✏️';
         this.map.forEach(([,el])=>{
-            if(this.on){
+            if(el.ownerSVGElement){
+                // SVG <text>: native contenteditable is too unreliable across
+                // browsers, so a click opens an HTML overlay box instead.
+                if(this.on) el.addEventListener('click', this.openSvgEditor);
+                else el.removeEventListener('click', this.openSvgEditor);
+            }else if(this.on){
                 el.setAttribute('contenteditable','true');
                 el.addEventListener('input', this.save);
             }else{
@@ -1422,7 +1449,51 @@ class Editor {
         });
     }
 
+    /* Click on a diagram label: float a matching-styled contenteditable box
+       over it rather than editing the SVG text node in place. */
+    openSvgEditor = (e)=>{
+        if(this.activeOverlay) this.commitSvgEdit();
+
+        const el = e.currentTarget;
+        const rect = el.getBoundingClientRect();
+        const cs = getComputedStyle(el);
+        const box = document.createElement('div');
+        box.className = 'svg-edit-box';
+        box.contentEditable = 'true';
+        box.textContent = el.textContent;
+        box.style.left = rect.left + 'px';
+        box.style.top = rect.top + 'px';
+        box.style.minWidth = rect.width + 'px';
+        box.style.fontSize = cs.fontSize;
+        box.style.fontWeight = cs.fontWeight;
+        box.style.fontFamily = cs.fontFamily;
+        box.style.direction = cs.direction;
+        box.style.color = (cs.fill && cs.fill !== 'none') ? cs.fill : cs.color;
+        document.body.appendChild(box);
+
+        box.addEventListener('keydown', ev=>{
+            if(ev.key === 'Enter'){ ev.preventDefault(); box.blur(); }
+            if(ev.key === 'Escape'){ ev.preventDefault(); this.activeOverlay = null; box.remove(); }
+        });
+        box.addEventListener('blur', ()=> this.commitSvgEdit());
+
+        this.activeOverlay = { box, el };
+        box.focus();
+        document.getSelection().selectAllChildren(box);
+    }
+
+    commitSvgEdit(){
+        if(!this.activeOverlay) return;
+        const { box, el } = this.activeOverlay;
+        const text = box.textContent.trim();
+        if(text) el.textContent = text;
+        box.remove();
+        this.activeOverlay = null;
+        this.save();
+    }
+
     save = ()=>{
+        fitCardHeadings();   // re-fit live so a growing headline never overflows
         const text = {};
         this.map.forEach(([k, el])=>{ text[k] = el.innerHTML; });
         try{
@@ -1443,6 +1514,7 @@ class Editor {
         this.map.forEach(([k, el])=>{
             if(typeof saved.text[k] === 'string') el.innerHTML = saved.text[k];
         });
+        fitCardHeadings();
     }
 
     reset(){
@@ -1454,6 +1526,9 @@ class Editor {
        file opens permanently stuck in it: dashed outlines, a checkmark button
        and the banner all baked in. */
     export(){
+        // Otherwise a mid-edit overlay box ships baked into the file as a
+        // stray floating <div>, and the edit itself is lost.
+        if(this.activeOverlay) this.commitSvgEdit();
         const live = Array.from(document.querySelectorAll('[contenteditable]'));
         live.forEach(el=>el.removeAttribute('contenteditable'));
         document.body.classList.remove('editing');
@@ -1489,6 +1564,16 @@ class Editor {
 const deck = new Deck();
 const editor = new Editor(deck);
 flowPulses();
+fitCardHeadings();
+
+// Web-font metrics land after the fonts actually load, and viewport-relative
+// clamp() sizes shift on resize -- both change how much text fits per line.
+if(document.fonts) document.fonts.ready.then(fitCardHeadings);
+let fitTimer = null;
+window.addEventListener('resize', ()=>{
+    clearTimeout(fitTimer);
+    fitTimer = setTimeout(fitCardHeadings, 150);
+});
 
 /* --- entry points: hover corner, button, E key -------------------------- */
 const zone = document.querySelector('.edit-zone');
@@ -1514,5 +1599,6 @@ document.addEventListener('keydown', e=>{
 // The first sheet is already on screen at load, so reveal it without waiting.
 document.querySelector('.slide').classList.add('visible');
 </script>
-</body>
-</html>
+
+
+</body></html>
