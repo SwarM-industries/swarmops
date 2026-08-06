@@ -11,3 +11,9 @@ swarmops-*/
 
 # personal working notes, not shared team docs
 TONY.md
+presentation.tony.html
+OBSERVABILITY_ACCESS.md
+
+# tool scratch output, not project content
+.claude-design/
+.playwright-mcp/

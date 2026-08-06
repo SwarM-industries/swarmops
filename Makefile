@@ -3,8 +3,9 @@ SHELL := /bin/bash
 ORG := SwarM-industries
 REPOS := swarmops-frontend swarmops-gateway swarmops-auth-service swarmops-fleet-service \
          swarmops-mission-service swarmops-planning-service swarmops-telemetry-service \
-         swarmops-notification-service swarmops-drone-simulator swarmops-local \
-         swarmops-deployments swarmops-infrastructure swarmops-contracts
+         swarmops-notification-service swarmops-drone-simulator swarmops-unity-simulator \
+         swarmops-local swarmops-deployments swarmops-infrastructure swarmops-contracts \
+         swarmops-diag-test
 
 # "." is this repo (swarmops — docs/plan/pitch site), included in every all-repo operation.
 ALL := . $(REPOS)
@@ -19,7 +20,7 @@ SERVICE_REPOS := swarmops-auth-service swarmops-fleet-service swarmops-mission-s
 .PHONY: help repos clone-missing status fetch-all pull-all push-all sync branch foreach trigger-publish check-publish
 
 help:
-	@echo "SwarmOps multi-repo automation (14 repos: swarmops + 13 app repos)"
+	@echo "SwarmOps multi-repo automation (16 repos: swarmops + 15 app repos)"
 	@echo ""
 	@echo "  make repos                 list every repo this Makefile manages"
 	@echo "  make clone-missing         clone any org repo not present locally"
