@@ -133,6 +133,11 @@ h2{
     max-width:40ch; color:var(--muted);
 }
 .note b{ color:var(--ink); font-weight:700; }
+/* A short stat callout, not a wrapped paragraph like the rest of .note --
+   opts out of the 40ch cap. fitOneLiners() (script) keeps it from running
+   past the slide edge instead of a fixed width, since a fixed number here
+   would just be next slide's overflow bug with extra steps. */
+.note.one-line{ max-width:none; white-space:nowrap; }
 .byline{
     font-weight:700; font-size:clamp(1.15rem,2.2vw,1.8rem); letter-spacing:.02em;
 }
@@ -180,7 +185,7 @@ ul.points li.st::before{ display:none; }
     border:2px solid var(--ink);
     padding:clamp(.75rem,2.2vh,1.25rem) clamp(.7rem,1.4vw,1.15rem);
 }
-/* nowrap keeps the headline on one line; fitCardHeadings() shrinks it until
+/* nowrap keeps the headline on one line; fitOneLiners() shrinks it until
    it actually fits. Deliberately no overflow:hidden/ellipsis here -- hiding
    part of a headline behind "..." is worse than any sizing glitch, so the
    text stays fully visible and the script is what makes it fit. */
@@ -369,6 +374,24 @@ ul.points li.st::before{ display:none; }
     opacity:0; pointer-events:none; transition:opacity .3s ease;
 }
 .edit-bar.on{ opacity:1; }
+/* Fires when restore() finds saved edits that no longer match the deck's
+   shape and discards them. That discard used to be a console.warn only --
+   invisible unless DevTools happened to be open -- so from the editor's side
+   it looked like edits vanished for no reason. This is the same event, just
+   not silent anymore. */
+.stale-notice{
+    position:fixed; top:0; inset-inline:0; z-index:1000;
+    background:var(--ink); color:var(--paper);
+    display:flex; align-items:center; justify-content:center; gap:1em;
+    font-weight:500; font-size:.8rem; padding:.55em 1em;
+    transform:translateY(-100%); transition:transform .35s var(--ease);
+}
+.stale-notice.show{ transform:translateY(0); }
+.stale-notice button{
+    background:none; border:1px solid var(--paper); color:var(--paper);
+    width:20px; height:20px; border-radius:50%; cursor:pointer; font-size:11px;
+    line-height:1; flex:none; padding:0;
+}
 body.editing [contenteditable]{ outline:1px dashed var(--accent); outline-offset:3px; }
 body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
 
@@ -436,6 +459,10 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
 <div class="edit-zone"></div>
 <button class="edit-btn" id="editBtn" title="מצב עריכה (E)">✏️</button>
 <div class="edit-bar" id="editBar">מצב עריכה · לחצו על טקסט כדי לערוך · Ctrl+S ייצוא · Ctrl+Shift+Del איפוס</div>
+<div class="stale-notice" id="staleNotice">
+  <span>העריכות השמורות בדפדפן הזה נשמרו על גרסה אחרת של המצגת ולכן לא שוחזרו.</span>
+  <button id="staleClose" aria-label="סגור">✕</button>
+</div>
 
 
 <!-- ==========================================================================
@@ -573,7 +600,7 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
   </div>
   <div class="main">
     <p class="kicker reveal">המחיר</p>
-    <h2 class="reveal">איך העלות מצטברת</h2>
+    <h2 class="reveal">חוסר היעילות בשיטה קיימת</h2>
     <div class="rule reveal"></div>
     <p class="lede reveal">כל רחפן שמתווסף מוסיף החלטות. מרגע מסוים מפעיל אחד לא מספיק, והטעויות עולות בזמן טיסה ובסוללות.</p>
     <div class="figure reveal">
@@ -592,30 +619,30 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
 
         <g class="node n2">
           <rect class="box" x="380" y="30" width="150" height="72"></rect>
-          <text x="455" y="73" text-anchor="middle">יותר החלטות</text>
+          <text x="455" y="73" text-anchor="middle">עוד כוח אדם</text>
         </g>
         <path class="wire" d="M376 66 H348" marker-end="url(#a5)"></path>
 
         <g class="node n3">
           <rect class="box" x="190" y="30" width="150" height="72"></rect>
-          <text x="265" y="73" text-anchor="middle">שיבוץ שגוי</text>
+          <text x="265" y="73" text-anchor="middle">עוד טעויות</text>
         </g>
         <path class="wire" d="M186 66 H158" marker-end="url(#a5)"></path>
 
         <g class="node n4">
           <rect class="box-hot" x="0" y="30" width="150" height="72"></rect>
-          <text class="t-out" x="75" y="73" text-anchor="middle">עלות מיותרת</text>
+          <text class="t-out" x="75" y="73" text-anchor="middle">המשימה נפגעת</text>
         </g>
 
         <!-- One plain-language caption per box: the chain has to read on its
              own to someone who has never scheduled a drone. -->
-        <text class="t-sm node n1" x="645" y="132" text-anchor="middle">הצי גדל</text>
-        <text class="t-sm node n2" x="455" y="132" text-anchor="middle">מי טס לאן, ומתי</text>
-        <text class="t-sm node n3" x="265" y="132" text-anchor="middle">לא הרחפן הנכון</text>
-        <text class="t-sm node n4" x="75" y="132" text-anchor="middle">שעות טיסה וסוללות</text>
+        <text class="t-sm node n1" x="645" y="132" text-anchor="middle">רחפן הוא כלי יקר</text>
+        <text class="t-sm node n2" x="455" y="132" text-anchor="middle">עוד לוחמים "מושבתים"</text>
+        <text class="t-sm node n3" x="265" y="132" text-anchor="middle">אדם נוטה לעשות טעויות</text>
+        <text class="t-sm node n4" x="75" y="132" text-anchor="middle">איכות המשימה יורדת</text>
       </svg>
     </div>
-    <p class="note reveal"><b>הערכה להמחשה:</b> שיבוץ לא אופטימלי מוסיף כ-15% זמן טיסה מיותר.</p>
+    <p class="note reveal one-line"><b>הערכה להמחשה:</b> שיבוץ לא אופטימלי מוסיף כ-15% זמן טיסה מיותר.</p>
   </div>
 </section>
 
@@ -630,9 +657,9 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
   </div>
   <div class="main">
     <p class="kicker reveal">הרעיון</p>
-    <h2 class="reveal">שהמחשב יחליט מי טס לאן</h2>
+    <h2 class="reveal">מערכת שליטה ובקרה מרכזית ניידת</h2>
     <div class="rule reveal"></div>
-    <p class="lede reveal">במקום שמפעיל ישבץ ידנית, המערכת מקבלת את כל התמונה ומחזירה תוכנית מוכנה תוך שניות.</p>
+    <p class="lede reveal">במקום שרחפן יופעל ידנית, המערכת מקבלת את התמונה המלאה ומחזירה תוכנית מוכנה תוך שניות ומשלחת את הרחפן למשימה.</p>
     <div class="figure reveal">
       <svg viewBox="0 0 680 175" role="img" aria-label="הצי והמשימות נכנסים, המערכת מחליטה, ויוצאת תוכנית טיסה">
         <defs>
@@ -659,9 +686,9 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
           <text x="102" y="77" text-anchor="middle">תוכנית טיסה</text>
         </g>
 
-        <text class="t-sm node n1" x="585" y="142" text-anchor="middle">מי פנוי ומה צריך</text>
-        <text class="t-sm node n2" x="343" y="142" text-anchor="middle">מי לוקח כל משימה</text>
-        <text class="t-sm node n3" x="102" y="142" text-anchor="middle">מסלול לכל רחפן</text>
+        <text class="t-sm node n1" x="585" y="142" text-anchor="middle">מי פנוי ומה המשימה</text>
+        <text class="t-sm node n2" x="343" y="142" text-anchor="middle">איזה רחפן נשלח ולמה</text>
+        <text class="t-sm node n3" x="102" y="142" text-anchor="middle">הרחפן נשלח למשימה אוטומטית</text>
       </svg>
     </div>
   </div>
@@ -679,15 +706,15 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
-    <p class="kicker reveal">מהמערכת בנויה</p>
-    <h2 class="reveal">שש חתיכות שמדברות ביניהן</h2>
+    <p class="kicker reveal">המערכת</p>
+    <h2 class="reveal">שישה חלקים שמתקשרים ביניהם</h2>
     <div class="rule reveal"></div>
-    <p class="lede reveal">במקום תוכנה אחת גדולה, שש קטנות. כל אחת יכולה ליפול ולקום לבד.</p>
+    <p class="lede reveal">במקום תוכנה אחת גדולה, שישה חלקים קטנים. כל חלק יכול "ליפול" ו- "לקום" לבד.</p>
     <div class="figure reveal">
       <svg viewBox="0 0 700 205" role="img" aria-label="עץ שירותים: שער כניסה אחד בראש, מסתעף לשישה שירותים">
         <g class="node n1">
           <rect class="box-fill" x="265" y="4" width="170" height="56"></rect>
-          <text class="t-out" x="350" y="39" text-anchor="middle">שער כניסה</text>
+          <text class="t-out" x="350" y="39" text-anchor="middle">"שער כניסה"</text>
         </g>
 
         <path class="wire" d="M350 60 V96 H62 V134"></path>
@@ -705,15 +732,18 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
         <g class="node n7"><rect class="box" x="585" y="134" width="105" height="52"></rect><text x="637" y="167" text-anchor="middle" dir="ltr">notify</text></g>
       </svg>
     </div>
-    <p class="note reveal"><b style="color:#ff3300">planning</b> הוא המוח: הוא מחליט מי טס לאן.</p>
+    <p class="note reveal"><b style="color:#ff3300">planning</b> הוא המוח: הוא מחליט מי טס לאן ולמה.</p>
   </div>
 </section>
 
 
 <!-- ==========================================================================
      08 · האילוצים (PRD §4.1, §6)
-     Four inputs converging on one output: the shape itself says "all of this
+     Five inputs converging on one output: the shape itself says "all of this
      at once", which is the entire argument for why a person cannot do it.
+     Rows are laid out symmetrically around the target box's vertical centre
+     (150): the middle row lands exactly on it, hence the plain horizontal
+     wire there instead of a curve like its neighbours.
      ========================================================================== -->
 <section class="slide">
   <div class="head">
@@ -725,28 +755,30 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
     <h2 class="reveal">מה נכנס לחישוב</h2>
     <div class="rule reveal"></div>
     <div class="figure reveal">
-      <svg viewBox="0 0 700 250" role="img" aria-label="ארבעה אילוצים מתכנסים לתוכנית טיסה אחת">
+      <svg viewBox="0 0 700 300" role="img" aria-label="חמישה אילוצים מתכנסים לתוכנית טיסה אחת">
         <defs>
           <marker id="a9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
             <path d="M0 0 L10 5 L0 10 z" fill="#111110"></path>
           </marker>
         </defs>
 
-        <g class="node n1"><rect class="box" x="470" y="4" width="225" height="48"></rect><text x="582" y="34" text-anchor="middle">סוללה</text></g>
-        <g class="node n2"><rect class="box" x="470" y="64" width="225" height="48"></rect><text x="582" y="94" text-anchor="middle">עדיפות ודדליין</text></g>
-        <g class="node n3"><rect class="box" x="470" y="124" width="225" height="48"></rect><text x="582" y="154" text-anchor="middle">אזורים אסורים</text></g>
-        <g class="node n4"><rect class="box" x="470" y="184" width="225" height="48"></rect><text x="582" y="214" text-anchor="middle">התאמת מטען</text></g>
+        <g class="node n1"><rect class="box" x="470" y="6"   width="225" height="48"></rect><text x="582" y="36"  text-anchor="middle">סוללה</text></g>
+        <g class="node n2"><rect class="box" x="470" y="66"  width="225" height="48"></rect><text x="582" y="96"  text-anchor="middle">עדיפות ודדליין</text></g>
+        <g class="node n3"><rect class="box" x="470" y="126" width="225" height="48"></rect><text x="582" y="156" text-anchor="middle">אזורים אסורים</text></g>
+        <g class="node n4"><rect class="box" x="470" y="186" width="225" height="48"></rect><text x="582" y="216" text-anchor="middle">התאמת מטען</text></g>
+        <g class="node n5"><rect class="box" x="470" y="246" width="225" height="48"></rect><text x="582" y="276" text-anchor="middle">מרחק</text></g>
 
-        <path class="wire" d="M466 28  C380 28,  350 118, 264 118" marker-end="url(#a9)"></path>
-        <path class="wire" d="M466 88  C400 88,  350 118, 264 118" marker-end="url(#a9)"></path>
-        <path class="wire" d="M466 148 C400 148, 350 118, 264 118" marker-end="url(#a9)"></path>
-        <path class="wire" d="M466 208 C380 208, 350 118, 264 118" marker-end="url(#a9)"></path>
+        <path class="wire" d="M466 30  C380 30,  350 150, 264 150" marker-end="url(#a9)"></path>
+        <path class="wire" d="M466 90  C410 90,  350 150, 264 150" marker-end="url(#a9)"></path>
+        <path class="wire" d="M466 150 H264" marker-end="url(#a9)"></path>
+        <path class="wire" d="M466 210 C410 210, 350 150, 264 150" marker-end="url(#a9)"></path>
+        <path class="wire" d="M466 270 C380 270, 350 150, 264 150" marker-end="url(#a9)"></path>
 
-        <g class="node n5">
-          <rect class="box-hot" x="30" y="82" width="230" height="72"></rect>
-          <text class="t-out" x="145" y="126" text-anchor="middle">תוכנית טיסה</text>
+        <g class="node n6">
+          <rect class="box-hot" x="30" y="114" width="230" height="72"></rect>
+          <text class="t-out" x="145" y="158" text-anchor="middle">תוכנית טיסה</text>
         </g>
-        <text class="t-sm node n5" x="145" y="180" text-anchor="middle">הכל נשקל יחד</text>
+        <text class="t-sm node n6" x="145" y="212" text-anchor="middle">הכל משוכלל יחד</text>
       </svg>
     </div>
   </div>
@@ -794,7 +826,7 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
 
         <!-- the loop back: this return leg is the entire point of the sheet -->
         <path class="wire" d="M103 98 V186 H578 V102" marker-end="url(#a10)"></path>
-        <text class="t-sm node n3" x="340" y="222" text-anchor="middle">וחוזר חלילה, בלי שאף אחד מבקש</text>
+        <text class="t-sm node n3" x="340" y="222" text-anchor="middle">וחוזר חלילה, באופן אוטומטי, לא ידנית</text>
       </svg>
     </div>
   </div>
@@ -1326,17 +1358,18 @@ function flowPulses(){
 }
 
 /* ===========================================================================
-   CARD HEADLINE FIT
-   .card .h is white-space:nowrap so it never wraps, but its font-size is a
-   fixed clamp() shared by every card -- fine for short text, but a longer
-   headline (typed later, in-browser, by anyone) would just overflow. Re-measure
-   and shrink per element instead of hand-tuning a size for whatever text
-   happens to be there today.
+   ONE-LINE TEXT FIT
+   Covers every element that is white-space:nowrap by design -- .card .h, and
+   any .note explicitly marked .one-line for a short stat callout rather than
+   a wrapped paragraph -- but shares one clamp()/fixed font-size across every
+   instance of its kind, so a longer edit (typed later, in-browser, by anyone)
+   would just overflow. Re-measure and shrink per element instead of
+   hand-tuning a size for whatever text happens to be there today.
    =========================================================================== */
-function fitCardHeadings(){
+function fitOneLiners(){
     const range = document.createRange();
 
-    document.querySelectorAll('.card .h').forEach(el=>{
+    document.querySelectorAll('.card .h, .note.one-line').forEach(el=>{
         // Back to the authored CSS before measuring, or each pass would
         // compound the previous pass's shrink.
         el.style.fontSize = '';
@@ -1372,6 +1405,61 @@ function fitCardHeadings(){
         // Genuinely too long even at the floor: wrap it rather than clip it.
         // Two readable lines beat one truncated one.
         if(textWidth() > avail) el.style.whiteSpace = 'normal';
+    });
+}
+
+/* ===========================================================================
+   FIGURE CAPTION FIT
+   Same problem as the card headlines, one level down: a .t-sm caption sits
+   text-anchor="middle" under its box with nothing stopping it from growing
+   into the neighbour on either side once someone edits it (the diagrams are
+   editable in-browser now, same as everything else). There is no clamp() to
+   fall back to here -- diagram text has one authored size -- so the true
+   available width is measured directly from the neighbouring captions
+   instead of assumed from the box geometry, which stays correct even for a
+   loop-back row where spacing is not uniform.
+   =========================================================================== */
+function fitFigureCaptions(){
+    document.querySelectorAll('.figure svg').forEach(svg=>{
+        // Captions that share a y sit in the same reading row; only same-row
+        // neighbours can ever visually collide with one another.
+        const rows = new Map();
+        svg.querySelectorAll('text.t-sm').forEach(t=>{
+            const y = t.getAttribute('y');
+            if(!rows.has(y)) rows.set(y, []);
+            rows.get(y).push(t);
+        });
+
+        rows.forEach(row=>{
+            row.sort((a,b)=> parseFloat(a.getAttribute('x')) - parseFloat(b.getAttribute('x')));
+            row.forEach((t,i)=>{
+                t.style.fontSize = '';   // authored size, before measuring
+                if(row.length < 2) return;   // nothing in this row to collide with
+
+                const x = parseFloat(t.getAttribute('x'));
+                const leftGap  = i>0 ? x - parseFloat(row[i-1].getAttribute('x')) : Infinity;
+                const rightGap = i<row.length-1 ? parseFloat(row[i+1].getAttribute('x')) - x : Infinity;
+                const avail = Math.min(leftGap, rightGap) - 14;   // breathing room
+                if(avail <= 0) return;
+
+                let len = t.getComputedTextLength();
+                if(len <= avail) return;
+
+                const size = parseFloat(getComputedStyle(t).fontSize);
+                const floor = size * 0.6;
+                let next = Math.max(floor, size * avail / len);
+                t.style.fontSize = next + 'px';
+
+                // getComputedTextLength() does not scale perfectly linearly
+                // with font-size, so one correction pass after the proportional
+                // guess is what actually lands inside `avail`.
+                let guard = 0;
+                while(t.getComputedTextLength() > avail && next > floor && guard++ < 12){
+                    next = Math.max(floor, next - 0.5);
+                    t.style.fontSize = next + 'px';
+                }
+            });
+        });
     });
 }
 
@@ -1493,7 +1581,8 @@ class Editor {
     }
 
     save = ()=>{
-        fitCardHeadings();   // re-fit live so a growing headline never overflows
+        fitOneLiners();        // re-fit live so a growing headline/note never overflows
+        fitFigureCaptions();   // same, for diagram captions edited via the SVG overlay
         const text = {};
         this.map.forEach(([k, el])=>{ text[k] = el.innerHTML; });
         try{
@@ -1509,12 +1598,26 @@ class Editor {
         // Refuse to apply a payload written against a different deck shape.
         if(saved.fp !== this.fingerprint()){
             console.warn('SwarmOps: saved edits came from a different version of this deck and were ignored. Ctrl+Shift+Del clears them.');
+            this.showStale();
             return;
         }
         this.map.forEach(([k, el])=>{
             if(typeof saved.text[k] === 'string') el.innerHTML = saved.text[k];
         });
-        fitCardHeadings();
+        fitOneLiners();
+        fitFigureCaptions();
+    }
+
+    /* The discarded payload is left untouched in localStorage rather than
+       cleared: it is only unreadable against THIS shape, not gone, and the
+       most common cause is a work-in-progress edit to the deck itself, which
+       may well move back to a matching shape later. */
+    showStale(){
+        const el = document.getElementById('staleNotice');
+        if(!el) return;
+        el.classList.add('show');
+        clearTimeout(this._staleTimer);
+        this._staleTimer = setTimeout(()=> el.classList.remove('show'), 8000);
     }
 
     reset(){
@@ -1537,6 +1640,12 @@ class Editor {
         const icon = this.btn.textContent;
         this.btn.textContent = '✏️';
 
+        // A transient "your edits didn't load" banner has no business being
+        // baked into a downloaded file as permanent markup.
+        const stale = document.getElementById('staleNotice');
+        const staleShown = stale && stale.classList.contains('show');
+        if(staleShown) stale.classList.remove('show');
+
         // Drop the generated pulse clones so the export is the authored
         // markup, not markup plus one render's worth of scratch elements.
         const clones = Array.from(document.querySelectorAll('.figure .pulse'));
@@ -1551,6 +1660,7 @@ class Editor {
             this.bar.classList.add('on');
             this.btn.textContent = icon;
         }
+        if(staleShown) stale.classList.add('show');
         flowPulses();   // put the motion back on the live page
 
         const a = document.createElement('a');
@@ -1564,15 +1674,16 @@ class Editor {
 const deck = new Deck();
 const editor = new Editor(deck);
 flowPulses();
-fitCardHeadings();
+fitOneLiners();
+fitFigureCaptions();
 
 // Web-font metrics land after the fonts actually load, and viewport-relative
 // clamp() sizes shift on resize -- both change how much text fits per line.
-if(document.fonts) document.fonts.ready.then(fitCardHeadings);
+if(document.fonts) document.fonts.ready.then(()=>{ fitOneLiners(); fitFigureCaptions(); });
 let fitTimer = null;
 window.addEventListener('resize', ()=>{
     clearTimeout(fitTimer);
-    fitTimer = setTimeout(fitCardHeadings, 150);
+    fitTimer = setTimeout(()=>{ fitOneLiners(); fitFigureCaptions(); }, 150);
 });
 
 /* --- entry points: hover corner, button, E key -------------------------- */
@@ -1588,6 +1699,9 @@ zone.addEventListener('mouseleave', ()=>{ hide = setTimeout(()=>{ if(!editor.on)
 btn.addEventListener('mouseenter', ()=> clearTimeout(hide));
 btn.addEventListener('mouseleave', ()=>{ hide = setTimeout(()=>{ if(!editor.on) btn.classList.remove('show'); }, 400); });
 btn.addEventListener('click', ()=> editor.toggle());
+document.getElementById('staleClose').addEventListener('click', ()=>{
+    document.getElementById('staleNotice').classList.remove('show');
+});
 
 document.addEventListener('keydown', e=>{
     if((e.key === 'e' || e.key === 'E') && !e.target.isContentEditable){ editor.toggle(); }
