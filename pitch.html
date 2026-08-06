@@ -212,6 +212,13 @@ ul.points li.st::before{ display:none; }
 }
 .person img.low{ object-position:center 58%; }
 .p-name{ font-weight:900; font-size:clamp(1.3rem,2.5vw,2rem); line-height:1.1; }
+/* The shared title sits between the name and the personal role: same for all
+   three, so it reads as a band rather than as a third piece of information. */
+.p-title{
+    display:block; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+    font-size:clamp(.7rem,1.05vw,.9rem); color:var(--muted); line-height:1.2;
+    margin:.15em 0 .1em;
+}
 .p-role{ font-weight:400; font-size:clamp(1rem,1.7vw,1.35rem); color:var(--accent); line-height:1.25; }
 
 /* ===========================================================================
@@ -258,6 +265,10 @@ ul.points li.st::before{ display:none; }
 .figure .box-fill{ fill:var(--ink); stroke:none; }
 .figure .box-hot{ fill:var(--accent); stroke:none; }
 .figure .box-line-hot{ fill:var(--paper); stroke:var(--accent); stroke-width:3; }
+/* The stacked-disk rings inside a database cylinder. Lighter than .box so the
+   silhouette still reads first, and deliberately not .wire — the pulse
+   animation walks every .wire and these are not paths anything travels along. */
+.figure .disk{ fill:none; stroke:var(--ink); stroke-width:2; opacity:.45; }
 .figure .wire{ fill:none; stroke:var(--ink); stroke-width:2.5; }
 /* the travelling highlight, cloned from each wire by script */
 .figure .pulse{ fill:none; stroke:var(--accent); stroke-width:6; stroke-linecap:round; pointer-events:none; }
@@ -448,21 +459,24 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
       <figure class="person">
         <img src="presentation-assets/tony.jpg" alt="טוני">
         <figcaption>
-          <span class="p-name">טוני</span><br>
+          <span class="p-name">טוני</span>
+          <span class="p-title" dir="ltr">Co-Founder</span>
           <span class="p-role">צלף + מפעיל רחפן</span>
         </figcaption>
       </figure>
       <figure class="person">
         <img class="low" src="presentation-assets/guy2.jpg" alt="גיא">
         <figcaption>
-          <span class="p-name">גיא</span><br>
+          <span class="p-name">גיא</span>
+          <span class="p-title" dir="ltr">Co-Founder</span>
           <span class="p-role">חובש קרבי, חילוץ והצלה</span>
         </figcaption>
       </figure>
       <figure class="person">
         <img src="presentation-assets/valfish.jpg" alt="ולפיש">
         <figcaption>
-          <span class="p-name">ולפיש</span><br>
+          <span class="p-name">ולפיש</span>
+          <span class="p-title" dir="ltr">Co-Founder</span>
           <span class="p-role">תותחן בצוות טנק</span>
         </figcaption>
       </figure>
@@ -707,6 +721,8 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
         <g class="node n4">
           <ellipse class="box" cx="520" cy="118" rx="62" ry="15" />
           <path class="box" d="M458 118 V158 A62 15 0 0 0 582 158 V118" />
+          <path class="disk" d="M458 131 A62 15 0 0 0 582 131" />
+          <path class="disk" d="M458 145 A62 15 0 0 0 582 145" />
           <text class="t-sm" x="520" y="192" text-anchor="middle">הקלסר שלו</text>
         </g>
 
@@ -719,6 +735,8 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
         <g class="node n5">
           <ellipse class="box" cx="330" cy="118" rx="62" ry="15" />
           <path class="box" d="M268 118 V158 A62 15 0 0 0 392 158 V118" />
+          <path class="disk" d="M268 131 A62 15 0 0 0 392 131" />
+          <path class="disk" d="M268 145 A62 15 0 0 0 392 145" />
           <text class="t-sm" x="330" y="192" text-anchor="middle">הקלסר שלו</text>
         </g>
 
@@ -731,6 +749,8 @@ body.editing [contenteditable]:focus{ outline:2px solid var(--accent); }
         <g class="node n6">
           <ellipse class="box" cx="140" cy="118" rx="62" ry="15" />
           <path class="box" d="M78 118 V158 A62 15 0 0 0 202 158 V118" />
+          <path class="disk" d="M78 131 A62 15 0 0 0 202 131" />
+          <path class="disk" d="M78 145 A62 15 0 0 0 202 145" />
           <text class="t-sm" x="140" y="192" text-anchor="middle">הקלסר שלו</text>
         </g>
       </svg>
