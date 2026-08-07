@@ -974,7 +974,7 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
 
 
 <!-- ==========================================================================
-     14 · הענן (slot: architecture.drawio page 13)
+     14 · הענן
      ========================================================================== -->
 <section class="slide">
   <div class="head">
@@ -986,11 +986,53 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
     <h2 class="reveal">איפה זה בעצם רץ</h2>
     <div class="rule reveal"></div>
     <p class="lede reveal">הכל רץ בענן של אמזון, ברשת פרטית וסגורה.</p>
-    <div class="slot reveal">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><path d="M10 6.5h4M6.5 10v4M17.5 10v4M10 17.5h4"></path></svg>
-      <span class="s-label" dir="ltr">DIAGRAM</span>
-      <span class="s-note">architecture.drawio, עמוד 13</span>
+    <div class="figure reveal">
+      <!-- Simplified from architecture.drawio page 13 (AWS Account / Region / VPC /
+           AZ) down to the four levels that matter for a pitch read from across a
+           room: the account, the region, the private VPC, and the two zones that
+           give it redundancy. The full diagram's subnets, NAT gateways and IAM
+           detail live in the source file, not here. -->
+      <svg viewBox="0 0 700 250" role="img" aria-label="חשבון AWS, אזור us-east-1, VPC פרטי המשתרע על שני אזורי זמינות עם EKS בכל אחד">
+        <defs>
+          <marker id="a13" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="#111110"></path>
+          </marker>
+        </defs>
+
+        <g class="node n1">
+          <text class="t-sm" x="652" y="112" text-anchor="middle">מהאינטרנט</text>
+          <path class="wire" d="M666 125 H612" marker-end="url(#a13)"></path>
+        </g>
+
+        <g class="node n2">
+          <rect class="box" x="30" y="6" width="582" height="238"></rect>
+          <text class="t-sm" x="321" y="28" text-anchor="middle">חשבון AWS · SwarmOps</text>
+        </g>
+
+        <g class="node n3">
+          <rect class="box" x="55" y="44" width="532" height="186"></rect>
+          <text class="t-sm" x="321" y="66" text-anchor="middle">אזור us-east-1</text>
+        </g>
+
+        <g class="node n4">
+          <rect class="box-line-hot" x="80" y="82" width="482" height="134"></rect>
+          <text x="321" y="104" text-anchor="middle" fill="#ff3300">VPC פרטי</text>
+        </g>
+
+        <g class="node n5">
+          <rect class="box" x="100" y="122" width="205" height="80"></rect>
+          <text x="202" y="150" text-anchor="middle">אזור זמינות A</text>
+          <text class="t-sm" x="202" y="174" text-anchor="middle">EKS</text>
+        </g>
+
+        <g class="node n6">
+          <rect class="box" x="337" y="122" width="205" height="80"></rect>
+          <text x="439" y="150" text-anchor="middle">אזור זמינות B</text>
+          <text class="t-sm" x="439" y="174" text-anchor="middle">EKS</text>
+        </g>
+      </svg>
     </div>
+    <p class="note reveal">שני אזורי זמינות, כדי שנפילה של אחד לא תהפוך את המערכת לבלתי שמישה.</p>
   </div>
 </section>
 
@@ -1038,7 +1080,7 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
         </g>
       </svg>
     </div>
-    <p class="note reveal">המנוף הוא <b>הזמן, לא התעריף</b>. כיבינו את הסביבה בסוף כל יום עבודה.</p>
+    <p class="note reveal">על מנת לצמצם חיובים בתהליך הפיתוח<br>כיבינו את הסביבה בסוף כל יום עבודה.</p>
   </div>
 </section>
 
@@ -1072,7 +1114,7 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
 
         <g class="node n2">
           <rect class="box-hot" x="245" y="26" width="196" height="86"></rect>
-          <text class="t-out" x="343" y="77" text-anchor="middle" dir="ltr">Argo</text>
+          <text class="t-out" x="343" y="77" text-anchor="middle" dir="ltr">ArgoCD</text>
         </g>
         <path class="wire" d="M241 69 H201" marker-end="url(#a14)"></path>
 
@@ -1084,11 +1126,11 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
         <!-- The old single caption ran ~29 characters wide, past the 242-unit
              gap between box centres. One short caption per box instead. -->
         <text class="t-sm node n1" x="585" y="142" text-anchor="middle">הצוות כותב שינוי</text>
-        <text class="t-sm node n2" x="343" y="142" text-anchor="middle">משווה קוד למה שרץ</text>
-        <text class="t-sm node n3" x="102" y="142" text-anchor="middle">בלי שנוגעים בשרת</text>
+        <text class="t-sm node n2" x="343" y="142" text-anchor="middle">ארגו משווה קוד למה שרץ בפועל</text>
+        <text class="t-sm node n3" x="102" y="142" text-anchor="middle">מתעדכן בלי התערבות ידנית בשרת</text>
       </svg>
     </div>
-    <p class="note reveal">גרסה חדשה יוצאת <b>בהדרגה</b>: קודם לחלק קטן. אם המדידה מראה בעיה, היא נעצרת וחוזרת אחורה לבד.</p>
+    <p class="note reveal">גרסה חדשה יוצאת <b>בהדרגה</b>: קודם לחלק קטן מהמשתמשים. אם המדידה האוטומטית של כמות השגיאות מראה כמות שגיאות גדולה, הפריסה נעצרת וחוזרת אחורה לבד.</p>
   </div>
 </section>
 
@@ -1190,10 +1232,10 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
     <h2 class="reveal">מגבלות ועמידות</h2>
     <div class="rule reveal"></div>
     <ul class="points reveal">
-      <li class="st"><span class="tagpill ok" dir="ltr">OK</span><span>רק שער אחד חשוף לאינטרנט. כל שאר השירותים סגורים מבחוץ.</span></li>
+      <li class="st"><span class="tagpill ok" dir="ltr">OK</span><span>רק "שער" אחד חשוף לאינטרנט.<br>כל שאר השירותים סגורים לגישה מבחוץ.</span></li>
       <li class="st"><span class="tagpill ok" dir="ltr">OK</span><span>הכניסה לענן היא בהרשאה זמנית, בלי סיסמה קבועה ששמורה בקוד.</span></li>
-      <li class="st"><span class="tagpill ok" dir="ltr">OK</span><span>אם מישהו משנה משהו בשרת ידנית, המערכת מחזירה את עצמה למה שכתוב בקוד.</span></li>
-      <li class="st"><span class="tagpill tbd" dir="ltr">TBD</span><span><b>לשימוש צבאי:</b> עוד לא הגדרנו איפה המידע יישמר ואילו רחפנים מורשים להתחבר.</span></li>
+      <li class="st"><span class="tagpill ok" dir="ltr">OK</span><span>אם מישהו משנה משהו בשרת ידנית, המערכת (ArgoCD) מחזירה את עצמה למה שכתוב בקוד.</span></li>
+      <li class="st"><span class="tagpill tbd" dir="ltr">TBD</span><span><b>לשימוש צבאי:</b> התממשקות עם רשת צה"לנט תהיה פשוטה, התשתית כבר קיימת.</span></li>
     </ul>
   </div>
 </section>
@@ -1212,17 +1254,17 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
     <h2 class="reveal">מה באמת למדנו</h2>
     <div class="rule reveal"></div>
     <div class="cards reveal">
-      <div class="card">
-        <span class="h">שש קטנות, לא אחת גדולה</span>
-        <span class="d">בנינו שש מערכות נפרדות. הקושי האמיתי הוא לגרום להן לדבר נכון ביניהן.</span>
+      <div class="card risk">
+        <span class="h">מה שרץ אצלי לא רץ בענן</span>
+        <span class="d">לעיתים, מה שרץ במחשב האישי לא רץ אותו דבר בענן, חשוב לוודא את כל התכונות של האפליקציה והפריסה בענן בעצמו.</span>
       </div>
       <div class="card risk">
         <span class="h">השקט הוא הסכנה</span>
-        <span class="d">כשמשהו קורס, מיד יודעים. כשמשהו טועה בשקט, מגלים מאוחר מדי.</span>
+        <span class="d">כשמשהו קורס, מיד יודעים. כשמשהו טועה בשקט, מגלים מאוחר מדי, לכן חשוב לוודא שאנחנו כותבים את הקוד ולא "לדחוף" לפני בדיקה.</span>
       </div>
-      <div class="card risk">
-        <span class="h">לתכנן מחדש, לא רק לתקן</span>
-        <span class="d">מערכת ששורדת בשטח לא קולעת נכון בפעם הראשונה. היא מתכננת מחדש כשהמציאות משתנה.</span>
+      <div class="card">
+        <span class="h">ניהול גרסאות בצוות</span>
+        <span class="d">בצוות, לעיתים כמה מפתחים רוצים "לדחוף" שינוי באותו הקובץ בו זמנית, לכן נדרש תיאום מראש.</span>
       </div>
     </div>
   </div>
@@ -1230,32 +1272,11 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
 
 
 <!-- ==========================================================================
-     21 · מאחורי הקלעים (slot: behind-the-scenes video)
+     21 · סיום
      ========================================================================== -->
 <section class="slide">
   <div class="head">
     <span class="num">21</span>
-    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
-  </div>
-  <div class="main">
-    <p class="kicker reveal">מאחורי הקלעים</p>
-    <h2 class="reveal">איך זה נראה מבפנים</h2>
-    <div class="rule reveal"></div>
-    <div class="slot reveal">
-      <svg viewBox="0 0 24 24" style="fill:var(--muted); stroke:none;"><path d="M6 4l14 8-14 8V4z"></path></svg>
-      <span class="s-label" dir="ltr">VIDEO</span>
-      <span class="s-note">סרטון מאחורי הקלעים מתהליך הפיתוח</span>
-    </div>
-  </div>
-</section>
-
-
-<!-- ==========================================================================
-     22 · סיום
-     ========================================================================== -->
-<section class="slide">
-  <div class="head">
-    <span class="num">22</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
