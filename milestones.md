@@ -841,3 +841,21 @@ the whole sheet) and **re-exporting both frontend pod strips already trimmed** (
 588x75, content centred with 10px of background each side). That re-export is what fixed sheet
 18's lopsided framing, at the asset level; an earlier CSS-crop attempt here was dropped as
 redundant, and its maths was keyed to the old 775/713-wide files anyway.
+
+**Update 2026-08-08 (Tony) — sheet 14 redrawn as a real AWS architecture diagram.** The cloud
+sheet was a location diagram (account / region / VPC / two zones); it is now an AWS-style one:
+public subnets holding the ALB and the NAT gateway, a private zone per AZ holding the EKS nodes
+and the stateful workload that lives there, an internet-gateway icon on the VPC boundary, and ECR
++ Route 53 inside the region but outside the VPC, where they actually are. Everything drawn is
+read out of `swarmops-infrastructure`'s terraform — notably **one** NAT gateway, not one per AZ
+(`single_nat_gateway = true`), because drawing two would look tidier and contradict sheet 15's
+cost numbers. The card row under it is now `.cards.compact` and lost the canary card, which is
+what paid for the diagram growing from ~580px to ~880px wide; the Argo card lists the five real
+application names instead of describing them.
+
+**This sheet is the one place the deck's ink + one-red rule is deliberately broken** — it is drawn
+in AWS's published category colours (navy account, teal region/private, green public subnet,
+purple networking, orange containers) because the point of the sheet is "this is a real cloud
+deployment" and that palette is what makes a panel read the nesting before the labels. It is
+contained: every rule is scoped under `.fig-aws`, so nothing leaks to another figure. If a future
+edit wants the deck uniform again, that whole stylesheet block is the thing to delete.

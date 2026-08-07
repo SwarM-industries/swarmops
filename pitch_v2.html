@@ -188,6 +188,18 @@ ul.points li.st::before{ display:none; }
     width:100%; max-width:1450px; text-align:start;
 }
 .cards.two{ grid-template-columns:repeat(2,minmax(0,1fr)); max-width:1040px; }
+/* A card row that is supporting evidence rather than the sheet's subject -- the
+   cloud sheet, where the diagram is the point and the numbers are the footnote.
+   Everything scales down together so the row still reads as the same component,
+   just quieter, and gives its height back to the figure above it. */
+.cards.compact .card{ padding:clamp(.45rem,1.2vh,.9rem) clamp(.5rem,1vw,1rem); }
+.cards.compact .card .h{ font-size:clamp(.95rem,1.6vw,1.65rem); margin-bottom:.2em; }
+.cards.compact .card .d{ font-size:clamp(.8rem,1.2vw,1.25rem); line-height:1.25; }
+/* Five cards in a three-column grid leave a hole in the second row, which reads
+   as a missing card rather than a deliberate layout. The one card with a list
+   for a body takes the empty cell instead -- it is also the card that most
+   wants the extra width. */
+.cards .card.wide{ grid-column:span 2; }
 .card{
     border:2px solid var(--ink);
     padding:clamp(.75rem,2.2vh,1.6rem) clamp(.7rem,1.4vw,1.5rem);
@@ -282,6 +294,58 @@ ul.points li.st::before{ display:none; }
    track that same ladder on their own. */
 .figure.fig-sm{ max-width:min(100%,62vh); }   /* ~670px at 1080 tall */
 .figure.fig-md{ max-width:min(100%,92vh); }   /* ~995px at 1080 tall */
+/* Paired with that figure's 2.25:1 canvas: the cloud sheet's card row is
+   .cards.compact precisely so this can be the sheet's subject rather than its
+   third element. Change the canvas ratio and this has to move with it, or the
+   cards get pushed through the footer rule. */
+.figure.fig-aws{ max-width:min(100%,79vh); }  /* ~850px at 1080 tall */
+
+/* ===========================================================================
+   AWS DIAGRAM (sheet 14 only)
+   The one sheet that opts out of the deck's ink + one-red rule. It is drawn in
+   AWS's own icon palette on purpose: the point of the sheet is "this is a real
+   cloud deployment", and a panel that has seen AWS diagrams reads the nesting
+   and the colours before it reads a word of Hebrew. Contained by being scoped
+   to .fig-aws -- nothing here leaks to another figure -- and by staying with
+   AWS's published category colours rather than inventing a second palette:
+     #232F3E account/outline   #00A4A6 region + AZ (dashed)
+     #8C4FFF networking (IGW, ALB)   #ED7100 containers (EKS)
+   MongoDB and RabbitMQ get their own brand colours instead of an AWS category:
+   they are workloads running IN the cluster, not AWS managed services, and
+   colouring them like one would be a lie the diagram does not need to tell.
+   =========================================================================== */
+.figure.fig-aws .c-cloud { fill:none; stroke:#232F3E; stroke-width:2; }
+.figure.fig-aws .c-region{ fill:none; stroke:#00A4A6; stroke-width:2; stroke-dasharray:7 5; }
+.figure.fig-aws .c-vpc   { fill:none; stroke:#8C4FFF; stroke-width:2.5; }
+.figure.fig-aws .c-az    { fill:none; stroke:#00A4A6; stroke-width:1.8; stroke-dasharray:5 4; }
+.figure.fig-aws .c-public{ fill:none; stroke:#7AA116; stroke-width:1.8; stroke-dasharray:5 4; }
+.figure.fig-aws .l-public{ fill:#7AA116; }
+.figure.fig-aws .l-cloud { fill:#232F3E; }
+.figure.fig-aws .l-region,
+.figure.fig-aws .l-az    { fill:#00A4A6; }
+.figure.fig-aws .l-vpc   { fill:#8C4FFF; font-size:19px; }
+/* Service tiles: paper card, thin navy rule, icon over label -- the shape AWS
+   diagrams use for a resource as opposed to a container. */
+.figure.fig-aws .tile    { fill:var(--paper); stroke:#232F3E; stroke-width:1.5; }
+.figure.fig-aws .t-tile  { font-size:15px; font-weight:700; fill:var(--ink); }
+.figure.fig-aws .t-mini  { font-size:12px; font-weight:500; fill:var(--muted); }
+/* Filled-square icons, white glyph inside -- the current AWS icon style. */
+.figure.fig-aws .ico-net { fill:#8C4FFF; }
+.figure.fig-aws .ico-eks { fill:#ED7100; }
+.figure.fig-aws .ico-ecr { fill:#ED7100; }
+.figure.fig-aws .ico-db  { fill:#13AA52; }   /* MongoDB green */
+.figure.fig-aws .ico-mq  { fill:#FF6600; }   /* RabbitMQ orange */
+.figure.fig-aws .glyph   { fill:#fff; stroke:none; }
+.figure.fig-aws .glyph-o { fill:none; stroke:#fff; stroke-width:1.8; }
+.figure.fig-aws .glyph-s { fill:none; stroke:#fff; stroke-width:2; stroke-linecap:round; }
+/* Container badges are outlined, not filled -- AWS marks a container with a
+   line icon and a resource with a solid one, and that difference is doing real
+   work here: it is how a zone reads as a place and EKS reads as a thing. */
+.figure.fig-aws .i-line-cloud { fill:none; stroke:#232F3E; stroke-width:1.6; }
+.figure.fig-aws .i-line-region{ fill:none; stroke:#00A4A6; stroke-width:1.6; stroke-dasharray:3 2.5; }
+.figure.fig-aws .i-fill-region{ fill:#00A4A6; }
+.figure.fig-aws .i-line-vpc   { fill:none; stroke:#8C4FFF; stroke-width:1.5; }
+.figure.fig-aws .i-fill-vpc   { fill:#8C4FFF; }
 .figure svg{ width:100%; height:auto; display:block; overflow:visible; }
 .figure text{ font-family:var(--font); font-weight:700; font-size:22px; fill:var(--ink); }
 .figure .t-out{ fill:var(--paper); }
@@ -1156,49 +1220,164 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
     <h2 class="reveal">איפה זה בעצם רץ</h2>
     <div class="rule reveal"></div>
     <p class="lede reveal">הכל רץ בענן של אמזון, ברשת פרטית וסגורה.</p>
-    <div class="figure fig-sm reveal">
-      <!-- Simplified from architecture.drawio page 13 (AWS Account / Region / VPC /
-           AZ) down to the four levels that matter for a pitch read from across a
-           room: the account, the region, the private VPC, and the two zones that
-           give it redundancy. The full diagram's subnets, NAT gateways and IAM
-           detail live in the source file, not here. -->
-      <svg viewBox="0 0 700 250" role="img" aria-label="חשבון AWS, אזור us-east-1, VPC פרטי המשתרע על שני אזורי זמינות עם EKS בכל אחד">
+    <div class="figure fig-aws reveal">
+      <!-- Drawn in AWS's own diagram language rather than the deck's: nested
+           labelled containers (account / region / VPC / subnet / availability
+           zone), each with its icon badge in the start-side corner, and services
+           as filled category-coloured tiles. Colours and dash patterns follow the
+           AWS Architecture Icons convention -- navy account, teal dashed region
+           and private zones, green dashed public subnets, purple networking,
+           orange containers -- so anyone who has read an AWS diagram before
+           recognises the levels before reading a word.
+
+           This is the ONE sheet where the deck's two-colour rule is suspended;
+           see the .fig-aws block in the stylesheet for why that is deliberate
+           and contained.
+
+           Everything drawn here is real, read out of swarmops-infrastructure's
+           terraform, not decoration: public + private subnets per AZ, nodes in
+           the PRIVATE ones, and exactly ONE NAT gateway shared by both zones
+           (`single_nat_gateway = true`, a deliberate ~$35-65/mo saving recorded
+           in COST_NOTES.md). Draw a second NAT here and the sheet starts lying
+           about the bill. Icon badges are hand-drawn geometry, not traced logos:
+           simple shapes survive being read from across a room. -->
+      <svg viewBox="0 0 900 400" role="img" aria-label="דיאגרמת ארכיטקטורה בסגנון AWS: חשבון AWS, בתוכו אזור us-east-1, VPC פרטי עם רשתות ציבוריות שמכילות מאזן עומסים ושער יציאה אחד, ושני אזורי זמינות עם רשתות פרטיות — בכל אחת שרתי EKS, ובנוסף MongoDB באזור A ו-RabbitMQ באזור B. מתחת ל-VPC: מאגר גרסאות ECR ושירות שמות Route 53">
         <defs>
           <marker id="a13" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
             <path d="M0 0 L10 5 L0 10 z" fill="#111110"></path>
           </marker>
         </defs>
 
-        <g class="node n1">
-          <text class="t-sm" x="652" y="112" text-anchor="middle">מהאינטרנט</text>
-          <path class="wire" d="M666 125 H612" marker-end="url(#a13)"></path>
-        </g>
-
+        <!-- ===== containers, outermost in ===== -->
         <g class="node n2">
-          <rect class="box" x="30" y="6" width="582" height="238"></rect>
-          <text class="t-sm" x="321" y="28" text-anchor="middle">חשבון AWS · SwarmOps</text>
+          <rect class="c-cloud" x="40" y="6" width="750" height="388"></rect>
+          <text class="t-sm l-cloud" x="415" y="26" text-anchor="middle">חשבון AWS · SwarmOps</text>
+          <g transform="translate(762,10)">
+            <path class="i-line-cloud" d="M4.5 14 h9 a3.5 3.5 0 0 0 .3-7 a4.5 4.5 0 0 0 -8.6-1.2 a3.4 3.4 0 0 0 -.7 8.2 z"></path>
+          </g>
         </g>
 
         <g class="node n3">
-          <rect class="box" x="55" y="44" width="532" height="186"></rect>
-          <text class="t-sm" x="321" y="66" text-anchor="middle">אזור us-east-1</text>
+          <rect class="c-region" x="64" y="40" width="702" height="346"></rect>
+          <text class="t-sm l-region" x="415" y="60" text-anchor="middle">אזור us-east-1</text>
+          <g transform="translate(740,44)">
+            <circle class="i-line-region" cx="8" cy="8" r="7.5"></circle>
+            <circle class="i-fill-region" cx="8" cy="8" r="2.5"></circle>
+          </g>
         </g>
 
         <g class="node n4">
-          <rect class="box-line-hot" x="80" y="82" width="482" height="134"></rect>
-          <text x="321" y="104" text-anchor="middle" fill="#ff3300">VPC פרטי</text>
+          <rect class="c-vpc" x="86" y="74" width="658" height="250"></rect>
+          <text class="l-vpc" x="415" y="95" text-anchor="middle">VPC פרטי</text>
+          <g transform="translate(718,78)">
+            <rect class="i-line-vpc" x="1" y="1" width="16" height="16" rx="3"></rect>
+            <circle class="i-fill-vpc" cx="6" cy="6.5" r="1.6"></circle>
+            <circle class="i-fill-vpc" cx="12" cy="6.5" r="1.6"></circle>
+            <circle class="i-fill-vpc" cx="9" cy="12" r="1.6"></circle>
+            <path class="i-line-vpc" d="M6 6.5 H12 M6 6.5 L9 12 M12 6.5 L9 12"></path>
+          </g>
         </g>
 
+        <!-- ===== public tier ===== -->
         <g class="node n5">
-          <rect class="box" x="100" y="122" width="205" height="80"></rect>
-          <text x="202" y="150" text-anchor="middle">אזור זמינות A</text>
-          <text class="t-sm" x="202" y="174" text-anchor="middle">2 שרתי EKS</text>
+          <rect class="c-public" x="100" y="104" width="630" height="76"></rect>
+          <text class="t-sm l-public" x="415" y="122" text-anchor="middle">רשתות ציבוריות · אחת בכל אזור זמינות</text>
+
+          <rect class="tile" x="435" y="130" width="160" height="44"></rect>
+          <g transform="translate(444,140)">
+            <rect class="ico-net" x="0" y="0" width="24" height="24" rx="4"></rect>
+            <path class="glyph-s" d="M5 12 H11 M11 12 V7 H18 M11 12 H18 M11 12 V17 H18"></path>
+          </g>
+          <text class="t-tile" x="531" y="150" text-anchor="middle">מאזן עומסים</text>
+          <text class="t-mini" x="531" y="165" text-anchor="middle" dir="ltr">ALB · 2 AZ</text>
+
+          <rect class="tile" x="235" y="130" width="160" height="44"></rect>
+          <g transform="translate(244,140)">
+            <rect class="ico-net" x="0" y="0" width="24" height="24" rx="4"></rect>
+            <path class="glyph-s" d="M6 9 H18 M14.5 5.5 L18 9 L14.5 12.5 M18 15 H6 M9.5 11.5 L6 15 L9.5 18.5"></path>
+          </g>
+          <text class="t-tile" x="331" y="150" text-anchor="middle">יציאה לאינטרנט</text>
+          <text class="t-mini" x="331" y="165" text-anchor="middle" dir="ltr">NAT Gateway ×1</text>
         </g>
 
+        <!-- ===== the load path in ===== -->
+        <g class="node n1">
+          <text class="t-sm" x="845" y="140" text-anchor="middle">מהאינטרנט</text>
+          <!-- Crosses every container border on its way to the balancer, which is
+               what an AWS diagram does: the internet gateway icon sitting ON the
+               VPC boundary is what makes the crossing legal. -->
+          <path class="wire" d="M858 152 H599" marker-end="url(#a13)"></path>
+          <g transform="translate(732,140)">
+            <rect class="ico-net" x="0" y="0" width="24" height="24" rx="4"></rect>
+            <path class="glyph-s" d="M8 6 V18 M8 6 L5.5 9 M8 6 L10.5 9 M16 18 V6 M16 18 L13.5 15 M16 18 L18.5 15"></path>
+          </g>
+        </g>
+
+        <!-- ===== private tier, one zone each ===== -->
         <g class="node n6">
-          <rect class="box" x="337" y="122" width="205" height="80"></rect>
-          <text x="439" y="150" text-anchor="middle">אזור זמינות B</text>
-          <text class="t-sm" x="439" y="174" text-anchor="middle">3 שרתי EKS</text>
+          <path class="wire" d="M515 174 V184 H575 V188" marker-end="url(#a13)"></path>
+          <rect class="c-az" x="420" y="192" width="310" height="120"></rect>
+          <text class="t-sm l-az" x="575" y="212" text-anchor="middle">אזור זמינות B · רשת פרטית</text>
+
+          <rect class="tile" x="585" y="224" width="130" height="70"></rect>
+          <g transform="translate(638,230)">
+            <rect class="ico-eks" x="0" y="0" width="24" height="24" rx="4"></rect>
+            <path class="glyph-o" d="M12 5 L18 8.5 L18 15.5 L12 19 L6 15.5 L6 8.5 Z"></path>
+            <circle class="glyph" cx="12" cy="12" r="1.8"></circle>
+          </g>
+          <text class="t-tile" x="650" y="272" text-anchor="middle" dir="ltr">EKS ×3</text>
+          <text class="t-mini" x="650" y="286" text-anchor="middle" dir="ltr">t3.medium</text>
+
+          <rect class="tile" x="435" y="224" width="130" height="70"></rect>
+          <g transform="translate(488,230)">
+            <rect class="ico-mq" x="0" y="0" width="24" height="24" rx="4"></rect>
+            <path class="glyph-s" d="M6 8 H18 M6 12 H18 M6 16 H12"></path>
+          </g>
+          <text class="t-tile" x="500" y="272" text-anchor="middle" dir="ltr">RabbitMQ</text>
+          <text class="t-mini" x="500" y="286" text-anchor="middle" dir="ltr">8Gi gp3</text>
+        </g>
+
+        <g class="node n7">
+          <path class="wire" d="M515 174 V184 H255 V188" marker-end="url(#a13)"></path>
+          <rect class="c-az" x="100" y="192" width="310" height="120"></rect>
+          <text class="t-sm l-az" x="255" y="212" text-anchor="middle">אזור זמינות A · רשת פרטית</text>
+
+          <rect class="tile" x="265" y="224" width="130" height="70"></rect>
+          <g transform="translate(318,230)">
+            <rect class="ico-eks" x="0" y="0" width="24" height="24" rx="4"></rect>
+            <path class="glyph-o" d="M12 5 L18 8.5 L18 15.5 L12 19 L6 15.5 L6 8.5 Z"></path>
+            <circle class="glyph" cx="12" cy="12" r="1.8"></circle>
+          </g>
+          <text class="t-tile" x="330" y="272" text-anchor="middle" dir="ltr">EKS ×2</text>
+          <text class="t-mini" x="330" y="286" text-anchor="middle" dir="ltr">t3.medium</text>
+
+          <rect class="tile" x="115" y="224" width="130" height="70"></rect>
+          <g transform="translate(168,230)">
+            <rect class="ico-db" x="0" y="0" width="24" height="24" rx="4"></rect>
+            <path class="glyph" d="M12 4 C16 9.5 16 14.5 12 20 C8 14.5 8 9.5 12 4 Z"></path>
+          </g>
+          <text class="t-tile" x="180" y="272" text-anchor="middle" dir="ltr">MongoDB</text>
+          <text class="t-mini" x="180" y="286" text-anchor="middle" dir="ltr">5Gi gp3</text>
+        </g>
+
+        <!-- ===== regional services, outside the VPC on purpose ===== -->
+        <g class="node n8">
+          <rect class="tile" x="430" y="336" width="150" height="40"></rect>
+          <g transform="translate(439,344)">
+            <rect class="ico-net" x="0" y="0" width="24" height="24" rx="4"></rect>
+            <circle class="glyph-o" cx="12" cy="12" r="7"></circle>
+            <path class="glyph-o" d="M12 5 V19 M5 12 H19 M12 5 C8.5 8 8.5 16 12 19 M12 5 C15.5 8 15.5 16 12 19"></path>
+          </g>
+          <text class="t-tile" x="523" y="354" text-anchor="middle">שם מתחם</text>
+          <text class="t-mini" x="523" y="367" text-anchor="middle" dir="ltr">Route 53</text>
+
+          <rect class="tile" x="250" y="336" width="150" height="40"></rect>
+          <g transform="translate(259,344)">
+            <rect class="ico-ecr" x="0" y="0" width="24" height="24" rx="4"></rect>
+            <path class="glyph-o" d="M12 4 L19 8 L12 12 L5 8 Z M5 8 V16 L12 20 L19 16 V8 M12 12 V20"></path>
+          </g>
+          <text class="t-tile" x="343" y="354" text-anchor="middle">מאגר גרסאות</text>
+          <text class="t-mini" x="343" y="367" text-anchor="middle" dir="ltr">ECR · 9 services</text>
         </g>
       </svg>
     </div>
@@ -1207,7 +1386,7 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
          if the cluster has been rebuilt since. The old closing line about two
          availability zones now lives inside the diagram as the per-zone server
          counts, because the sheet has no vertical room for both it and these. -->
-    <div class="cards reveal">
+    <div class="cards compact reveal">
       <div class="card">
         <span class="h">5 שרתים</span>
         <!-- All-latin line, so the whole thing is dir="ltr". Isolating only the
@@ -1223,17 +1402,17 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
         <span class="h">25Gi אחסון</span>
         <span class="d">6 כרכי <span dir="ltr">gp3</span> — בסיס נתונים, תורים, מדדים ולוגים</span>
       </div>
-      <div class="card">
+      <div class="card wide">
         <span class="h">5 אפליקציות ארגו</span>
-        <span class="d">כולן מסונכרנות ותקינות</span>
+        <!-- The literal Argo CD application names, not a description of them:
+             this card is the one place on the deck where what Argo actually
+             manages is enumerable, and the names are what is on the screen in
+             sheet 17's screenshot. All-latin, so dir="ltr" on the whole line. -->
+        <span class="d" dir="ltr">swarmops · kube-prometheus-stack · loki-stack · argo-rollouts · external-dns</span>
       </div>
       <div class="card">
         <span class="h">9 שירותים</span>
         <span class="d">גרסאות שמורות ב-<span dir="ltr">ECR</span>, תג נפרד לכל שינוי</span>
-      </div>
-      <div class="card">
-        <span class="h">שחרור הדרגתי אחד</span>
-        <span class="d"><span dir="ltr">planning-service</span> — 5 מתוך 5 מעודכנים</span>
       </div>
     </div>
   </div>
