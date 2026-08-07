@@ -1,18 +1,27 @@
 SHELL := /bin/bash
 
 ORG := SwarM-industries
+
+# Every repo is a sibling checkout under one workspace directory, and this Makefile lives
+# inside the `swarmops` docs repo — so paths are anchored to the workspace root rather than
+# to $(CURDIR). That way `make pull-all` behaves identically from the workspace root or from
+# inside swarmops/. Override with WORKSPACE=/path/to/checkouts if your layout differs.
+MAKEFILE_DIR := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+WORKSPACE ?= $(if $(wildcard $(MAKEFILE_DIR)/swarmops/.git),$(MAKEFILE_DIR),$(abspath $(MAKEFILE_DIR)/..))
+
+# The 15 app repos. `swarmops` (this repo — docs/plan/pitch site) is added separately in ALL.
 REPOS := swarmops-frontend swarmops-gateway swarmops-auth-service swarmops-fleet-service \
          swarmops-mission-service swarmops-planning-service swarmops-telemetry-service \
          swarmops-notification-service swarmops-drone-simulator swarmops-unity-simulator \
          swarmops-local swarmops-deployments swarmops-infrastructure swarmops-contracts \
          swarmops-diag-test
 
-# "." is this repo (swarmops — docs/plan/pitch site), included in every all-repo operation.
-ALL := . $(REPOS)
+# All 16 repos in the org, as directory names under $(WORKSPACE).
+ALL := swarmops $(REPOS)
 
 # The 9 repos with a `publish` job (build -> push ECR -> bump swarmops-deployments).
-# Excludes swarmops-local/-deployments/-infrastructure/-contracts and this docs repo,
-# none of which have that CI job.
+# Excludes swarmops-local/-deployments/-infrastructure/-contracts/-unity-simulator/-diag-test
+# and this docs repo, none of which have that CI job.
 SERVICE_REPOS := swarmops-auth-service swarmops-fleet-service swarmops-mission-service \
                  swarmops-planning-service swarmops-telemetry-service swarmops-notification-service \
                  swarmops-frontend swarmops-gateway swarmops-drone-simulator
@@ -21,6 +30,7 @@ SERVICE_REPOS := swarmops-auth-service swarmops-fleet-service swarmops-mission-s
 
 help:
 	@echo "SwarmOps multi-repo automation (16 repos: swarmops + 15 app repos)"
+	@echo "workspace: $(WORKSPACE)"
 	@echo ""
 	@echo "  make repos                 list every repo this Makefile manages"
 	@echo "  make clone-missing         clone any org repo not present locally"
@@ -46,53 +56,82 @@ help:
 	@echo "  make check-publish         latest publish-job run + conclusion for every service repo"
 
 repos:
-	@for d in $(ALL); do echo "$$d"; done
+	@for n in $(ALL); do echo "$$n"; done
 
 clone-missing:
-	@for r in $(REPOS); do \
-		if [ ! -d "$$r" ]; then \
-			echo "== cloning $$r =="; \
-			gh repo clone "$(ORG)/$$r" "$$r" -- -q; \
+	@for n in $(ALL); do \
+		if [ ! -d "$(WORKSPACE)/$$n" ]; then \
+			echo "== cloning $$n =="; \
+			gh repo clone "$(ORG)/$$n" "$(WORKSPACE)/$$n" -- -q; \
 		fi; \
 	done
 
 status:
-	@for d in $(ALL); do \
+	@for n in $(ALL); do \
+		d="$(WORKSPACE)/$$n"; \
+		if [ ! -d "$$d/.git" ]; then echo "== $$n — MISSING (make clone-missing) =="; continue; fi; \
 		branch=$$(git -C "$$d" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "?"); \
 		out=$$(git -C "$$d" status --short 2>&1); \
 		if [ -n "$$out" ]; then \
-			echo "== $$d ($$branch) — dirty =="; \
+			echo "== $$n ($$branch) — dirty =="; \
 			echo "$$out"; \
 		elif [ -n "$$VERBOSE" ]; then \
-			echo "== $$d ($$branch) — clean =="; \
+			echo "== $$n ($$branch) — clean =="; \
 		fi; \
 	done
 
 fetch-all:
-	@for d in $(ALL); do \
-		echo "== fetch $$d =="; \
-		git -C "$$d" fetch --all --prune --quiet || echo "  FAILED: $$d"; \
+	@for n in $(ALL); do \
+		d="$(WORKSPACE)/$$n"; \
+		if [ ! -d "$$d/.git" ]; then echo "== fetch $$n — MISSING (make clone-missing) =="; continue; fi; \
+		echo "== fetch $$n =="; \
+		git -C "$$d" fetch --all --prune --quiet || echo "  FAILED: $$n"; \
 	done
 
 pull-all:
-	@for d in $(ALL); do \
+	@for n in $(ALL); do \
+		d="$(WORKSPACE)/$$n"; \
+		if [ ! -d "$$d/.git" ]; then echo "== pull $$n — MISSING (make clone-missing) =="; continue; fi; \
 		branch=$$(git -C "$$d" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "?"); \
-		echo "== pull $$d ($$branch) =="; \
-		git -C "$$d" pull --ff-only || echo "  FAILED (diverged or dirty?): $$d"; \
+		echo "== pull $$n ($$branch) =="; \
+		git -C "$$d" pull --ff-only || echo "  FAILED (diverged or dirty?): $$n"; \
 	done
 
 push-all:
-	@for d in $(ALL); do \
+	@for n in $(ALL); do \
+		d="$(WORKSPACE)/$$n"; \
+		if [ ! -d "$$d/.git" ]; then echo "== push $$n — MISSING (make clone-missing) =="; continue; fi; \
 		branch=$$(git -C "$$d" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "?"); \
 		if [ "$$branch" = "main" ] && [ -z "$$FORCE_MAIN" ]; then \
-			echo "== skip $$d — on main, use a PR instead (FORCE_MAIN=1 to override) =="; \
+			echo "== skip $$n — on main, use a PR instead (FORCE_MAIN=1 to override) =="; \
 			continue; \
 		fi; \
-		echo "== push $$d ($$branch) =="; \
-		git -C "$$d" push -u origin "$$branch" || echo "  FAILED: $$d"; \
+		echo "== push $$n ($$branch) =="; \
+		git -C "$$d" push -u origin "$$branch" || echo "  FAILED: $$n"; \
 	done
 
 sync: fetch-all pull-all
+
+branch:
+	@if [ -z "$(REPO)" ] || [ -z "$(NAME)" ]; then \
+		echo "usage: make branch REPO=<repo-dir> NAME=<slug> [TYPE=feature|bugfix|hotfix]"; \
+		exit 1; \
+	fi; \
+	t="$(TYPE)"; \
+	if [ -z "$$t" ]; then t=feature; fi; \
+	git -C "$(WORKSPACE)/$(REPO)" checkout -b "$$t/$(NAME)"
+
+foreach:
+	@if [ -z "$(CMD)" ]; then \
+		echo "usage: make foreach CMD='git log -1 --oneline'"; \
+		exit 1; \
+	fi; \
+	for n in $(ALL); do \
+		d="$(WORKSPACE)/$$n"; \
+		if [ ! -d "$$d" ]; then echo "== $$n — MISSING (make clone-missing) =="; continue; fi; \
+		echo "== $$n =="; \
+		(cd "$$d" && eval "$(CMD)") || echo "  FAILED: $$n"; \
+	done
 
 trigger-publish:
 	@if [ -z "$$MSG" ]; then \
@@ -107,18 +146,19 @@ trigger-publish:
 	else \
 		targets="$(SERVICE_REPOS)"; \
 	fi; \
-	for d in $$targets; do \
-		echo "== trigger $$d =="; \
+	for n in $$targets; do \
+		d="$(WORKSPACE)/$$n"; \
+		echo "== trigger $$n =="; \
 		branch=$$(git -C "$$d" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "?"); \
 		if [ "$$branch" != "main" ]; then \
-			echo "  SKIP: $$d not on main ($$branch)"; \
+			echo "  SKIP: $$n not on main ($$branch)"; \
 			continue; \
 		fi; \
 		if [ -n "$$(git -C "$$d" status --porcelain)" ]; then \
-			echo "  SKIP: $$d has local changes — refusing to risk sweeping them into main"; \
+			echo "  SKIP: $$n has local changes — refusing to risk sweeping them into main"; \
 			continue; \
 		fi; \
-		git -C "$$d" pull --ff-only || { echo "  FAILED pull: $$d"; continue; }; \
+		git -C "$$d" pull --ff-only || { echo "  FAILED pull: $$n"; continue; }; \
 		marker="<!-- ci-trigger: $$(date -u +%Y-%m-%dT%H:%M:%SZ) -->"; \
 		if grep -q '^<!-- ci-trigger:' "$$d/README.md" 2>/dev/null; then \
 			sed -i.bak "s|^<!-- ci-trigger:.*-->|$$marker|" "$$d/README.md" && rm -f "$$d/README.md.bak"; \
@@ -126,34 +166,15 @@ trigger-publish:
 			printf '\n%s\n' "$$marker" >> "$$d/README.md"; \
 		fi; \
 		git -C "$$d" add README.md; \
-		printf '%s' "$$MSG" | git -C "$$d" commit -F - --quiet -- README.md || { echo "  nothing to commit: $$d"; continue; }; \
-		git -C "$$d" push || echo "  FAILED push: $$d"; \
+		printf '%s' "$$MSG" | git -C "$$d" commit -F - --quiet -- README.md || { echo "  nothing to commit: $$n"; continue; }; \
+		git -C "$$d" push || echo "  FAILED push: $$n"; \
 	done
 
 check-publish:
-	@for d in $(SERVICE_REPOS); do \
-		echo "== $$d =="; \
-		gh run list --repo $(ORG)/$$d --branch main --limit 1 \
+	@for n in $(SERVICE_REPOS); do \
+		echo "== $$n =="; \
+		gh run list --repo $(ORG)/$$n --branch main --limit 1 \
 			--json displayTitle,status,conclusion,createdAt \
 			--jq '.[0] | "  \(.createdAt)  \(.status)/\(.conclusion // "-")  \(.displayTitle)"' \
-			|| echo "  FAILED: $$d"; \
-	done
-
-branch:
-	@if [ -z "$(REPO)" ] || [ -z "$(NAME)" ]; then \
-		echo "usage: make branch REPO=<repo-dir> NAME=<slug> [TYPE=feature|bugfix|hotfix]"; \
-		exit 1; \
-	fi; \
-	t="$(TYPE)"; \
-	if [ -z "$$t" ]; then t=feature; fi; \
-	git -C "$(REPO)" checkout -b "$$t/$(NAME)"
-
-foreach:
-	@if [ -z "$(CMD)" ]; then \
-		echo "usage: make foreach CMD='git log -1 --oneline'"; \
-		exit 1; \
-	fi; \
-	for d in $(ALL); do \
-		echo "== $$d =="; \
-		(cd "$$d" && eval "$(CMD)") || echo "  FAILED: $$d"; \
+			|| echo "  FAILED: $$n"; \
 	done
