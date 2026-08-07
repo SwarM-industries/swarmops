@@ -3,11 +3,21 @@ SHELL := /bin/bash
 ORG := SwarM-industries
 
 # Every repo is a sibling checkout under one workspace directory, and this Makefile lives
-# inside the `swarmops` docs repo — so paths are anchored to the workspace root rather than
-# to $(CURDIR). That way `make pull-all` behaves identically from the workspace root or from
-# inside swarmops/. Override with WORKSPACE=/path/to/checkouts if your layout differs.
+# inside the `swarmops` docs repo. Two valid layouts: (a) the docs repo is checked out AS the
+# workspace root itself (its .git sits directly in MAKEFILE_DIR, siblings are MAKEFILE_DIR's
+# own children — the common case), or (b) the docs repo is nested one level down as a
+# `swarmops/` subfolder of a separate workspace root. Detect which by checking for a known
+# sibling repo directly under MAKEFILE_DIR, not by checking for a nested swarmops/.git (that
+# wildcard is never true in layout (a), which silently resolved WORKSPACE one directory too
+# high — found live, every `make pull-all` reported all 15 repos as missing). Override with
+# WORKSPACE=/path/to/checkouts if your layout differs from both.
 MAKEFILE_DIR := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
-WORKSPACE ?= $(if $(wildcard $(MAKEFILE_DIR)/swarmops/.git),$(MAKEFILE_DIR),$(abspath $(MAKEFILE_DIR)/..))
+WORKSPACE ?= $(if $(wildcard $(MAKEFILE_DIR)/swarmops-frontend),$(MAKEFILE_DIR),$(abspath $(MAKEFILE_DIR)/..))
+# Where the `swarmops` docs repo itself lives — MAKEFILE_DIR directly in layout (a) (it IS
+# $(WORKSPACE) already), or $(WORKSPACE)/swarmops in layout (b). Every loop below special-cases
+# n=="swarmops" to use this instead of the usual $(WORKSPACE)/$$n, since layout (a) has no
+# subdirectory literally named `swarmops` to find.
+SWARMOPS_DIR := $(if $(wildcard $(MAKEFILE_DIR)/swarmops-frontend),$(WORKSPACE),$(WORKSPACE)/swarmops)
 
 # The 15 app repos. `swarmops` (this repo — docs/plan/pitch site) is added separately in ALL.
 REPOS := swarmops-frontend swarmops-gateway swarmops-auth-service swarmops-fleet-service \
@@ -60,15 +70,16 @@ repos:
 
 clone-missing:
 	@for n in $(ALL); do \
-		if [ ! -d "$(WORKSPACE)/$$n" ]; then \
+		d="$$( [ "$$n" = swarmops ] && echo "$(SWARMOPS_DIR)" || echo "$(WORKSPACE)/$$n" )"; \
+		if [ ! -d "$$d" ]; then \
 			echo "== cloning $$n =="; \
-			gh repo clone "$(ORG)/$$n" "$(WORKSPACE)/$$n" -- -q; \
+			gh repo clone "$(ORG)/$$n" "$$d" -- -q; \
 		fi; \
 	done
 
 status:
 	@for n in $(ALL); do \
-		d="$(WORKSPACE)/$$n"; \
+		d="$$( [ "$$n" = swarmops ] && echo "$(SWARMOPS_DIR)" || echo "$(WORKSPACE)/$$n" )"; \
 		if [ ! -d "$$d/.git" ]; then echo "== $$n — MISSING (make clone-missing) =="; continue; fi; \
 		branch=$$(git -C "$$d" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "?"); \
 		out=$$(git -C "$$d" status --short 2>&1); \
@@ -82,7 +93,7 @@ status:
 
 fetch-all:
 	@for n in $(ALL); do \
-		d="$(WORKSPACE)/$$n"; \
+		d="$$( [ "$$n" = swarmops ] && echo "$(SWARMOPS_DIR)" || echo "$(WORKSPACE)/$$n" )"; \
 		if [ ! -d "$$d/.git" ]; then echo "== fetch $$n — MISSING (make clone-missing) =="; continue; fi; \
 		echo "== fetch $$n =="; \
 		git -C "$$d" fetch --all --prune --quiet || echo "  FAILED: $$n"; \
@@ -90,7 +101,7 @@ fetch-all:
 
 pull-all:
 	@for n in $(ALL); do \
-		d="$(WORKSPACE)/$$n"; \
+		d="$$( [ "$$n" = swarmops ] && echo "$(SWARMOPS_DIR)" || echo "$(WORKSPACE)/$$n" )"; \
 		if [ ! -d "$$d/.git" ]; then echo "== pull $$n — MISSING (make clone-missing) =="; continue; fi; \
 		branch=$$(git -C "$$d" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "?"); \
 		echo "== pull $$n ($$branch) =="; \
@@ -99,7 +110,7 @@ pull-all:
 
 push-all:
 	@for n in $(ALL); do \
-		d="$(WORKSPACE)/$$n"; \
+		d="$$( [ "$$n" = swarmops ] && echo "$(SWARMOPS_DIR)" || echo "$(WORKSPACE)/$$n" )"; \
 		if [ ! -d "$$d/.git" ]; then echo "== push $$n — MISSING (make clone-missing) =="; continue; fi; \
 		branch=$$(git -C "$$d" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "?"); \
 		if [ "$$branch" = "main" ] && [ -z "$$FORCE_MAIN" ]; then \
@@ -127,7 +138,7 @@ foreach:
 		exit 1; \
 	fi; \
 	for n in $(ALL); do \
-		d="$(WORKSPACE)/$$n"; \
+		d="$$( [ "$$n" = swarmops ] && echo "$(SWARMOPS_DIR)" || echo "$(WORKSPACE)/$$n" )"; \
 		if [ ! -d "$$d" ]; then echo "== $$n — MISSING (make clone-missing) =="; continue; fi; \
 		echo "== $$n =="; \
 		(cd "$$d" && eval "$(CMD)") || echo "  FAILED: $$n"; \
@@ -147,7 +158,7 @@ trigger-publish:
 		targets="$(SERVICE_REPOS)"; \
 	fi; \
 	for n in $$targets; do \
-		d="$(WORKSPACE)/$$n"; \
+		d="$$( [ "$$n" = swarmops ] && echo "$(SWARMOPS_DIR)" || echo "$(WORKSPACE)/$$n" )"; \
 		echo "== trigger $$n =="; \
 		branch=$$(git -C "$$d" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "?"); \
 		if [ "$$branch" != "main" ]; then \
