@@ -32,8 +32,8 @@
     --ease: cubic-bezier(.16,1,.3,1);
     --dur: .65s;
 
-    --pad: clamp(1rem, 3.2vw, 3.2rem);
-    --gap: clamp(.45rem, 1.5vh, 1rem);
+    --pad: clamp(1rem, 3.2vw, 4rem);
+    --gap: clamp(.45rem, 1.5vh, 1.3rem);
 }
 
 *{ margin:0; padding:0; box-sizing:border-box; }
@@ -43,7 +43,14 @@
    Every sheet is exactly one viewport tall and never scrolls internally.
    =========================================================================== */
 html,body{ height:100%; overflow-x:hidden; }
-html{ scroll-snap-type:y mandatory; scroll-behavior:smooth; }
+html{
+    scroll-snap-type:y mandatory; scroll-behavior:smooth;
+    /* Native scrollbar sits on the left in this RTL doc and just fights the
+       deck's own dot-navigation -- scrolling still works, it's just not drawn. */
+    scrollbar-width:none;      /* Firefox */
+    -ms-overflow-style:none;   /* legacy Edge/IE */
+}
+html::-webkit-scrollbar{ display:none; }  /* Chrome, Edge, Safari */
 
 body{
     background:var(--paper); color:var(--ink);
@@ -59,7 +66,7 @@ body{
     display:grid;
     grid-template-rows:1fr auto;
     padding:var(--pad);
-    padding-bottom:clamp(1.5rem,3.6vh,2.2rem);
+    padding-bottom:clamp(1.5rem,3.6vh,2.6rem);
 }
 
 /* ===========================================================================
@@ -76,19 +83,19 @@ body{
 .head{
     grid-row:2;
     display:flex; align-items:baseline; justify-content:space-between;
-    gap:1rem; padding-top:clamp(.35rem,1vh,.7rem);
+    gap:1rem; padding-top:clamp(.35rem,1vh,.9rem);
     border-top:1px solid var(--hair);
 }
 .num{
-    font-weight:900; font-size:clamp(1.5rem,3.6vw,2.8rem); line-height:1;
+    font-weight:900; font-size:clamp(1.5rem,3.6vw,3.6rem); line-height:1;
     color:var(--accent); font-variant-numeric:tabular-nums; letter-spacing:-.02em;
 }
 .mark{
     display:flex; align-items:center; gap:.45em;
-    font-weight:700; font-size:clamp(.8rem,1.4vw,1.1rem); color:var(--muted);
+    font-weight:700; font-size:clamp(.8rem,1.4vw,1.4rem); color:var(--muted);
     letter-spacing:.02em; white-space:nowrap;
 }
-.mark img{ width:clamp(1.1rem,2.2vw,1.7rem); height:auto; opacity:.75; }
+.mark img{ width:clamp(1.1rem,2.2vw,2.2rem); height:auto; opacity:.75; }
 
 /* main region: centred, but never taller than the row it sits in */
 .main{
@@ -105,31 +112,31 @@ body{
    Hierarchy comes from size and weight only.
    =========================================================================== */
 .kicker{
-    font-weight:700; font-size:clamp(1rem,1.8vw,1.45rem);
+    font-weight:700; font-size:clamp(1rem,1.8vw,1.85rem);
     letter-spacing:.14em; color:var(--muted);
 }
 h1{
     font-weight:900; line-height:1.02; letter-spacing:-.035em;
-    font-size:clamp(2.9rem,8.8vw,7rem);
+    font-size:clamp(2.9rem,8.8vw,9rem);
     text-wrap:balance;
 }
 h2{
     font-weight:900; line-height:1.05; letter-spacing:-.03em;
-    font-size:clamp(2.3rem,6.4vw,5rem);
+    font-size:clamp(2.3rem,6.4vw,6.5rem);
     max-width:19ch; text-wrap:balance;
 }
 .rule{
-    height:clamp(6px,.9vh,9px); width:clamp(90px,12vw,165px);
+    height:clamp(6px,.9vh,12px); width:clamp(90px,12vw,220px);
     background:var(--accent); flex:none;
 }
 .lede{
     font-weight:300; line-height:1.35;
-    font-size:clamp(1.35rem,2.9vw,2.35rem);
+    font-size:clamp(1.35rem,2.9vw,3rem);
     max-width:32ch; color:var(--ink);
 }
 .note{
     font-weight:400; line-height:1.4;
-    font-size:clamp(1.05rem,1.9vw,1.55rem);
+    font-size:clamp(1.05rem,1.9vw,2rem);
     max-width:40ch; color:var(--muted);
 }
 .note b{ color:var(--ink); font-weight:700; }
@@ -139,7 +146,7 @@ h2{
    would just be next slide's overflow bug with extra steps. */
 .note.one-line{ max-width:none; white-space:nowrap; }
 .byline{
-    font-weight:700; font-size:clamp(1.15rem,2.2vw,1.8rem); letter-spacing:.02em;
+    font-weight:700; font-size:clamp(1.15rem,2.2vw,2.3rem); letter-spacing:.02em;
 }
 
 /* ===========================================================================
@@ -147,10 +154,10 @@ h2{
    Start-aligned inside a centred sheet: ragged-centre body copy is harder to
    scan than a flush edge, even when the sheet itself is symmetric.
    =========================================================================== */
-ul.points{ list-style:none; display:flex; flex-direction:column; gap:clamp(.5rem,1.5vh,1.05rem); text-align:start; }
+ul.points{ list-style:none; display:flex; flex-direction:column; gap:clamp(.5rem,1.5vh,1.35rem); text-align:start; }
 ul.points li{
     font-weight:300; line-height:1.3;
-    font-size:clamp(1.3rem,2.6vw,2.05rem);
+    font-size:clamp(1.3rem,2.6vw,2.6rem);
     max-width:30ch;
     padding-inline-start:.9em; position:relative;
 }
@@ -165,7 +172,7 @@ ul.points li.st{ padding-inline-start:0; display:flex; gap:.65em; align-items:ba
 ul.points li.st::before{ display:none; }
 .tagpill{
     flex:none; font-weight:700; letter-spacing:.1em;
-    font-size:clamp(.7rem,1.2vw,.95rem);
+    font-size:clamp(.7rem,1.2vw,1.2rem);
     padding:.3em .65em; border:2px solid currentColor; line-height:1;
 }
 .tagpill.ok{ color:var(--ok); }
@@ -176,14 +183,14 @@ ul.points li.st::before{ display:none; }
    Hard-edged bordered boxes. Red border marks the failure/risk cards.
    =========================================================================== */
 .cards{
-    display:grid; gap:clamp(.5rem,1.2vw,1rem);
+    display:grid; gap:clamp(.5rem,1.2vw,1.3rem);
     grid-template-columns:repeat(3,minmax(0,1fr));
-    width:100%; max-width:1120px; text-align:start;
+    width:100%; max-width:1450px; text-align:start;
 }
-.cards.two{ grid-template-columns:repeat(2,minmax(0,1fr)); max-width:800px; }
+.cards.two{ grid-template-columns:repeat(2,minmax(0,1fr)); max-width:1040px; }
 .card{
     border:2px solid var(--ink);
-    padding:clamp(.75rem,2.2vh,1.25rem) clamp(.7rem,1.4vw,1.15rem);
+    padding:clamp(.75rem,2.2vh,1.6rem) clamp(.7rem,1.4vw,1.5rem);
 }
 /* nowrap keeps the headline on one line; fitOneLiners() shrinks it until
    it actually fits. Deliberately no overflow:hidden/ellipsis here -- hiding
@@ -191,12 +198,12 @@ ul.points li.st::before{ display:none; }
    text stays fully visible and the script is what makes it fit. */
 .card .h{
     display:block; font-weight:900; line-height:1.12;
-    font-size:clamp(1.2rem,2.15vw,1.75rem); margin-bottom:.35em;
+    font-size:clamp(1.2rem,2.15vw,2.2rem); margin-bottom:.35em;
     white-space:nowrap;
 }
 .card .d{
     display:block; font-weight:300; line-height:1.3; color:var(--muted);
-    font-size:clamp(1rem,1.65vw,1.35rem);
+    font-size:clamp(1rem,1.65vw,1.7rem);
 }
 .card.risk{ border-color:var(--accent); }
 .card.risk .h{ color:var(--accent); }
@@ -210,25 +217,25 @@ ul.points li.st::before{ display:none; }
    =========================================================================== */
 .people{
     display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
-    gap:clamp(.6rem,1.6vw,1.4rem);
-    width:100%; max-width:920px;
+    gap:clamp(.6rem,1.6vw,1.8rem);
+    width:100%; max-width:1200px;
 }
 .person{ display:flex; flex-direction:column; gap:.5em; }
 .person img{
     display:block; width:100%; aspect-ratio:3/4; object-fit:cover;
-    max-height:min(42vh,340px); max-width:100%;
+    max-height:min(42vh,440px); max-width:100%;
     border:2px solid var(--ink); filter:grayscale(1) contrast(1.05);
 }
 .person img.low{ object-position:center 58%; }
-.p-name{ font-weight:900; font-size:clamp(1.3rem,2.5vw,2rem); line-height:1.1; }
+.p-name{ font-weight:900; font-size:clamp(1.3rem,2.5vw,2.6rem); line-height:1.1; }
 /* The shared title sits between the name and the personal role: same for all
    three, so it reads as a band rather than as a third piece of information. */
 .p-title{
     display:block; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
-    font-size:clamp(.7rem,1.05vw,.9rem); color:var(--muted); line-height:1.2;
+    font-size:clamp(.7rem,1.05vw,1.15rem); color:var(--muted); line-height:1.2;
     margin:.15em 0 .1em;
 }
-.p-role{ font-weight:400; font-size:clamp(1rem,1.7vw,1.35rem); color:var(--accent); line-height:1.25; }
+.p-role{ font-weight:400; font-size:clamp(1rem,1.7vw,1.75rem); color:var(--accent); line-height:1.25; }
 
 /* ===========================================================================
    STRIP
@@ -243,12 +250,12 @@ ul.points li.st::before{ display:none; }
    =========================================================================== */
 .strip{
     display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
-    gap:clamp(.45rem,1.2vw,.9rem);
-    width:100%; max-width:940px;
+    gap:clamp(.45rem,1.2vw,1.15rem);
+    width:100%; max-width:1220px;
 }
 .strip img{
     display:block; width:100%; aspect-ratio:1/1; object-fit:cover;
-    max-height:min(26vh,215px); max-width:100%;
+    max-height:min(26vh,280px); max-width:100%;
     border:2px solid var(--ink);
 }
 .strip img.low{ object-position:center 62%; }
@@ -265,7 +272,7 @@ ul.points li.st::before{ display:none; }
    pulse whose dash length is measured per path at runtime, so a wire can
    never be missing no matter its geometry.
    =========================================================================== */
-.figure{ width:100%; max-width:min(100%,880px); }
+.figure{ width:100%; max-width:min(100%,1150px); }
 .figure svg{ width:100%; height:auto; display:block; overflow:visible; }
 .figure text{ font-family:var(--font); font-weight:700; font-size:22px; fill:var(--ink); }
 .figure .t-out{ fill:var(--paper); }
@@ -303,7 +310,7 @@ ul.points li.st::before{ display:none; }
    "not finished" even from across a room.
    =========================================================================== */
 .slot{
-    width:100%; max-width:660px; aspect-ratio:16/9;
+    width:100%; max-width:860px; aspect-ratio:16/9;
     border:3px dashed var(--hair);
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     gap:.6em; padding:1rem; text-align:center;
@@ -313,18 +320,55 @@ ul.points li.st::before{ display:none; }
    just handing width control to the grid instead of each box's own cap. */
 .slots{
     display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:clamp(.7rem,1.8vw,1.4rem);
-    width:100%; max-width:880px;
+    gap:clamp(.7rem,1.8vw,1.8rem);
+    width:100%; max-width:1150px;
 }
 .slots .slot{ max-width:none; }
-.slot svg{ width:clamp(1.9rem,3.8vw,3rem); height:auto; stroke:var(--muted); fill:none; stroke-width:1.4; }
+.slot svg{ width:clamp(1.9rem,3.8vw,3.8rem); height:auto; stroke:var(--muted); fill:none; stroke-width:1.4; }
 .slot .s-label{
     font-weight:900; letter-spacing:.12em; color:var(--accent);
-    font-size:clamp(.85rem,1.45vw,1.15rem);
+    font-size:clamp(.85rem,1.45vw,1.5rem);
 }
 .slot .s-note{
     font-weight:300; color:var(--muted); line-height:1.35; max-width:32ch;
-    font-size:clamp(.95rem,1.55vw,1.25rem);
+    font-size:clamp(.95rem,1.55vw,1.6rem);
+}
+
+/* A slot once its asset has actually landed: dashed placeholder becomes a
+   solid frame (same language as .strip img) and the note overlays the
+   footage itself instead of sitting below an icon. */
+.slot.filled{
+    border-style:solid; border-color:var(--ink); padding:0; overflow:hidden; position:relative;
+}
+.slot.filled video{
+    width:100%; height:100%; object-fit:cover; display:block;
+}
+.slot.filled img{
+    width:100%; height:100%; object-fit:contain; display:block;
+}
+/* The live-map screenshot doesn't share the video slots' 16:9 shape -- it's
+   close to square, 720x718. Using ITS real ratio here (instead of 16:9 or a
+   rounded 1:1) means object-fit:contain on .slot.filled img never has a
+   mismatch to paper over, so there is no letterboxing. min-height:0 lets the
+   box flex-shrink to whatever room .main actually has left under the heading
+   text on a shorter window, instead of holding its full native height and
+   getting sliced by .slide's overflow:hidden -- max-width caps it at native
+   size so it never scales up past the source image on a huge screen either. */
+.slot.map-shot{
+    width:auto; max-width:min(720px,100%);
+    height:auto; max-height:100%; min-height:0;
+    aspect-ratio:720/718;
+}
+.slot.filled .s-note{
+    /* Physical right/bottom on purpose, not inset-inline-end: this is a
+       corner badge pinned to the visual bottom-right of the frame, which
+       should hold regardless of the document's RTL flow. */
+    position:absolute; z-index:1; pointer-events:none;
+    right:.6em; bottom:.6em; left:auto; top:auto;
+    max-width:55%; width:max-content; text-align:end; color:#fff;
+    font-size:clamp(.78rem,1.25vw,1.2rem); line-height:1.3;
+    padding:.35em .75em; border-radius:3px;
+    background:rgba(17,17,16,.72);
 }
 
 /* ===========================================================================
@@ -333,12 +377,12 @@ ul.points li.st::before{ display:none; }
 /* Mark stacked over name, tight, so the two read as one lockup rather than
    as two separate stacked elements. Matches the real logo.png, which stacks
    the same way. */
-.lockup{ display:flex; flex-direction:column; align-items:center; gap:clamp(.25rem,1vh,.7rem); }
-.lockup img{ width:clamp(84px,10.5vw,160px); height:auto; }
-.lockup .wordmark{ font-size:clamp(3.2rem,10vw,7.2rem); line-height:.92; }
+.lockup{ display:flex; flex-direction:column; align-items:center; gap:clamp(.25rem,1vh,.9rem); }
+.lockup img{ width:clamp(84px,10.5vw,200px); height:auto; }
+.lockup .wordmark{ font-size:clamp(3.2rem,10vw,9rem); line-height:.92; }
 
-.logo-sm{ width:clamp(70px,9vw,120px); height:auto; opacity:.85; }
-.wordmark{ font-weight:900; font-size:clamp(2.8rem,8.5vw,6rem); line-height:1; letter-spacing:-.03em; }
+.logo-sm{ width:clamp(70px,9vw,150px); height:auto; opacity:.85; }
+.wordmark{ font-weight:900; font-size:clamp(2.8rem,8.5vw,7.5rem); line-height:1; letter-spacing:-.03em; }
 
 /* ===========================================================================
    REVEAL
@@ -843,7 +887,7 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
 
 
 <!-- ==========================================================================
-     10 · הסימולטור (slot: drone-operation video)
+     10 · הסימולטור
      ========================================================================== -->
 <section class="slide">
   <div class="head">
@@ -856,14 +900,12 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
     <div class="rule reveal"></div>
     <p class="lede reveal">טס, משדר תמונה, ומגיב בזמן אמת. בלי חומרה אמיתית.</p>
     <div class="slots reveal">
-      <div class="slot">
-        <svg viewBox="0 0 24 24" style="fill:var(--muted); stroke:none;"><path d="M6 4l14 8-14 8V4z"></path></svg>
-        <span class="s-label" dir="ltr">VIDEO</span>
+      <div class="slot filled">
+        <video src="presentation-assets/videos/fpv-feed.mp4" controls muted loop preload="metadata" playsinline></video>
         <span class="s-note">מבט מצלמת הרחפן</span>
       </div>
-      <div class="slot">
-        <svg viewBox="0 0 24 24" style="fill:var(--muted); stroke:none;"><path d="M6 4l14 8-14 8V4z"></path></svg>
-        <span class="s-label" dir="ltr">VIDEO</span>
+      <div class="slot filled">
+        <video src="presentation-assets/videos/third-person.mp4" controls muted loop preload="metadata" playsinline></video>
         <span class="s-note">מבט חיצוני מתוך יוניטי</span>
       </div>
     </div>
@@ -872,7 +914,7 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
 
 
 <!-- ==========================================================================
-     11 · הנראות (slot: live map screenshot)
+     11 · הנראות
      ========================================================================== -->
 <section class="slide">
   <div class="head">
@@ -884,10 +926,8 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
     <h2 class="reveal">כל הצי במבט אחד</h2>
     <div class="rule reveal"></div>
     <p class="lede reveal">איפה כל רחפן, כמה סוללה נשארה, ובאיזו משימה הוא.</p>
-    <div class="slot reveal">
-      <svg viewBox="0 0 24 24"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"></path><circle cx="12" cy="9" r="2.5"></circle></svg>
-      <span class="s-label" dir="ltr">SCREENSHOT</span>
-      <span class="s-note">צילום מסך של המפה החיה</span>
+    <div class="slot filled map-shot reveal">
+      <img src="presentation-assets/screenshot/map_screenshot.png" alt="צילום מסך של המפה החיה">
     </div>
   </div>
 </section>
@@ -1209,10 +1249,15 @@ class Deck {
     observe(){
         const io = new IntersectionObserver(entries=>{
             entries.forEach(e=>{
+                const vids = e.target.querySelectorAll('video');
                 if(e.isIntersecting){
                     e.target.classList.add('visible');
                     this.i = this.slides.indexOf(e.target);
                     this.sync();
+                    // muted, so this is allowed to autoplay without a prior user gesture
+                    vids.forEach(v=>v.play().catch(()=>{}));
+                } else {
+                    vids.forEach(v=>v.pause());
                 }
             });
         },{ threshold:.5 });
