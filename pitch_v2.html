@@ -273,6 +273,15 @@ ul.points li.st::before{ display:none; }
    never be missing no matter its geometry.
    =========================================================================== */
 .figure{ width:100%; max-width:min(100%,1150px); }
+/* Diagrams that cannot have the full 1150px: either they share their sheet with
+   something else (the cloud sheet runs figure + a card grid) or they are simply
+   tall (the services sheet grew a second tier for the bus). Capped in vh rather
+   than px on purpose -- a px cap here is MORE specific than the .figure rules in
+   the max-height media queries below, so it would quietly win on a short screen
+   and reintroduce exactly the overflow it was added to prevent. These two values
+   track that same ladder on their own. */
+.figure.fig-sm{ max-width:min(100%,62vh); }   /* ~670px at 1080 tall */
+.figure.fig-md{ max-width:min(100%,92vh); }   /* ~995px at 1080 tall */
 .figure svg{ width:100%; height:auto; display:block; overflow:visible; }
 .figure text{ font-family:var(--font); font-weight:700; font-size:22px; fill:var(--ink); }
 .figure .t-out{ fill:var(--paper); }
@@ -299,6 +308,8 @@ ul.points li.st::before{ display:none; }
 .slide.visible .figure .node.n5{ transition-delay:.56s; }
 .slide.visible .figure .node.n6{ transition-delay:.66s; }
 .slide.visible .figure .node.n7{ transition-delay:.76s; }
+.slide.visible .figure .node.n8{ transition-delay:.86s; }
+.slide.visible .figure .node.n9{ transition-delay:.96s; }
 
 @media (max-height:780px){ .figure{ max-width:min(100%,720px); } }
 @media (max-height:640px){ .figure{ max-width:min(100%,580px); } }
@@ -881,8 +892,14 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
     <h2 class="reveal">שישה חלקים שמתקשרים ביניהם</h2>
     <div class="rule reveal"></div>
     <p class="lede reveal">במקום תוכנה אחת גדולה, שישה חלקים קטנים. כל חלק יכול "ליפול" ו- "לקום" לבד.</p>
-    <div class="figure reveal">
-      <svg viewBox="0 0 700 205" role="img" aria-label="עץ שירותים: שער כניסה אחד בראש, מסתעף לשישה שירותים">
+    <div class="figure fig-md reveal">
+      <svg viewBox="0 0 700 284" role="img" aria-label="עץ שירותים: שער כניסה אחד בראש, מסתעף לשישה שירותים, ומתחתיהם תור הודעות RabbitMQ שמחבר בין סימולטור הרחפנים, telemetry, planning ו-notify">
+        <defs>
+          <marker id="a07" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="#111110"></path>
+          </marker>
+        </defs>
+
         <g class="node n1">
           <rect class="box-fill" x="265" y="4" width="170" height="56"></rect>
           <text class="t-out" x="350" y="39" text-anchor="middle">"שער כניסה"</text>
@@ -899,8 +916,43 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
         <g class="node n3"><rect class="box" x="125" y="134" width="105" height="52"></rect><text x="177" y="167" text-anchor="middle" dir="ltr">fleet</text></g>
         <g class="node n4"><rect class="box" x="240" y="134" width="105" height="52"></rect><text x="292" y="167" text-anchor="middle" dir="ltr">mission</text></g>
         <g class="node n5"><rect class="box-line-hot" x="355" y="134" width="105" height="52"></rect><text x="407" y="167" text-anchor="middle" dir="ltr" fill="#ff3300">planning</text></g>
-        <g class="node n6"><rect class="box" x="470" y="134" width="105" height="52"></rect><text x="522" y="167" text-anchor="middle" dir="ltr">telemetry</text></g>
-        <g class="node n7"><rect class="box" x="585" y="134" width="105" height="52"></rect><text x="637" y="167" text-anchor="middle" dir="ltr">notify</text></g>
+        <!-- telemetry sits in the rightmost slot and notify to its left, which is
+             the reverse of the order the other sheets list them in. The bus tier
+             below is why: the chain is simulator -> telemetry -> RabbitMQ ->
+             notify/planning, and in an RTL sheet that reads right to left. With
+             the two swapped back, the sim feed and the notify consume wire cross
+             each other under the row. -->
+        <g class="node n6"><rect class="box" x="470" y="134" width="105" height="52"></rect><text x="522" y="167" text-anchor="middle" dir="ltr">notify</text></g>
+        <g class="node n7"><rect class="box" x="585" y="134" width="105" height="52"></rect><text x="637" y="167" text-anchor="middle" dir="ltr">telemetry</text></g>
+
+        <!-- The message bus, drawn solid like the gateway bar above it: both are
+             plumbing the room never has to name, not services anyone built. Only
+             the three that actually touch RabbitMQ are wired to it. -->
+        <g class="node n8">
+          <rect class="box-fill" x="270" y="228" width="295" height="46"></rect>
+          <text class="t-out" x="417" y="257" text-anchor="middle" dir="ltr">RabbitMQ</text>
+        </g>
+        <g class="node n9">
+          <rect class="box" x="575" y="228" width="115" height="46"></rect>
+          <text x="632" y="257" text-anchor="middle" dir="ltr">simulator</text>
+        </g>
+
+        <!-- Authored in flow order on purpose: flowPulses() walks .wire elements
+             in DOM order and runs each pulse along its path's own direction, so
+             the markup order IS the animation order. Reads
+             simulator -> telemetry -> RabbitMQ -> notify -> planning.
+
+             The lane assignment is what keeps this readable: the simulator's
+             feed goes straight up at x=650, and telemetry's drop uses a corridor
+             at y=208 -- ABOVE the bus tier, so it clears the simulator box
+             entirely -- before turning down into the bus at x=545, which keeps
+             it clear of both the bar's right corner and notify's wire. Both bus
+             consumers leave straight up from points inside the bar. No wire
+             crosses another and none runs through a box. -->
+        <path class="wire" d="M650 228 V190" marker-end="url(#a07)"></path>
+        <path class="wire" d="M600 186 V208 H545 V224" marker-end="url(#a07)"></path>
+        <path class="wire" d="M522 228 V190" marker-end="url(#a07)"></path>
+        <path class="wire" d="M407 228 V190" marker-end="url(#a07)"></path>
       </svg>
     </div>
     <p class="note reveal"><b style="color:#ff3300">planning</b> הוא המוח: הוא מחליט מי טס לאן ולמה.</p>
@@ -1104,7 +1156,7 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
     <h2 class="reveal">איפה זה בעצם רץ</h2>
     <div class="rule reveal"></div>
     <p class="lede reveal">הכל רץ בענן של אמזון, ברשת פרטית וסגורה.</p>
-    <div class="figure reveal">
+    <div class="figure fig-sm reveal">
       <!-- Simplified from architecture.drawio page 13 (AWS Account / Region / VPC /
            AZ) down to the four levels that matter for a pitch read from across a
            room: the account, the region, the private VPC, and the two zones that
@@ -1140,17 +1192,50 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
         <g class="node n5">
           <rect class="box" x="100" y="122" width="205" height="80"></rect>
           <text x="202" y="150" text-anchor="middle">אזור זמינות A</text>
-          <text class="t-sm" x="202" y="174" text-anchor="middle">EKS</text>
+          <text class="t-sm" x="202" y="174" text-anchor="middle">2 שרתי EKS</text>
         </g>
 
         <g class="node n6">
           <rect class="box" x="337" y="122" width="205" height="80"></rect>
           <text x="439" y="150" text-anchor="middle">אזור זמינות B</text>
-          <text class="t-sm" x="439" y="174" text-anchor="middle">EKS</text>
+          <text class="t-sm" x="439" y="174" text-anchor="middle">3 שרתי EKS</text>
         </g>
       </svg>
     </div>
-    <p class="note reveal">שני אזורי זמינות, כדי שנפילה של אחד לא תהפוך את המערכת לבלתי שמישה.</p>
+    <!-- Every number here is read off resources.md, a live kubectl/aws snapshot
+         taken 2026-08-07 -- not estimates. Re-run those checks before the talk
+         if the cluster has been rebuilt since. The old closing line about two
+         availability zones now lives inside the diagram as the per-zone server
+         counts, because the sheet has no vertical room for both it and these. -->
+    <div class="cards reveal">
+      <div class="card">
+        <span class="h">5 שרתים</span>
+        <!-- All-latin line, so the whole thing is dir="ltr". Isolating only the
+             t3.medium token instead left the surrounding dots and units to the
+             RTL flow and the separators reordered around the value. -->
+        <span class="d" dir="ltr">t3.medium · SPOT · 10 vCPU · 18.7Gi RAM</span>
+      </div>
+      <div class="card">
+        <span class="h">62 קונטיינרים</span>
+        <span class="d">23 <span dir="ltr">deployments</span>, ב-5 מרחבי שמות</span>
+      </div>
+      <div class="card">
+        <span class="h">25Gi אחסון</span>
+        <span class="d">6 כרכי <span dir="ltr">gp3</span> — בסיס נתונים, תורים, מדדים ולוגים</span>
+      </div>
+      <div class="card">
+        <span class="h">5 אפליקציות ארגו</span>
+        <span class="d">כולן מסונכרנות ותקינות</span>
+      </div>
+      <div class="card">
+        <span class="h">9 שירותים</span>
+        <span class="d">גרסאות שמורות ב-<span dir="ltr">ECR</span>, תג נפרד לכל שינוי</span>
+      </div>
+      <div class="card">
+        <span class="h">שחרור הדרגתי אחד</span>
+        <span class="d"><span dir="ltr">planning-service</span> — 5 מתוך 5 מעודכנים</span>
+      </div>
+    </div>
   </div>
 </section>
 

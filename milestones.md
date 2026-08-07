@@ -810,3 +810,34 @@ Two things worth knowing before touching this deck again:
 `PITCH_ASSETS_TODO.md` rewritten — the only asset still outstanding is the optional
 behind-the-scenes clip. All seven screenshots are committed alongside `pitch_v2.html` in the same
 commit, so nothing here depends on an untracked file.
+
+**Update 2026-08-07 (Tony) — deck sheets 07 and 14 reworked; merged with Guy's same-day
+`pitch_v2.html` polish.** Sheet 07's service tree grew a second tier: a solid `RabbitMQ` bar plus
+a `simulator` box, wired `simulator → telemetry → RabbitMQ → planning` and `RabbitMQ → notify`, so
+the event-driven half of the system is finally visible on the deck. `telemetry` and `notify` swap
+places in the row for this: the sheet is RTL, so the chain has to read right-to-left, and with the
+old order the simulator feed and the notify wire cross under the row. Sheet 14 keeps the AWS/VPC
+diagram (shrunk, and now carrying per-AZ server counts) and gains six resource cards — 5 servers,
+62 pods, 25Gi storage, 5 Argo apps, 9 service images, 1 canary. Every number is read off the new
+`resources.md`, a live `kubectl`/`aws` snapshot taken 2026-08-07; **re-run those checks before the
+defense if the cluster has been rebuilt**, nothing auto-updates it.
+
+Three things worth knowing before touching this deck again:
+
+- **Wire order in a `.figure` is the animation.** `flowPulses()` walks `.wire` elements in DOM
+  order and runs each orange pulse along its path's own direction, so a diagram that animates in
+  the wrong order is a markup-order bug, not a script bug.
+- **Per-sheet figure caps must be authored in `vh`, not `px`.** `.figure.fig-sm` / `.fig-md` are
+  more specific than the `.figure` rules inside the `max-height` media queries, so a px cap wins
+  on a short screen and silently reintroduces the overflow it was added to prevent (`.slide` is
+  `overflow:hidden` — a too-tall sheet clips its footnote rather than scrolling).
+- **Adding or removing an editable element invalidates every saved in-browser edit.** The inline
+  editor keys its localStorage payload to a fingerprint of the deck's shape, so structural edits
+  discard it wholesale. Edit the file, not the browser, for anything meant to last.
+
+Merge note: Guy pushed `cbb4ddb` against the same file the same day. His changes were taken whole
+for sheets 17–22 and 24 — including **deleting** sheet 17's cropped sync band (the tree now gets
+the whole sheet) and **re-exporting both frontend pod strips already trimmed** (588x129 and
+588x75, content centred with 10px of background each side). That re-export is what fixed sheet
+18's lopsided framing, at the asset level; an earlier CSS-crop attempt here was dropped as
+redundant, and its maths was keyed to the old 775/713-wide files anyway.
