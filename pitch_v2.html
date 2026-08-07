@@ -354,10 +354,48 @@ ul.points li.st::before{ display:none; }
    text on a shorter window, instead of holding its full native height and
    getting sliced by .slide's overflow:hidden -- max-width caps it at native
    size so it never scales up past the source image on a huge screen either. */
-.slot.map-shot{
-    width:auto; max-width:min(720px,100%);
-    height:auto; max-height:100%; min-height:0;
-    aspect-ratio:720/718;
+/* Every other screenshot in the deck gets the same treatment, one rule per
+   source rather than a shared 16/9: the Argo CD tree, the Argo Rollouts
+   canary views and the Grafana dashboard are all different shapes, and a
+   ratio that isn't the file's own is a letterbox bar with extra steps.
+   The shared four declarations are hoisted below so only the ratio and the
+   width cap differ per shot. */
+.slot.map-shot{     max-width:min(720px,100%);  aspect-ratio:720/718;   }
+.slot.argo-shot{    max-width:min(1120px,100%); aspect-ratio:2028/1263; }
+.slot.canary-shot{  max-width:min(880px,100%);  aspect-ratio:1363/1038; }
+.slot.wide-shot{    max-width:min(1500px,100%); aspect-ratio:3440/1319; }
+.slot.map-shot, .slot.argo-shot, .slot.canary-shot, .slot.wide-shot{
+    width:auto; height:auto; max-height:100%; min-height:0;
+}
+/* The two frontend pod strips are near-banners (6:1 and 9.5:1) and carry no
+   aspect-ratio at all -- the image sets the height and the frame hugs it.
+   Ratio-driven frames are subtly wrong for a shape this extreme: the 3px
+   border is inside the border box, so the CONTENT ends up ~3.6% wider than
+   the source's own ratio and object-fit:contain answers that with a visible
+   bar of paper down each side. Nothing to mismatch if the image is what's
+   being measured. Same width on both so their edges line up when stacked,
+   even though one ends up noticeably shorter than the other. */
+.slot.pod-strip-a, .slot.pod-strip-b{
+    width:100%; height:auto;
+    /* Both resets are load-bearing. Without aspect-ratio:auto the base
+       .slot's 16/9 still applies and each frame asks for ~480px of height;
+       without flex:none the column then shrinks that back down to whatever
+       room is left, landing both frames on one arbitrary height that
+       matches neither image. */
+    aspect-ratio:auto; flex:none;
+}
+.slot.pod-strip-a img, .slot.pod-strip-b img{ height:auto; }
+/* The canary before/after pair sits in a .slots grid, which otherwise hands
+   its children the default 16/9. Both sources are ~1.30 (935x723 and
+   941x712); the 2% difference between them is small enough that
+   object-fit:contain absorbs it without a visible bar. */
+.slots.canary .slot{ aspect-ratio:935/723; }
+/* Two banner strips stacked as one unit -- a plain column, since neither the
+   .slots grid (equal columns) nor .strip (square tiles) describes this. */
+.pod-stack{
+    display:flex; flex-direction:column; align-items:stretch;
+    gap:clamp(.6rem,1.8vh,1.6rem);
+    width:100%; max-width:min(1000px,100%); min-height:0;
 }
 .slot.filled .s-note{
     /* Physical right/bottom on purpose, not inset-inline-end: this is a
@@ -370,6 +408,88 @@ ul.points li.st::before{ display:none; }
     padding:.35em .75em; border-radius:3px;
     background:rgba(17,17,16,.72);
 }
+
+/* ===========================================================================
+   SCREENSHOT CROPS
+   Two of these screenshots are dashboards: shown whole they read as scale
+   ("we instrument everything", "that is a lot of healthy services") but not
+   one label on them survives being shrunk to fit a sheet. So the interesting
+   region gets cut out and shown near 1:1 next to, or instead of, the whole.
+
+   These are BACKGROUND CROPS of the same files, not separate images: no
+   second copy of a 437KB png to keep in sync, and re-framing is a number
+   change rather than a re-export. For a region (x,y,w,h) out of a WxH source
+   the maths is
+       background-size:     W/w*100%   H/h*100%
+       background-position: x/(W-w)*100%   y/(H-h)*100%
+   and the values below are that maths already evaluated -- the source rect
+   is recorded in each comment so a tile can be re-derived. Evaluated rather
+   than left as calc(): dividing by a var() inside calc() is newer CSS than
+   this deck needs to depend on, and a silent failure here blanks the tile.
+   =========================================================================== */
+.win{
+    width:100%; border:2px solid var(--ink);
+    background-repeat:no-repeat;
+}
+.win.c1, .win.c2, .win.c3{ background-image:url(presentation-assets/screenshot/grafana_dashboard.png); }
+.win.argo-sync{            background-image:url(presentation-assets/screenshot/base_argo.png); }
+.win.canary-steps{         background-image:url(presentation-assets/screenshot/canary_in_progress3.png); }
+
+/* The left two-fifths of canary_in_progress3.png (1363x1038): the step
+   ladder (20% -> analysis -> 50% -> analysis -> 100%) and the summary that
+   names the strategy. Shown instead of the whole screenshot, not next to it
+   -- the Revisions panel that the rest of that file is made of is what sheet
+   20 shows in close-up anyway, so nothing is lost by cropping it away, and
+   whole it forced the ladder down to a third of readable size.
+                                                     rect 0,0 845x495 */
+.win.canary-steps{
+    /* Height-driven, unlike the banner crops: this one is nearly square, so
+       it is the sheet's vertical room that runs out first, and left to run
+       at full width it clips the sheet's own kicker and footnote (.slide
+       hides overflow rather than scrolling).
+
+       The height is a DEFINITE value, which is the whole trick. A .slot gets
+       away with `width:auto; max-height:100%` because the <img> inside it
+       has an intrinsic size to shrink-to-fit around; a background-image
+       contributes nothing, so the same rules collapse this box to zero.
+       Given a definite height, aspect-ratio derives the width instead.
+       43vh is what is actually left under this sheet's four lines of type. */
+    height:min(43vh,495px); width:auto; max-width:100%; flex:none;
+    aspect-ratio:845/495; background-size:161.302% 209.697%; background-position:0% 0%;
+}
+
+/* The Argo sync header, cut out of base_argo.png (2028x1263) and shown at
+   roughly 1:1, because this band is the whole argument of its sheet: synced
+   to a commit, auto-sync on, and an author line reading swarmops-ci-bot. At
+   the scale the full tree has to be drawn at, none of that is readable.
+   The right edge is set at 1425 rather than at the card's own border so the
+   longest line on it -- the GMT timestamp -- clears with room to spare; an
+   earlier 1330 sliced it mid-word.            rect 265,115 1160x135 */
+.win.argo-sync{
+    max-width:min(1150px,100%);
+    aspect-ratio:1160/135; background-size:174.828% 935.556%; background-position:30.530% 10.195%;
+}
+
+.crops{
+    display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:clamp(.5rem,1.4vw,1.4rem);
+    width:100%; max-width:1450px; min-height:0;
+}
+.crop{ display:flex; flex-direction:column; gap:.5em; min-height:0; }
+.crop .c-cap{
+    font-weight:400; line-height:1.3; color:var(--muted);
+    font-size:clamp(.9rem,1.4vw,1.4rem);
+}
+/* All three Grafana rects are cut to the same ~3.95 ratio even where the
+   underlying panel isn't, so the three tiles render at one height and the
+   captions below them sit on a single baseline. Ragged tile bottoms would be
+   the one soft edge in a deck made entirely of hard ones. */
+/* "Service targets up" -- the big 10 / 12.        rect 337,215 750x190 */
+.win.c1{ aspect-ratio:750/190;  background-size:458.667% 694.211%; background-position:12.528% 19.043%; }
+/* "Container restarts (15m)" -- spikes to flat.  rect 2233,230 1121x283 */
+.win.c2{ aspect-ratio:1121/283; background-size:306.868% 466.078%; background-position:96.291% 22.201%; }
+/* "Solve duration (p50/p95)" -- the algorithm.   rect 337,1066 1001x253 */
+.win.c3{ aspect-ratio:1001/253; background-size:343.656% 521.344%; background-position:13.817% 100%; }
 
 /* ===========================================================================
    TITLE + CLOSING
@@ -606,7 +726,7 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
     </div>
     <p class="note reveal">ובנוסף, כולנו פגשנו את אותן הבעיות בדיוק.</p>
   </div>
-</section>aa
+</section>
 
 
 <!-- ==========================================================================
@@ -1130,13 +1250,21 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
         <text class="t-sm node n3" x="102" y="142" text-anchor="middle">מתעדכן בלי התערבות ידנית בשרת</text>
       </svg>
     </div>
-    <p class="note reveal">גרסה חדשה יוצאת <b>בהדרגה</b>: קודם לחלק קטן מהמשתמשים. אם המדידה האוטומטית של כמות השגיאות מראה כמות שגיאות גדולה, הפריסה נעצרת וחוזרת אחורה לבד.</p>
+    <!-- The full "…and rolls itself back" version of this line used to live
+         here. Sheets 19 and 20 now show that happening with real screenshots,
+         so this one stops at the promise and lets them carry the proof. -->
+    <p class="note reveal">גרסה חדשה יוצאת <b>בהדרגה</b>, ולא לכולם בבת אחת.</p>
   </div>
 </section>
 
 
 <!-- ==========================================================================
-     17 · ניטור (slot: architecture.drawio page 6)
+     17 · הפריסה (Argo CD, the real thing)
+     Every number and name on this sheet is read straight off base_argo.png --
+     Synced 12, Healthy 27, and a last sync authored by swarmops-ci-bot with
+     the comment "frontend: bump image to 0.0.0-b164c57". That bot authorship
+     is the entire point of the sheet: do not soften it to "the system", and
+     do not round the counts.
      ========================================================================== -->
 <section class="slide">
   <div class="head">
@@ -1144,24 +1272,181 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
-    <p class="kicker reveal">ניטור</p>
-    <h2 class="reveal">לדעת לפני שמישהו מתלונן</h2>
+    <p class="kicker reveal">הפריסה</p>
+    <h2 class="reveal">מי שמריץ את זה הוא בוט</h2>
     <div class="rule reveal"></div>
-    <p class="lede reveal">כל שירות מדווח על עצמו. כשמשהו חורג, המערכת מתריעה לבד.</p>
-    <div class="slot reveal">
-      <svg viewBox="0 0 24 24"><path d="M3 17l5-6 4 4 6-9 3 4"></path></svg>
-      <span class="s-label" dir="ltr">DIAGRAM</span>
-      <span class="s-note">architecture.drawio, עמוד 6</span>
+    <p class="lede reveal">כל השירותים בשרת מסונכרנים אוטומטית לקוד. אף אדם לא נגע בהם.</p>
+    <!-- Same file twice, on purpose, and as two SIBLINGS rather than nested
+         in a wrapper: .main is the flex column that .slot's max-height:100%
+         is written against, and putting the slot one level deeper collapsed
+         it to a third of its size. The band is the evidence, cut out so it
+         stays readable; the tree below is texture -- at the size a sheet can
+         give it, it says "a lot of services, all healthy" and nothing more,
+         which is exactly its job here. -->
+    <div class="win argo-sync reveal" role="img" aria-label="ארגו סי-די: מסונכרן לקומיט, סנכרון אוטומטי פעיל, והמסנכרן הוא בוט ה-CI"></div>
+    <div class="slot filled argo-shot reveal">
+      <img src="presentation-assets/screenshot/base_argo.png" alt="מסך ארגו סי-די: כל שירותי SwarmOps תקינים ומסונכרנים">
+      <!-- Kept to two words: the frame here is small, and .s-note's 55% cap
+           wraps anything longer into a two-line block sitting over the tree. -->
+      <span class="s-note" dir="ltr">Argo CD</span>
     </div>
   </div>
 </section>
 
 
 <!-- ==========================================================================
-     18 · ההגנה
+     18 · הפריסה (the swap itself)
+     Two frames of the same Argo pod view, ~30 seconds apart: both frontend
+     pods up, then only the new one. Stacked rather than side by side because
+     the sources are banners (6:1 and 9.5:1) -- as a two-up they would each be
+     about a centimetre tall on a projector.
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">18</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">הפריסה</p>
+    <h2 class="reveal">גרסה חדשה נכנסת, ואיש לא מרגיש</h2>
+    <div class="rule reveal"></div>
+    <p class="lede reveal">הישן ממשיך לרוץ עד שהחדש מוכן. רק אז הוא נעלם.</p>
+    <!-- Captions sit BELOW these two rather than as the usual .s-note corner
+         badge: on a 6:1 banner there is no empty corner to put a badge in,
+         and overlaid it lands squarely on the pods it is describing. -->
+    <div class="pod-stack reveal">
+      <div class="crop">
+        <div class="slot filled pod-strip-a">
+          <img src="presentation-assets/screenshot/forntend_argo_blue-green.png" alt="שני עותקים של הממשק רצים במקביל, הישן והחדש">
+        </div>
+        <span class="c-cap">הישן והחדש רצים יחד</span>
+      </div>
+      <div class="crop">
+        <div class="slot filled pod-strip-b">
+          <img src="presentation-assets/screenshot/frontend_argo_green.png" alt="עותק אחד של הממשק, החדש בלבד">
+        </div>
+        <span class="c-cap">נשאר רק החדש</span>
+      </div>
+    </div>
+    <p class="note reveal">אפס זמן השבתה — המשתמש לא רואה שום הפסקה.</p>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     19 · הפריסה (canary)
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">19</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">הפריסה</p>
+    <h2 class="reveal">קודם ל-20%, ורק אז לכולם</h2>
+    <div class="rule reveal"></div>
+    <p class="lede reveal">הגרסה החדשה של שירות התכנון נחשפת בשלבים, עם בדיקה אוטומטית ביניהם.</p>
+    <div class="win canary-steps reveal" role="img" aria-label="השקה מדורגת: 20 אחוז, בדיקה, 50 אחוז, בדיקה, 100 אחוז"></div>
+    <p class="note reveal">אם הבדיקה מזהה חריגה, הפריסה נעצרת וחוזרת אחורה לבד.</p>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     20 · הפריסה (mid-rollout vs. finished)
+     DOM order is the chronology: this is an RTL grid, so the FIRST child
+     lands on the right, which is where a Hebrew reader starts. Swapping these
+     two would run the story backwards on screen.
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">20</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">הפריסה</p>
+    <h2 class="reveal">שתי גרסאות, ואז אחת</h2>
+    <div class="rule reveal"></div>
+    <p class="lede reveal">באמצע ההשקה שתי הגרסאות חיות במקביל. בסיום, הישנה מתפנה.</p>
+    <div class="slots canary reveal">
+      <div class="slot filled">
+        <!-- %20, not a raw space: the filename really is "canary in
+             progress2.png". Left un-renamed so the asset folder still matches
+             what was handed over. -->
+        <img src="presentation-assets/screenshot/canary%20in%20progress2.png" alt="באמצע ההשקה: הגרסה החדשה והישנה רצות יחד">
+        <span class="s-note">באמצע ההשקה — ישן וחדש יחד</span>
+      </div>
+      <div class="slot filled">
+        <img src="presentation-assets/screenshot/canary_final.png" alt="בסיום ההשקה: הגרסה הישנה ירדה לגמרי">
+        <span class="s-note">בסיום — הישן ירד</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     21 · ניטור
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">21</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">ניטור</p>
+    <h2 class="reveal">לדעת לפני שמישהו מתלונן</h2>
+    <div class="rule reveal"></div>
+    <p class="lede reveal">כל שירות מדווח על עצמו. כשמשהו חורג, המערכת מתריעה לבד.</p>
+    <div class="slot filled wide-shot reveal">
+      <img src="presentation-assets/screenshot/grafana_dashboard.png" alt="לוח מחוונים של גרפנה עם מדדי המערכת">
+      <span class="s-note">Grafana · לוח המחוונים של SwarmOps</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     22 · ניטור (zoom)
+     Sheet 21 shows the whole dashboard, which reads as scale but not as
+     information -- nothing on it is legible past the front row. These three
+     tiles are crops of that same file, chosen for the panels that survive
+     being shrunk: two big numerals, a collapsing spike, and one curve.
+     Crop geometry lives in the GRAFANA CROPS stylesheet block.
+     ========================================================================== -->
+<section class="slide">
+  <div class="head">
+    <span class="num">22</span>
+    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
+  </div>
+  <div class="main">
+    <p class="kicker reveal">ניטור</p>
+    <h2 class="reveal">מה בעצם נמדד</h2>
+    <div class="rule reveal"></div>
+    <p class="lede reveal">לא רק אם המערכת חיה, אלא כמה בקשות, כמה כשלונות, וכמה זמן לוקח לחשב תוכנית.</p>
+    <div class="crops reveal">
+      <div class="crop">
+        <div class="win c1" role="img" aria-label="עשרה מתוך שנים עשר רכיבים מדווחים כחיים"></div>
+        <span class="c-cap">כמה שירותים חיים כרגע</span>
+      </div>
+      <div class="crop">
+        <div class="win c2" role="img" aria-label="גרף אתחולים חוזרים של רכיבים, יורד לאפס"></div>
+        <span class="c-cap">אתחולים חוזרים של רכיבים</span>
+      </div>
+      <div class="crop">
+        <div class="win c3" role="img" aria-label="גרף זמן חישוב התוכנית, במילישניות"></div>
+        <span class="c-cap">זמן חישוב התוכנית</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     23 · ההגנה
      Defence in depth, drawn as literal nested walls rather than a flow: the
      point is that passing one layer gets you nothing, which a left-to-right
-     arrow chain would actually contradict. Pairs with sheet 19, which owns
+     arrow chain would actually contradict. Pairs with sheet 24, which owns
      what is still open. Every claim here is real: private subnets with only
      the gateway exposed (plan.md), JWT verified independently by each
      service including planning-service (verify_jwt.py), and OIDC-only AWS
@@ -1171,7 +1456,7 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">18</span>
+    <span class="num">23</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
@@ -1218,13 +1503,13 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
 
 
 <!-- ==========================================================================
-     19 · אבטחה
+     24 · אבטחה
      The TBD row is deliberately left open rather than answered: real
      regulatory claims about military use are not something to invent.
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">19</span>
+    <span class="num">24</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
@@ -1242,11 +1527,11 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
 
 
 <!-- ==========================================================================
-     20 · מה למדנו
+     25 · מה למדנו
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">20</span>
+    <span class="num">25</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
@@ -1272,11 +1557,11 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
 
 
 <!-- ==========================================================================
-     21 · סיום
+     26 · סיום
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">21</span>
+    <span class="num">26</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">

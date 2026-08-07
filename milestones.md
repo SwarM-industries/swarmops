@@ -781,3 +781,32 @@ tzinfo on a round trip) — `reconcile_loop`'s own try/except silently swallowed
 the trailing `run_solve()` call never ran. Fixed; see `swarmops-planning-service/STATUS.md` for
 detail. M10 item 4's "full dry run" now has a repeatable, scripted way to actually re-run — all
 three scenarios confirmed live, individually and back to back.
+
+**Update 2026-08-07 — monitoring/delivery screenshots wired in; deck 21 → 26 sheets, zero
+placeholders left. The live deck is now `pitch_v2.html`** — `pitch.html` is deliberately frozen
+at the pre-screenshot 21-sheet version as a backup, so present from and edit v2 from here on.
+Seven screenshots landed in `presentation-assets/screenshot/`
+(Grafana dashboard, Argo CD app tree, Argo Rollouts canary at three points, two frontend pod
+strips). All seven are now in the deck. New sheets 17–20 cover delivery (Argo CD synced by
+`swarmops-ci-bot`, the frontend pod swap, the canary step ladder, mid-rollout vs. finished);
+sheet 21 fills the last dashed slot with the real Grafana dashboard and sheet 22 zooms into three
+of its panels. Old sheets 17–21 renumbered to 21–26 (`.num` badges are hardcoded in markup).
+
+Two things worth knowing before touching this deck again:
+
+- **Screenshots of dashboards do not survive being shrunk to fit a sheet.** The Grafana shot
+  (3440x1319), the Argo tree and the canary view are all illegible at the size a sheet can give
+  them. The fix used throughout is a CSS *background crop* of the same file — `background-size` /
+  `background-position` maths documented in the `SCREENSHOT CROPS` stylesheet block, with the
+  source rect in a comment above each rule. No cropped copies of the images exist on disk, so
+  re-framing one is a number change, not a re-export.
+- **A background crop has no intrinsic size.** `width:auto; max-height:100%` — the pattern every
+  `.slot` uses, because the `<img>` inside gives it something to shrink-to-fit around — collapses
+  a `.win` to zero. Crops must be driven from a definite width *or* a definite height
+  (`.win.canary-steps` uses `height:min(43vh,495px)`). Likewise `.slot`'s base `aspect-ratio:16/9`
+  has to be explicitly reset, not just overridden, or flex-shrink resolves the conflict by
+  inventing a height that matches no image.
+
+`PITCH_ASSETS_TODO.md` rewritten — the only asset still outstanding is the optional
+behind-the-scenes clip. All seven screenshots are committed alongside `pitch_v2.html` in the same
+commit, so nothing here depends on an untracked file.
