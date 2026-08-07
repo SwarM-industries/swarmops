@@ -361,11 +361,19 @@ ul.points li.st::before{ display:none; }
    The shared four declarations are hoisted below so only the ratio and the
    width cap differ per shot. */
 .slot.map-shot{     max-width:min(720px,100%);  aspect-ratio:720/718;   }
-.slot.argo-shot{    max-width:min(1120px,100%); aspect-ratio:2028/1263; }
+.slot.argo-shot{    max-width:min(1500px,100%); aspect-ratio:2028/1263; }
 .slot.canary-shot{  max-width:min(880px,100%);  aspect-ratio:1363/1038; }
-.slot.wide-shot{    max-width:min(1500px,100%); aspect-ratio:3440/1319; }
-.slot.map-shot, .slot.argo-shot, .slot.canary-shot, .slot.wide-shot{
+.slot.map-shot, .slot.argo-shot, .slot.canary-shot{
     width:auto; height:auto; max-height:100%; min-height:0;
+}
+/* wide-shot's ratio is flat enough (2.6:1) that the width:auto/max-height:100%
+   dual-auto resolution above was leaving a visible gap down the sides on this
+   one shot specifically -- switched to the same height-driven pattern as
+   .win.canary-steps (a definite height, width derived from it) instead of
+   fighting that resolution further. */
+.slot.wide-shot{
+    height:min(44vh,560px); width:auto; max-width:100%; flex:none;
+    aspect-ratio:3440/1319;
 }
 /* The two frontend pod strips are near-banners (6:1 and 9.5:1) and carry no
    aspect-ratio at all -- the image sets the height and the frame hugs it.
@@ -376,7 +384,7 @@ ul.points li.st::before{ display:none; }
    being measured. Same width on both so their edges line up when stacked,
    even though one ends up noticeably shorter than the other. */
 .slot.pod-strip-a, .slot.pod-strip-b{
-    width:100%; height:auto;
+    width:100%; max-width:none; height:auto;
     /* Both resets are load-bearing. Without aspect-ratio:auto the base
        .slot's 16/9 still applies and each frame asks for ~480px of height;
        without flex:none the column then shrinks that back down to whatever
@@ -387,9 +395,13 @@ ul.points li.st::before{ display:none; }
 .slot.pod-strip-a img, .slot.pod-strip-b img{ height:auto; }
 /* The canary before/after pair sits in a .slots grid, which otherwise hands
    its children the default 16/9. Both sources are ~1.30 (935x723 and
-   941x712); the 2% difference between them is small enough that
-   object-fit:contain absorbs it without a visible bar. */
-.slots.canary .slot{ aspect-ratio:935/723; }
+   941x712) but NOT identical -- a shared approximate ratio here let
+   object-fit:contain letterbox a visible white bar top and bottom of
+   whichever image didn't match exactly, so each gets its own true ratio
+   instead. DOM order: first child (canary in progress2.png) then second
+   (canary_final.png). */
+.slots.canary .slot:nth-child(1){ aspect-ratio:935/723; }
+.slots.canary .slot:nth-child(2){ aspect-ratio:941/712; }
 /* Two banner strips stacked as one unit -- a plain column, since neither the
    .slots grid (equal columns) nor .strip (square tiles) describes this. */
 .pod-stack{
@@ -432,7 +444,6 @@ ul.points li.st::before{ display:none; }
     background-repeat:no-repeat;
 }
 .win.c1, .win.c2, .win.c3{ background-image:url(presentation-assets/screenshot/grafana_dashboard.png); }
-.win.argo-sync{            background-image:url(presentation-assets/screenshot/base_argo.png); }
 .win.canary-steps{         background-image:url(presentation-assets/screenshot/canary_in_progress3.png); }
 
 /* The left two-fifths of canary_in_progress3.png (1363x1038): the step
@@ -456,18 +467,6 @@ ul.points li.st::before{ display:none; }
        43vh is what is actually left under this sheet's four lines of type. */
     height:min(43vh,495px); width:auto; max-width:100%; flex:none;
     aspect-ratio:845/495; background-size:161.302% 209.697%; background-position:0% 0%;
-}
-
-/* The Argo sync header, cut out of base_argo.png (2028x1263) and shown at
-   roughly 1:1, because this band is the whole argument of its sheet: synced
-   to a commit, auto-sync on, and an author line reading swarmops-ci-bot. At
-   the scale the full tree has to be drawn at, none of that is readable.
-   The right edge is set at 1425 rather than at the card's own border so the
-   longest line on it -- the GMT timestamp -- clears with room to spare; an
-   earlier 1330 sliced it mid-word.            rect 265,115 1160x135 */
-.win.argo-sync{
-    max-width:min(1150px,100%);
-    aspect-ratio:1160/135; background-size:174.828% 935.556%; background-position:30.530% 10.195%;
 }
 
 .crops{
@@ -697,7 +696,6 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
         </figcaption>
       </figure>
     </div>
-    <p class="note reveal">שלושתנו שירתנו בתפקיד קרבי, כל אחד בתפקיד אחר.</p>
   </div>
 </section>
 
@@ -1273,17 +1271,12 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
   </div>
   <div class="main">
     <p class="kicker reveal">הפריסה</p>
-    <h2 class="reveal">מי שמריץ את זה הוא בוט</h2>
+    <h2 class="reveal">מי שמריץ את זה הוא "בוט"</h2>
     <div class="rule reveal"></div>
-    <p class="lede reveal">כל השירותים בשרת מסונכרנים אוטומטית לקוד. אף אדם לא נגע בהם.</p>
-    <!-- Same file twice, on purpose, and as two SIBLINGS rather than nested
-         in a wrapper: .main is the flex column that .slot's max-height:100%
-         is written against, and putting the slot one level deeper collapsed
-         it to a third of its size. The band is the evidence, cut out so it
-         stays readable; the tree below is texture -- at the size a sheet can
-         give it, it says "a lot of services, all healthy" and nothing more,
-         which is exactly its job here. -->
-    <div class="win argo-sync reveal" role="img" aria-label="ארגו סי-די: מסונכרן לקומיט, סנכרון אוטומטי פעיל, והמסנכרן הוא בוט ה-CI"></div>
+    <p class="lede reveal">כל השירותים בשרת מסונכרנים אוטומטית לקוד. אף אדם לא משנה אותם ידנית.</p>
+    <!-- The cropped status band was dropped: one full screenshot, given the
+         whole sheet, reads better than a legible band fighting a small tree
+         for room. -->
     <div class="slot filled argo-shot reveal">
       <img src="presentation-assets/screenshot/base_argo.png" alt="מסך ארגו סי-די: כל שירותי SwarmOps תקינים ומסונכרנים">
       <!-- Kept to two words: the frame here is small, and .s-note's 55% cap
@@ -1310,7 +1303,7 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
     <p class="kicker reveal">הפריסה</p>
     <h2 class="reveal">גרסה חדשה נכנסת, ואיש לא מרגיש</h2>
     <div class="rule reveal"></div>
-    <p class="lede reveal">הישן ממשיך לרוץ עד שהחדש מוכן. רק אז הוא נעלם.</p>
+    <p class="lede reveal" style="max-width:none">הגרסה הישנה ממשיכה לרוץ עד שהחדשה מוכנה.<br>רק אז הישנה נעלמת.</p>
     <!-- Captions sit BELOW these two rather than as the usual .s-note corner
          badge: on a 6:1 banner there is no empty corner to put a badge in,
          and overlaid it lands squarely on the pods it is describing. -->
@@ -1319,16 +1312,15 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
         <div class="slot filled pod-strip-a">
           <img src="presentation-assets/screenshot/forntend_argo_blue-green.png" alt="שני עותקים של הממשק רצים במקביל, הישן והחדש">
         </div>
-        <span class="c-cap">הישן והחדש רצים יחד</span>
+        <span class="c-cap">הישנה והחדשה רצות יחד</span>
       </div>
       <div class="crop">
         <div class="slot filled pod-strip-b">
           <img src="presentation-assets/screenshot/frontend_argo_green.png" alt="עותק אחד של הממשק, החדש בלבד">
         </div>
-        <span class="c-cap">נשאר רק החדש</span>
+        <span class="c-cap">נשארה רק החדשה</span>
       </div>
     </div>
-    <p class="note reveal">אפס זמן השבתה — המשתמש לא רואה שום הפסקה.</p>
   </div>
 </section>
 
@@ -1345,9 +1337,9 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
     <p class="kicker reveal">הפריסה</p>
     <h2 class="reveal">קודם ל-20%, ורק אז לכולם</h2>
     <div class="rule reveal"></div>
-    <p class="lede reveal">הגרסה החדשה של שירות התכנון נחשפת בשלבים, עם בדיקה אוטומטית ביניהם.</p>
+    <p class="lede reveal" style="max-width:none">הגרסה החדשה עולה בשלבים,<br>עם בדיקה אוטומטית בין כל שלב.</p>
     <div class="win canary-steps reveal" role="img" aria-label="השקה מדורגת: 20 אחוז, בדיקה, 50 אחוז, בדיקה, 100 אחוז"></div>
-    <p class="note reveal">אם הבדיקה מזהה חריגה, הפריסה נעצרת וחוזרת אחורה לבד.</p>
+    <p class="note reveal">אם הבדיקה מזהה חריגה, הפריסה נעצרת וחוזרת למצב הקודם אוטומטית.</p>
   </div>
 </section>
 
@@ -1367,18 +1359,18 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
     <p class="kicker reveal">הפריסה</p>
     <h2 class="reveal">שתי גרסאות, ואז אחת</h2>
     <div class="rule reveal"></div>
-    <p class="lede reveal">באמצע ההשקה שתי הגרסאות חיות במקביל. בסיום, הישנה מתפנה.</p>
+    <p class="lede reveal">באמצע ההשקה שתי הגרסאות חיות במקביל. בסיום, הישנה נעלמת.</p>
     <div class="slots canary reveal">
       <div class="slot filled">
         <!-- %20, not a raw space: the filename really is "canary in
              progress2.png". Left un-renamed so the asset folder still matches
              what was handed over. -->
         <img src="presentation-assets/screenshot/canary%20in%20progress2.png" alt="באמצע ההשקה: הגרסה החדשה והישנה רצות יחד">
-        <span class="s-note">באמצע ההשקה — ישן וחדש יחד</span>
+        <span class="s-note">באמצע ההשקה · ישן וחדש יחד</span>
       </div>
       <div class="slot filled">
         <img src="presentation-assets/screenshot/canary_final.png" alt="בסיום ההשקה: הגרסה הישנה ירדה לגמרי">
-        <span class="s-note">בסיום — הישן ירד</span>
+        <span class="s-note">בסיום · הישן ירד</span>
       </div>
     </div>
   </div>
@@ -1397,7 +1389,7 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
     <p class="kicker reveal">ניטור</p>
     <h2 class="reveal">לדעת לפני שמישהו מתלונן</h2>
     <div class="rule reveal"></div>
-    <p class="lede reveal">כל שירות מדווח על עצמו. כשמשהו חורג, המערכת מתריעה לבד.</p>
+    <p class="lede reveal" style="max-width:none">כל שירות הוא מנוטר.<br>כשמשהו חורג, מערכת הניטור מתריעה לבד.</p>
     <div class="slot filled wide-shot reveal">
       <img src="presentation-assets/screenshot/grafana_dashboard.png" alt="לוח מחוונים של גרפנה עם מדדי המערכת">
       <span class="s-note">Grafana · לוח המחוונים של SwarmOps</span>
@@ -1423,7 +1415,7 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
     <p class="kicker reveal">ניטור</p>
     <h2 class="reveal">מה בעצם נמדד</h2>
     <div class="rule reveal"></div>
-    <p class="lede reveal">לא רק אם המערכת חיה, אלא כמה בקשות, כמה כשלונות, וכמה זמן לוקח לחשב תוכנית.</p>
+    <p class="lede reveal" style="max-width:none">לא רק אם המערכת חיה, אלא כמה בקשות,<br>כמה כשלונות, וכמה זמן לוקח לחשב תוכנית טיסה.</p>
     <div class="crops reveal">
       <div class="crop">
         <div class="win c1" role="img" aria-label="עשרה מתוך שנים עשר רכיבים מדווחים כחיים"></div>
@@ -1485,7 +1477,7 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
       </div>
       <div class="card risk">
         <span class="h">השקט הוא הסכנה</span>
-        <span class="d">כשמשהו קורס, מיד יודעים. כשמשהו טועה בשקט, מגלים מאוחר מדי, לכן חשוב לוודא שאנחנו בודקים את הקוד ולא "לדחוף" לפני בדיקה.</span>
+        <span class="d">כשמשהו קורס, מיד יודעים. כשמשהו מתקלקל בשקט, מגלים מאוחר מדי, לכן חשוב לוודא שאנחנו בודקים את הקוד ולא "לדחוף" לפני בדיקה.</span>
       </div>
       <div class="card">
         <span class="h">ניהול גרסאות בצוות</span>
