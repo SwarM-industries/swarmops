@@ -1443,73 +1443,13 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
 
 
 <!-- ==========================================================================
-     23 · ההגנה
-     Defence in depth, drawn as literal nested walls rather than a flow: the
-     point is that passing one layer gets you nothing, which a left-to-right
-     arrow chain would actually contradict. Pairs with sheet 24, which owns
-     what is still open. Every claim here is real: private subnets with only
-     the gateway exposed (plan.md), JWT verified independently by each
-     service including planning-service (verify_jwt.py), and OIDC-only AWS
-     auth with no static keys committed anywhere. The plaintext shared
-     secrets in values.yaml are a known gap and are NOT claimed as solved on
-     this sheet; do not add a row implying secrets management is handled.
-     ========================================================================== -->
-<section class="slide">
-  <div class="head">
-    <span class="num">23</span>
-    <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
-  </div>
-  <div class="main">
-    <p class="kicker reveal">אבטחה</p>
-    <h2 class="reveal">איך המערכת מוגנת</h2>
-    <div class="rule reveal"></div>
-    <p class="lede reveal">שלוש שכבות, אחת בתוך השנייה. מי שעבר את החיצונית עדיין רחוק מהמידע.</p>
-    <div class="figure reveal">
-      <svg viewBox="0 0 700 250" role="img" aria-label="שלוש שכבות הגנה מקוננות: רשת סגורה עם שער אחד, כל פנייה חייבת להזדהות, ובמרכז המידע">
-        <defs>
-          <marker id="a18" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-            <path d="M0 0 L10 5 L0 10 z" fill="#111110"></path>
-          </marker>
-        </defs>
-
-        <!-- Traffic arrives from the right, which is "from outside" in an RTL
-             reading order, and stops short of the outer wall. The arrowhead
-             scales with stroke-width, so the path ends at 612 rather than at
-             the wall's 600, or the head would sit on top of the border. -->
-        <g class="node n1">
-          <text class="t-sm" x="652" y="112" text-anchor="middle">מבחוץ</text>
-          <path class="wire" d="M666 125 H612" marker-end="url(#a18)"></path>
-        </g>
-
-        <g class="node n2">
-          <rect class="box" x="40" y="6" width="560" height="238"></rect>
-          <text x="320" y="37" text-anchor="middle">רשת סגורה, שער אחד</text>
-        </g>
-
-        <g class="node n3">
-          <rect class="box" x="100" y="52" width="440" height="146"></rect>
-          <text x="320" y="80" text-anchor="middle">כל פנייה חייבת להזדהות</text>
-        </g>
-
-        <g class="node n4">
-          <rect class="box-hot" x="175" y="92" width="290" height="66"></rect>
-          <text class="t-out" x="320" y="134" text-anchor="middle">המידע</text>
-        </g>
-      </svg>
-    </div>
-    <p class="note reveal">כל שירות בודק בעצמו מי פונה אליו, ולא סומך על השכן. גם אנחנו נכנסים לענן בהרשאה זמנית, בלי סיסמאות שמורות.</p>
-  </div>
-</section>
-
-
-<!-- ==========================================================================
-     24 · אבטחה
+     23 · אבטחה
      The TBD row is deliberately left open rather than answered: real
      regulatory claims about military use are not something to invent.
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">24</span>
+    <span class="num">23</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
@@ -1527,11 +1467,11 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
 
 
 <!-- ==========================================================================
-     25 · מה למדנו
+     24 · מה למדנו
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">25</span>
+    <span class="num">23</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
@@ -1557,11 +1497,11 @@ body.editing .figure text{ outline:1px dashed var(--accent); outline-offset:2px;
 
 
 <!-- ==========================================================================
-     26 · סיום
+     25 · סיום
      ========================================================================== -->
 <section class="slide">
   <div class="head">
-    <span class="num">26</span>
+    <span class="num">23</span>
     <span class="mark"><img src="presentation-assets/logo-mark.png" alt="">SwarmOps</span>
   </div>
   <div class="main">
