@@ -2,6 +2,19 @@
 
 ## Expose Grafana + Argo CD without port-forward
 
+> **Grafana half: BUILT 2026-08-08.** Live at `https://swarmops.harelvalfish.dev/grafana/`.
+> Gateway route + basic auth in `swarmops-gateway/nginx.conf`; `serve_from_sub_path`/`root_url`
+> in `swarmops-deployments/helm/observability/kube-prometheus-stack/values.yaml` (Grafana is
+> unusable under a subpath without both — the sketch below omits that); htpasswd Secret mounted
+> via new optional `volumes`/`volumeMounts` support in the shared service template. The Secret
+> itself is created out-of-band and stays out of the repo. See `OBSERVABILITY_ACCESS.md`.
+>
+> **Argo CD half: NOT built.** It's more than a proxy_pass. `argocd-server` serves TLS by default
+> and has no `server.insecure`/`rootpath`/`basehref` set, so a subpath route needs all three
+> changed — and they live in a `helm_release` in `swarmops-infrastructure/infra/cluster/argocd.tf`,
+> meaning a `terraform apply` against the controller that reconciles the whole cluster. Worth
+> doing deliberately, not as a footnote to a gateway change.
+
 Simplest approach: reuse existing NGINX gateway, add path routes, protect with basic auth.
 No new ALB, no new public Ingress — keeps single external surface (per plan.md:191-192 lock:
 "Ingress/ALB in front of gateway is the only externally reachable thing").
