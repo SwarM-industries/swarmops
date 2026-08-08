@@ -2,11 +2,12 @@
 
 Final checklist from the capstone brief. Check off before demo.
 
-**Synced against `milestones.md` + each repo's `STATUS.md` (Guy, 2026-07-29)** — this file had
-never been updated since it was first written; every box was still unchecked regardless of real
-progress. Checked boxes below are things confirmed done and verified live, not just "code
-exists." Where something is written/ready but not yet actually running, it stays unchecked with
-a note explaining exactly what's blocking it — a checklist that just says "not done" with no
+**Re-synced 2026-08-08 (Tony, via Claude) against `milestones.md` + `resources.md`** — the
+2026-07-29 sync below went stale fast: M8 and M9 both hit real "DONE, verified live" milestones
+on 2026-08-01, and `resources.md` (a live `kubectl`/`aws` snapshot taken 2026-08-07) confirms most
+of it still holds. Checked boxes below are things confirmed done and verified live, not just
+"code exists." Where something is written/ready but not yet actually running, it stays unchecked
+with a note explaining exactly what's blocking it — a checklist that just says "not done" with no
 context isn't more honest, just less useful.
 
 ## Repo & team setup
@@ -43,10 +44,11 @@ context isn't more honest, just less useful.
       fact; leaving unchecked rather than assuming.
 
 **Note:** `swarmops-infrastructure` split into `infra/persistent` (ECR + OIDC role,
-`prevent_destroy`'d, never torn down) and `infra/cluster` (VPC/EKS, destroy freely) after a
-cost-saving cluster teardown once took ECR down with it. `infra/cluster` **is currently destroyed**
-(cost discipline between work sessions) — needs a fresh `apply` before anything below that depends
-on a live cluster is actually reachable, regardless of what's checked above.
+`prevent_destroy`'d, never torn down) and `infra/cluster` (VPC/EKS, destroy freely). `infra/cluster`
+**was live and ACTIVE as of the 2026-08-07 `resources.md` snapshot** (EKS 1.34, 5 nodes, 62 pods) —
+a reversal of the 2026-07-29 "currently destroyed" state. Given the team's own cost discipline
+(destroy between sessions), re-confirm with `kubectl get nodes` before trusting anything below is
+actually reachable *right now* — don't assume the 08-07 snapshot still holds a day-plus later.
 
 ## Deploy to cloud
 - [x] Images tagged `<semver>-<7-char-hash>`, never `latest`
@@ -55,74 +57,80 @@ on a live cluster is actually reachable, regardless of what's checked above.
 - [x] Mongo on EBS-CSI-provisioned PVC (`gp3`, confirmed to survive a pod restart)
 - [x] AWS Load Balancer Controller + ALB/Ingress — only thing reachable from outside
 
-(M7, confirmed done 2026-07-28 — **but see the cloud infra note above**: `infra/cluster` is
-currently destroyed, so none of this is actually live/reachable *right now* even though it was
-built and verified. Re-verify reachability after the next `infra/cluster` apply, don't assume.)
+(M7, confirmed done 2026-07-28, and confirmed reachable again per the 2026-08-07 `resources.md`
+snapshot — same "re-verify before trusting" caveat as the cloud infra note above.)
 
 ## CI (GitHub Actions)
 - [x] One workflow per repo — all 9 service repos have `.github/workflows/ci.yml`
 - [x] PRs: lint/test/build only — never publish, never touch cluster
-- [ ] `main` push: version + OIDC auth (no static keys) + build + push to ECR — **the workflow
-      code for this exists and is merged in all 9 repos**, but doesn't actually work yet: every
-      run fails at the "Configure AWS credentials via OIDC" step
-      (`Not authorized to perform sts:AssumeRoleWithWebIdentity`). Terraform's recorded trust
-      policy looks correct; real AWS disagrees — needs Valfish to compare the live IAM role
-      against what's actually applied. Nothing has published to ECR for real through CI yet.
+- [x] `main` push: version + OIDC auth (no static keys) + build + push to ECR — **fixed**, no
+      longer failing at "Configure AWS credentials via OIDC." `resources.md` (2026-08-07) shows
+      real, distinct `<semver>-<7-char-hash>` tags deployed for all 9 services, which only happens
+      if CI actually published them — confirms this end-to-end, not just that the workflow file
+      is correct.
 
 ## GitOps (Argo CD)
-- [ ] Argo CD installed, own namespace, watching `swarmops-deployments` — not installed anywhere;
-      no live cluster to install it on right now.
-- [ ] `AppProject` (scoped repos/destinations) + top-level `Application` — **written and ready**
-      (`swarmops-deployments/argocd/`), not yet applied.
-- [ ] Auto sync + self-heal + prune on — can't verify, nothing installed yet.
+- [x] Argo CD installed, own namespace, watching `swarmops-deployments` — confirmed live,
+      `resources.md`: 7 pods in `argocd` namespace, 2026-08-07.
+- [x] `AppProject` + top-level `Application` — applied; 5 Argo CD Applications
+      (`swarmops`, `kube-prometheus-stack`, `loki-stack`, `argo-rollouts`, `external-dns`) all
+      `Synced`/`Healthy` per `resources.md`.
+- [x] Auto sync + self-heal + prune on — exercised, not just configured: M8's own exit criteria
+      ("delete a pod by hand → self-heal restores it; edit a live Deployment by hand → Argo CD
+      reverts drift") is recorded as met, `milestones.md`:287.
 - [x] Each service's CI edits only its own image file, via `yq` — verified by reading the
-      workflow code itself: every repo's `publish` job scopes its `yq` call to exactly its own
-      `environments/production/images/<service>.yaml`, never another service's file. True
-      regardless of the OIDC blocker above, since this is about what the code *would* do once it
-      runs, not whether it has run successfully yet.
-- [ ] Only a scoped bot identity can bypass `swarmops-deployments` branch protection — resolved
-      differently than planned: a fine-grained PAT (Contents: Read/write, scoped to just this
-      repo) from an existing account, not a separate GitHub App identity. Meets the scoping
-      *goal* (one repo, one permission, not a broad personal token) but image-bump commits show
-      as that person's account, not a distinct bot — a deliberate, documented simplification, not
-      an oversight.
-- [ ] Verified: drift correction, prune, rollback via Git revert — not testable without a live
-      Argo CD install.
+      workflow code, and now also by the real distinct tags in `resources.md` matching what each
+      service's own CI would have written.
+- [ ] Only a scoped bot identity can bypass `swarmops-deployments` branch protection — still
+      resolved differently than planned: a fine-grained PAT (Contents: Read/write, scoped to just
+      this repo) from an existing account, not a separate GitHub App identity. Meets the scoping
+      *goal* but image-bump commits show as that person's account, not a distinct bot — a
+      deliberate, documented simplification, unchanged since 2026-07-29.
+- [x] Verified: drift correction, prune, rollback via Git revert — same M8 exit-criteria evidence
+      as the self-heal box above.
 
 ## Observability
-- [ ] kube-prometheus-stack + Loki/Alloy, each its own Argo CD Application — **not started at
-      all** (confirmed by grepping every repo — zero implementation, only planning-doc mentions).
-      Can't start in earnest before Argo CD itself is real (M8).
-- [ ] Every service exposes `/metrics` (no PII/IDs in labels), has a `ServiceMonitor` — the
-      `/metrics` half is done on all 7 services, confirmed live; the `ServiceMonitor` half doesn't
-      exist yet (blocked on kube-prometheus-stack above). Leaving the box unchecked since it's a
-      two-part requirement and only one part is real.
+- [x] kube-prometheus-stack + Loki/Alloy, each its own Argo CD Application — both live and
+      `Synced`/`Healthy` per `resources.md` (2026-08-07); 16 pods in the `monitoring` namespace.
+- [ ] Every service exposes `/metrics` (no PII/IDs in labels), has a `ServiceMonitor` — `/metrics`
+      confirmed live on all 7 services. `ServiceMonitor` is templated and merged
+      (`templates/servicemonitor.yaml`), but `frontend`/`gateway` actually exposing `/metrics` is
+      still explicitly unconfirmed (`milestones.md`:309, gateway is plain NGINX) — leaving
+      unchecked until that's checked, not because the mechanism is missing.
 - [x] Structured JSON logs, no secrets/PII — done on all 7 services, confirmed live.
-- [ ] One Grafana dashboard — not started, no Grafana installed.
-- [ ] Alerts — not started, no Alertmanager installed.
+- [x] One Grafana dashboard — "SwarmOps Overview" (cluster/pod health, request/error
+      rate/latency, planning-service's 3 algorithm metrics) is live with real data, not just
+      merged — the pitch deck's sheets 21-22 (`milestones.md`:785-793) are screenshots of it
+      actually rendering.
+- [ ] Alerts — `PrometheusRule` (service down, replicas unavailable, crash-looping, high error
+      rate) is merged and deployed, but "an alert fires on demand" hasn't been explicitly
+      exercised/confirmed anywhere in `milestones.md` — leaving unchecked until someone actually
+      triggers one (e.g. scale a deployment to 0) and watches it fire.
 
 ## Required extension
-- [ ] Argo Rollouts canary on `planning-service` — installed, working, rehearsed (ship a bad
-      build, watch it roll back) — **`Rollout` + `AnalysisTemplate` written 2026-07-29**
-      (`swarmops-deployments/helm/swarmops/templates/planning-service-{rollout,analysistemplate}.yaml`),
-      basic canary (20% → analysis-gated hold → 50% → hold → 100%), planning-service already
-      excluded from the plain-Deployment loop. Not installed or rehearsed yet — needs a live
-      cluster (destroyed right now) and the OIDC fix above (so a real build can even reach ECR)
-      first. The `AnalysisTemplate`'s Prometheus address and metric-label scoping are both
-      best-guesses flagged inline in that file, to confirm once kube-prometheus-stack actually
-      exists.
+- [x] Argo Rollouts canary on `planning-service` — installed, working, **and rehearsed for real**:
+      `milestones.md`:229, 2026-08-01, "the canary rollback rehearsal passed for real against a
+      deliberately broken image." `resources.md` (2026-08-07) confirms the rollout is still live,
+      5/5 up-to-date. Runbook for re-running it: `swarmops-deployments/docs/canary-rollback-rehearsal.md`.
+      Worth re-running once more before the actual defense (cluster gets destroyed/rebuilt between
+      sessions; the rehearsal itself hasn't been repeated since 08-01, only re-confirmed as healthy).
 
 ## Demo day
 - [ ] Dev auth-bypass removed from frontend (real `auth-service` login only)
-- [ ] Every Argo CD Application shows `Synced` + `Healthy`
-- [ ] Traffic flows: ALB → gateway → services
-- [ ] Grafana dashboard shows live data, an alert fires on demand
-- [ ] Logs queryable through Loki
-- [ ] Canary rollback rehearsal works live
+- [x] Every Argo CD Application shows `Synced` + `Healthy` — true as of the 2026-08-07 snapshot,
+      re-verify same-day as demo.
+- [x] Traffic flows: ALB → gateway → services — confirmed reachable (Deploy to cloud section
+      above), SPA 504 that briefly broke this was root-caused and fixed live 2026-08-04
+      (`milestones.md`:473).
+- [x] Grafana dashboard shows live data — see Observability section above; **alert fires on
+      demand still unconfirmed**, keeping this box's second half honest.
+- [ ] Logs queryable through Loki — Loki is installed and healthy (Observability section), but no
+      entry in `milestones.md` confirms someone actually ran a query against it.
+- [x] Canary rollback rehearsal works live — see Required extension above (2026-08-01, real).
 - [ ] `terraform destroy` path confirmed (teardown after demo)
 
-(All correctly still open — none of these are meaningful to check until the items above they
-depend on are actually live, not just written.)
+(Most of this now genuinely testable — the remaining open boxes are things nobody has explicitly
+exercised yet, not things blocked on missing infra like the 2026-07-29 version of this section.)
 
 ## Talk-track ready (not extra work, just be able to answer)
 - [x] **Security** — Guy's services: see `TALK_TRACK_GUY.md` (2026-07-29)
