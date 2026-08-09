@@ -47,8 +47,13 @@ Slides 15–20 are not six separate diagrams. They are **six camera positions ov
 architecture world**, so moving between them is a continuous flight rather than a cut.
 
 - `_worldHTML(dense)` builds the world once per camera slide: account → region → VPC → two AZs →
-  five nodes → pods, plus the managed-services column, the RabbitMQ bus lane, and the
-  planning-service optimizer panel. World coordinate space is 4400×3100.
+  five nodes → pods, plus the managed-services column, the runtime-architecture graph, and the
+  planning-service optimizer panel. World coordinate space is 5500×3800.
+- The **runtime-architecture graph** (slide 19) is `architecture.drawio` diagram 2 rendered live:
+  the same 10 nodes and 13 edges, including MongoDB annotated per service rather than as its own
+  node. Boxes are absolutely placed inside the graph's own 3850×1000 space and the connector SVG
+  is drawn in that same coordinate space, so a wire cannot drift away from its box. If you move a
+  box, move its path — they are deliberately side by side in `_worldHTML` for that reason.
 - `_setupCamera()` holds the `CAM` map — one entry per slide, naming a **target** (`data-w="vpc"`,
   `data-w="bus"`, …), a **depth**, and padding. Nothing is hardcoded in pixels: on first build the
   engine measures every `[data-w]` box and derives scale + translation to frame it. Move a box in
@@ -57,14 +62,23 @@ architecture world**, so moving between them is a continuous flight rather than 
   layers at or below its own depth. Detail that does not exist at altitude — pod chips, queue
   names, optimizer stages — resolves in as you descend, with a blur-and-lift transition and a
   staggered delay so it arrives organically instead of popping.
-- `dim: true` (Data Plane, Optimizer) fades everything that is neither an ancestor nor a
-  descendant of the target, so the focus reads immediately.
+- `dim: true` (Runtime Architecture, Optimizer) fades everything that is neither an ancestor nor a
+  descendant of the target, so the focus reads immediately. Three CSS rules have to stay in this
+  order to work: `.lyr.on` → `.world .dimmed` → `.world .lyr:not(.on)`. That is the precedence
+  ladder *hidden beats dimmed beats revealed*; flip any two and either dimming silently stops
+  working or unrevealed layers leak in at 30%.
+- `oy` on a camera entry nudges the framing vertically — slide 19 uses it to sit the wide graph
+  above the caption instead of behind it.
 - Flight direction is automatic: entering a camera slide starts the world at the *previous* camera
   slide's transform, then transitions to its own. Backwards navigation flies back out.
 
-Depth ladder: `0` frames · `1` nodes, subnets, stores · `2` pods, queues, databases · `3` optimizer
-internals · `4` delivery pipeline (built, not yet used by any slide — it's ready for a future
-"Commit to Cluster" camera slide).
+Depth ladder: `0` frames · `1` nodes, subnets, stores · `2` pods, service graph, queues,
+databases · `3` optimizer internals · `4` delivery pipeline (built, not yet used by any slide —
+it's ready for a future "Commit to Cluster" camera slide).
+
+Slides 19 and 20 carry a title-only caption on purpose: the graph and the numbered optimizer
+stages *are* the content, and the clicks reveal those directly rather than a paragraph repeating
+them.
 
 ## Slide order — as built
 
@@ -92,7 +106,7 @@ Speaker · slide · click-steps · script timing.
 | 16 | Inside the Cluster 🎥 *camera: VPC, depth 1* | 3 | 30s |
 | 17 | Inside the Cluster · Dense 🎥 **VARIANT — pick one of 16/17** | 3 | 30s |
 | 18 | The Network 🎥 *camera: the edge* | 3 | 30s |
-| 19 | The Data Plane 🎥 **new** *camera: bus lane, depth 2* | 4 | ~30s |
+| 19 | Runtime Architecture 🎥 **new** *camera: service graph, depth 2* | 4 | ~30s |
 | 20 | The Optimizer 🎥 **new** *camera: planning internals, depth 3* | 5 | ~35s |
 | 21 | By the Numbers (stat wall) | 6 | 25s |
 | 22 | Commit to Cluster (GitOps pipeline) | 6 | 30s |
@@ -152,6 +166,11 @@ from the previous slide's flight, so hiding them would make them blink out and b
   32-slide deck, and the Hebrew text for The Data Plane and The Optimizer exists only in the
   deck's `data-speaker-notes`. Worth doing *after* the 16/17 decision, since that changes the
   numbering again.
+- **Is the frontend polling or WebSocket?** `architecture.drawio` contradicts itself: diagram 2
+  says *"alerts — polled (3s), no WebSocket"* and diagram 12 agrees, but diagram 3 says *"frontend
+  WebSocket push"* — and `CLAUDE.md`'s system shape says `HTTPS / WebSocket`. Slide 19 currently
+  says **polled every 3s** (the majority and the more specific claim). Confirm before presenting;
+  it's the kind of detail an instructor asks about.
 - **Timing.** The two new slides add roughly 60–65s to Tony's section. Something has to give
   against the 15-minute total — most likely trimming the Live Demo or Cost Engineering.
 - **Guy's field story (slide 04) is still a draft** — deck note is flagged
