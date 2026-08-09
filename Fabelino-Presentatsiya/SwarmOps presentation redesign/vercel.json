@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/SwarmOps%20Deck.dc.html" },
+    { "source": "/script", "destination": "/Speaker%20Script.dc.html" }
+  ]
+}
