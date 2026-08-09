@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>SwarmOps — Final Project 2026</title>
+<style>
+html,body{margin:0;padding:0;background:#f5f5f7}
+a{color:#1d1d1f;text-decoration:none}
+a:hover{color:#ff5f3c}
+.grad{background:linear-gradient(95deg,#ffb340,#ff5f3c 55%,#ff375f);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#ff5f3c}
+@keyframes sIn{from{opacity:0;transform:scale(.982)}to{opacity:1;transform:scale(1)}}
+@keyframes dIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes dZoom{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:scale(1)}}
+@keyframes dPop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+@keyframes dBar{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes dDeepZoom{from{opacity:0;transform:scale(.3)}60%{opacity:1}to{opacity:1;transform:scale(1)}}
+@media (prefers-reduced-motion:no-preference){
+[data-deck-active]{animation:sIn .7s cubic-bezier(.16,1,.3,1) both}
+[data-deck-active] .fx{animation:dIn .9s cubic-bezier(.16,1,.3,1) both}
+[data-deck-active] .fz{animation:dZoom 1.6s cubic-bezier(.16,1,.3,1) both}
+[data-deck-active] .fp{animation:dPop .7s cubic-bezier(.16,1,.3,1) both}
+[data-deck-active] .bar{animation:dBar 1.2s cubic-bezier(.16,1,.3,1) both;transform-origin:left center}
+[data-deck-active] .d1{animation-delay:.12s}
+[data-deck-active] .d2{animation-delay:.24s}
+[data-deck-active] .d3{animation-delay:.36s}
+[data-deck-active] .d4{animation-delay:.48s}
+[data-deck-active] .d5{animation-delay:.6s}
+[data-deck-active] .d6{animation-delay:.72s}
+[data-deck-active] .d7{animation-delay:.86s}
+[data-deck-active] .d8{animation-delay:1s}
+[data-deck-active][data-label="Cloud Footprint"] .d2{animation-delay:.3s}
+[data-deck-active][data-label="Cloud Footprint"] .d3{animation-delay:.9s}
+[data-deck-active][data-label="Cloud Footprint"] .d4{animation-delay:1.5s}
+[data-deck-active][data-label="Cloud Footprint"] .d5{animation-delay:2.1s}
+[data-deck-active][data-label="Cloud Footprint"] .d6{animation-delay:2.8s}
+[data-deck-active][data-label="Cloud Footprint"] .d7{animation-delay:3.5s}
+[data-deck-active][data-label="Inside the Cluster"]{animation:dDeepZoom 1.2s cubic-bezier(.16,1,.3,1) both}
+}
+.step-hidden{opacity:0 !important;animation:none !important}
+.step-live{animation-delay:0s !important}
+@media print{.fx,.fz,.fp,.bar{animation:none !important}.step-hidden{opacity:1 !important}}
+</style>
+</helmet>
+<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%" data-uneditable="">
+
+<section data-label="Title" data-speaker-notes="גיא פותח: בוקר טוב. אנחנו צוות SwarmOps: אני גיא, זה טוני, וזה הראל. בפרויקט הגמר בנינו את מה ששלושתנו היינו צריכים בצבא: מערכת אחת שמטיסה צי שלם של רחפנים, כדי שאנשים יוכלו להתרכז במשימה. בחמש־עשרה הדקות הקרובות: אני אראה את הבעיה ואת המערכת בפעולה, טוני ייקח אתכם לתוך הענן שהיא רצה עליו, והראל יראה איך היא נשארת חיה ומאובטחת." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;padding:90px 140px;text-align:center" data-om-slide-id="2ef252ec">
+  <img class="fx" src="assets/logo-mark.png" alt="SwarmOps logo" style="width:170px;height:auto">
+  <h1 class="fx d1" style="margin:0;font-size:150px;font-weight:700;letter-spacing:-0.03em;line-height:1">SwarmOps</h1>
+  <p class="fx d2" style="margin:0;font-size:40px;font-weight:400;color:#6e6e73">Centralized command and control for drone fleets</p>
+  <p class="fx d3" style="margin:24px 0 0;font-size:28px;font-weight:500;color:#6e6e73;letter-spacing:.04em">Guy&nbsp;&nbsp;·&nbsp;&nbsp;Tony&nbsp;&nbsp;·&nbsp;&nbsp;Harel&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;Final Project 2026</p>
+</section>
+
+<section data-label="The Team" data-speaker-notes="גיא: אז זה מי שאנחנו. טוני — צלף ומפעיל רחפנים, הוא הטיס אותם באמת. הראל — תותחן טנק, הוא יודע מה זה להילחם דרך מכשירים. ואני. לא המצאנו את הבעיה הזאת. חיינו אותה." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:60px;padding:90px 140px;text-align:center" data-om-slide-id="cb409727">
+  <div style="display:flex;flex-direction:column;gap:18px;align-items:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">THE TEAM</p>
+    <h2 class="fx d1" style="margin:0;font-size:84px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">Three soldiers, one problem</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,340px);gap:56px;justify-content:center">
+    <figure class="fp d2" style="margin:0;display:flex;flex-direction:column;gap:20px;align-items:center">
+      <img src="assets/guy.jpg" alt="Guy" style="width:340px;aspect-ratio:3/4;object-fit:cover;object-position:center 58%;border-radius:28px;filter:grayscale(1) contrast(1.05);box-shadow:0 16px 50px rgba(0,0,0,.14)">
+      <figcaption style="display:flex;flex-direction:column;gap:6px">
+        <span style="font-size:38px;font-weight:700">Guy</span>
+        <span style="font-size:26px;font-weight:400;color:#6e6e73">Combat medic · Search &amp; rescue</span>
+      </figcaption>
+    </figure>
+    <figure class="fp d3" style="margin:0;display:flex;flex-direction:column;gap:20px;align-items:center">
+      <img src="assets/tony.jpg" alt="Tony" style="width:340px;aspect-ratio:3/4;object-fit:cover;border-radius:28px;filter:grayscale(1) contrast(1.05);box-shadow:0 16px 50px rgba(0,0,0,.14)">
+      <figcaption style="display:flex;flex-direction:column;gap:6px">
+        <span style="font-size:38px;font-weight:700">Tony</span>
+        <span style="font-size:26px;font-weight:400;color:#6e6e73">Sniper · Drone operator</span>
+      </figcaption>
+    </figure>
+    <figure class="fp d4" style="margin:0;display:flex;flex-direction:column;gap:20px;align-items:center">
+      <img src="assets/harel.jpg" alt="Harel" style="width:340px;aspect-ratio:3/4;object-fit:cover;border-radius:28px;filter:grayscale(1) contrast(1.05);box-shadow:0 16px 50px rgba(0,0,0,.14)">
+      <figcaption style="display:flex;flex-direction:column;gap:6px">
+        <span style="font-size:38px;font-weight:700">Harel</span>
+        <span style="font-size:26px;font-weight:400;color:#6e6e73">Tank gunner</span>
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<section data-label="§ Guy" data-speaker-notes="גיא: מילה עליי קודם. הייתי חובש קרבי בחילוץ והצלה. מה שאני עומד לספר לכם הוא לא היפותטי. זה קרה." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;padding:90px 140px;text-align:center" data-om-slide-id="c01c2d98">
+  <img class="fp" src="assets/guy.jpg" alt="Guy" style="width:190px;height:190px;border-radius:50%;object-fit:cover;object-position:center 40%;filter:grayscale(1) contrast(1.05);box-shadow:0 12px 40px rgba(0,0,0,.15)">
+  <p class="fx d1" style="margin:0;font-size:28px;font-weight:600;letter-spacing:.2em;color:#6e6e73">GUY&nbsp;&nbsp;·&nbsp;&nbsp;COMBAT MEDIC, SEARCH &amp; RESCUE</p>
+  <h2 class="grad fx d2" style="margin:0;font-size:160px;font-weight:700;letter-spacing:-0.03em;line-height:1">The Mission</h2>
+  <p class="fx d3" style="margin:0;font-size:34px;font-weight:400;color:#6e6e73">The problem&nbsp;&nbsp;·&nbsp;&nbsp;The idea&nbsp;&nbsp;·&nbsp;&nbsp;Live demo</p>
+</section>
+
+<section data-label="From the Field" data-speaker-notes="גיא (להתאים לסיפור האמיתי): לילה אחד חיפשנו נעדר בשטח פתוח. היה לנו רחפן באוויר, מצלמה תרמית — הכלי המושלם. וכל הזמן הזה, חייל אחד עמד לידי ועשה דבר אחד בלבד: הטיס אותו. עיניים במסך, אצבעות על הסטיקים. כשהסוללה נגמרה, החיפוש פשוט נעצר. כולם עמדו בחושך וחיכו לעיניים. באותו לילה למדתי את הכלל שכל יחידת רחפנים מכירה בעל־פה: מפעיל אחד, רחפן אחד, בלי יוצאים מן הכלל. טוני נתקל באותו קיר כמפעיל רחפנים. הראל מתוך טנק. שלושה תפקידים, קיר אחד." style="background:#000;color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif" data-om-slide-id="a735b3b8">
+  <img class="fz" src="assets/drone1.jpeg" alt="Drone in the field" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+  <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.25) 40%,rgba(0,0,0,.82))"></div>
+  <div style="position:absolute;left:140px;right:140px;bottom:110px;display:flex;flex-direction:column;gap:24px;text-align:left">
+    <p class="fx d2" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff8a63">FROM THE FIELD</p>
+    <h2 class="fx d3" style="margin:0;font-size:80px;font-weight:700;letter-spacing:-0.015em;line-height:1.08;max-width:1300px">One operator. One drone. No exceptions.</h2>
+    <p class="fx d4" style="margin:0;font-size:34px;font-weight:400;color:rgba(245,245,247,.75);max-width:1000px">We each met that rule on duty, in three different jobs.</p>
+  </div>
+</section>
+
+<section data-label="The Problem" data-speaker-notes="גיא: זה לב העניין: להטיס רחפן אחד דורש את מלוא תשומת הלב של חייל. ▸ מחיר ראשון: כשחייל מטיס, הוא רובה מחוץ ללחימה. הצוות קטן באחד. ▸ שני: שני צוותים מטיסים שני רחפנים באותה גזרה, ואף אחד לא יודע על השני. ▸ שלישי: המפעיל הכי מיומן שלכם מוגבל לכלי טיס אחד בדיוק. תמיד." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:64px;padding:90px 140px;text-align:center" data-om-slide-id="0523e307">
+  <div style="display:flex;flex-direction:column;gap:18px;align-items:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">THE PROBLEM</p>
+    <h2 class="fx d1" style="margin:0;font-size:84px;font-weight:700;letter-spacing:-0.015em;line-height:1.08;max-width:1500px">Flying one drone takes a soldier’s full attention</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:32px;width:100%;max-width:1560px">
+    <div class="fp d2" style="background:#fff;border-radius:28px;padding:44px 40px;display:flex;flex-direction:column;gap:14px;text-align:left;box-shadow:0 2px 14px rgba(0,0,0,.05)">
+      <span style="font-size:32px;font-weight:700;line-height:1.2">A pilot in the air is a rifle out of the fight</span>
+      <span style="font-size:26px;font-weight:400;color:#6e6e73;line-height:1.4">While a soldier flies manually, the team is effectively one member short.</span>
+    </div>
+    <div class="fp d3" style="background:#fff;border-radius:28px;padding:44px 40px;display:flex;flex-direction:column;gap:14px;text-align:left;box-shadow:0 2px 14px rgba(0,0,0,.05)">
+      <span style="font-size:32px;font-weight:700;line-height:1.2">Two teams, two drones, zero coordination</span>
+      <span style="font-size:26px;font-weight:400;color:#6e6e73;line-height:1.4">Neighboring units fly the same sector without knowing about each other.</span>
+    </div>
+    <div class="fp d4" style="background:#fff;border-radius:28px;padding:44px 40px;display:flex;flex-direction:column;gap:14px;text-align:left;box-shadow:0 2px 14px rgba(0,0,0,.05)">
+      <span style="font-size:32px;font-weight:700;line-height:1.2">Capacity capped at one aircraft</span>
+      <span style="font-size:26px;font-weight:400;color:#6e6e73;line-height:1.4">No operator ever realizes their full capability flying a single drone.</span>
+    </div>
+  </div>
+</section>
+
+<section data-label="The Cost" data-speaker-notes="גיא: וזה רק מחמיר כשמנסים לגדול. ▸ כל רחפן שמוסיפים ▸ דורש עוד מפעיל. ▸ יותר אנשים שמלהטטים ביותר החלטות — יותר טעויות. ▸ וטעויות פוגעות במשימה. ▸ ההערכה שלנו: הקצאה לא אופטימלית מבזבזת בערך חמישה־עשר אחוז מזמן הטיסה הכולל. זה סוללה, זה כיסוי, אלה דקות שאין לכם." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:70px;padding:90px 140px;text-align:center" data-om-slide-id="cdec3f5a">
+  <div style="display:flex;flex-direction:column;gap:18px;align-items:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">THE COST</p>
+    <h2 class="fx d1" style="margin:0;font-size:84px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">Manual control doesn’t scale</h2>
+  </div>
+  <div style="display:flex;align-items:center;gap:28px">
+    <span class="fp d2" style="background:#fff;border-radius:100px;padding:24px 44px;font-size:30px;font-weight:600;box-shadow:0 2px 14px rgba(0,0,0,.05)">More drones</span>
+    <span class="fp d3" style="font-size:36px;color:#b6b6bc">→</span>
+    <span class="fp d3" style="background:#fff;border-radius:100px;padding:24px 44px;font-size:30px;font-weight:600;box-shadow:0 2px 14px rgba(0,0,0,.05)">More operators</span>
+    <span class="fp d4" style="font-size:36px;color:#b6b6bc">→</span>
+    <span class="fp d4" style="background:#fff;border-radius:100px;padding:24px 44px;font-size:30px;font-weight:600;box-shadow:0 2px 14px rgba(0,0,0,.05)">More errors</span>
+    <span class="fp d5" style="font-size:36px;color:#b6b6bc">→</span>
+    <span class="fp d5" style="border:2px solid #ff5f3c;color:#ff5f3c;border-radius:100px;padding:24px 44px;font-size:30px;font-weight:600">Degraded missions</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+    <span class="grad fp d6" style="font-size:150px;font-weight:700;letter-spacing:-0.03em;line-height:1">+15%</span>
+    <span class="fx d7" style="font-size:30px;font-weight:400;color:#6e6e73">wasted flight time from suboptimal tasking&nbsp; (illustrative estimate)</span>
+  </div>
+</section>
+
+<section data-label="The Idea" data-speaker-notes="גיא: אז הנה SwarmOps, במשפט אחד. המערכת מטיסה את הצי; אנשים מפקדים על המשימה. אתם אומרים לה מה אתם צריכים — לצפות על אזור, להגיע לנקודה. היא עונה בתוכנית טיסה מלאה תוך שניות, והרחפנים ממריאים בעצמם." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;padding:90px 160px;text-align:center" data-om-slide-id="cdf6d1a6">
+  <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">THE IDEA</p>
+  <h2 class="fx d1" style="margin:0;font-size:100px;font-weight:700;letter-spacing:-0.02em;line-height:1.08;max-width:1560px">The system flies the fleet.<br><span class="grad">People command the mission.</span></h2>
+  <p class="fx d3" style="margin:0;font-size:38px;font-weight:400;color:#6e6e73;line-height:1.4;max-width:1200px">A mission goes in. A complete flight plan comes out in seconds, and the drones launch themselves.</p>
+</section>
+
+<section data-label="Constraints" data-speaker-notes="גיא: כשהיא מתכננת, היא שוקלת הכול בבת אחת: ▸ מצב סוללה, ▸ עדיפות ודדליין, ▸ אזורי איסור טיסה, ▸ התאמת מטען, ▸ מרחק. ▸ כל משימה, כל רחפן, כל אילוץ. תוכנית טיסה אחת. זה לא משהו שבן אדם יכול להחזיק בראש. זו בדיוק הנקודה." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:70px;padding:90px 140px;text-align:center" data-om-slide-id="e5c90621">
+  <div style="display:flex;flex-direction:column;gap:18px;align-items:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">THE PLANNER</p>
+    <h2 class="fx d1" style="margin:0;font-size:84px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">What goes into a plan</h2>
+  </div>
+  <div style="display:flex;align-items:center;gap:70px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <span class="fp d2" style="background:#fff;border-radius:100px;padding:22px 48px;font-size:30px;font-weight:600;box-shadow:0 2px 12px rgba(0,0,0,.06)">Battery state</span>
+      <span class="fp d3" style="background:#fff;border-radius:100px;padding:22px 48px;font-size:30px;font-weight:600;box-shadow:0 2px 12px rgba(0,0,0,.06)">Priority &amp; deadline</span>
+      <span class="fp d4" style="background:#fff;border-radius:100px;padding:22px 48px;font-size:30px;font-weight:600;box-shadow:0 2px 12px rgba(0,0,0,.06)">No-fly zones</span>
+      <span class="fp d5" style="background:#fff;border-radius:100px;padding:22px 48px;font-size:30px;font-weight:600;box-shadow:0 2px 12px rgba(0,0,0,.06)">Payload match</span>
+      <span class="fp d6" style="background:#fff;border-radius:100px;padding:22px 48px;font-size:30px;font-weight:600;box-shadow:0 2px 12px rgba(0,0,0,.06)">Distance</span>
+    </div>
+    <span class="fx d6" style="font-size:64px;color:#c7c7cc">→</span>
+    <div class="fp d7" style="background:#1d1d1f;color:#f5f5f7;border-radius:36px;padding:70px 80px;display:flex;flex-direction:column;gap:12px">
+      <span style="font-size:44px;font-weight:700">One flight plan</span>
+      <span style="font-size:27px;font-weight:400;color:#a1a1a6">every constraint weighed together,<br>solved in seconds</span>
+    </div>
+  </div>
+</section>
+
+<section data-label="Replanning" data-speaker-notes="גיא: והתוכנית אף פעם לא קפואה. ▸ סוללה נחלשת? רחפן טרי לוקח את הסיור; הכיסוי לא נופל לרגע. ▸ נכנסת משימה דחופה יותר? כל הצי מסתדר מחדש סביבה. ▸ רחפן נופל? המשימות שלו מוקצות מחדש מיידית. בלי אדם בלולאה." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:64px;padding:90px 140px;text-align:center" data-om-slide-id="16f1f93e">
+  <div style="display:flex;flex-direction:column;gap:18px;align-items:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">REAL TIME</p>
+    <h2 class="fx d1" style="margin:0;font-size:84px;font-weight:700;letter-spacing:-0.015em;line-height:1.08;max-width:1500px">The plan updates while drones are in the air</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:32px;width:100%;max-width:1560px">
+    <div class="fp d2" style="background:#fff;border-radius:28px;padding:44px 40px;display:flex;flex-direction:column;gap:14px;text-align:left;box-shadow:0 2px 14px rgba(0,0,0,.05)">
+      <span style="font-size:30px;font-weight:700;color:#ff5f3c">Battery low</span>
+      <span style="font-size:27px;font-weight:400;color:#1d1d1f;line-height:1.4">A fresh drone takes over the patrol. Coverage never drops.</span>
+    </div>
+    <div class="fp d3" style="background:#fff;border-radius:28px;padding:44px 40px;display:flex;flex-direction:column;gap:14px;text-align:left;box-shadow:0 2px 14px rgba(0,0,0,.05)">
+      <span style="font-size:30px;font-weight:700;color:#ff5f3c">New mission arrives</span>
+      <span style="font-size:27px;font-weight:400;color:#1d1d1f;line-height:1.4">The whole fleet is re-ranked against the new priority.</span>
+    </div>
+    <div class="fp d4" style="background:#fff;border-radius:28px;padding:44px 40px;display:flex;flex-direction:column;gap:14px;text-align:left;box-shadow:0 2px 14px rgba(0,0,0,.05)">
+      <span style="font-size:30px;font-weight:700;color:#ff5f3c">A drone drops out</span>
+      <span style="font-size:27px;font-weight:400;color:#1d1d1f;line-height:1.4">Its tasks are reassigned instantly. No human in the loop.</span>
+    </div>
+  </div>
+</section>
+
+<section data-label="The Simulator" data-speaker-notes="גיא: איך בונים ובודקים את כל זה בלי לרסק רחפנים אמיתיים? בנינו סימולטור. רחפן וירטואלי שטס, משדר וידאו ומגיב בזמן אמת. משמאל, פיד ה־FPV. מימין, אותה טיסה מבחוץ. מבחינת המערכת — אין הבדל בינו לבין חומרה אמיתית." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:48px;padding:90px 140px;text-align:center" data-om-slide-id="a2dc197a">
+  <div style="display:flex;flex-direction:column;gap:18px;align-items:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">THE SIMULATOR</p>
+    <h2 class="fx d1" style="margin:0;font-size:84px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">A virtual drone, like the real thing</h2>
+    <p class="fx d2" style="margin:0;font-size:32px;font-weight:400;color:#6e6e73">It flies, streams video and reacts in real time. No hardware needed.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;width:100%;max-width:1560px">
+    <div class="fp d3" style="display:flex;flex-direction:column;gap:16px">
+      <video data-video="assets/fpv-feed.mp4" autoPlay="{{ true }}" muted="{{ true }}" loop="{{ true }}" playsInline="{{ true }}" style="display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:24px;box-shadow:0 20px 60px rgba(0,0,0,.18)"></video>
+      <span style="font-size:27px;font-weight:400;color:#6e6e73">FPV feed, straight from the virtual camera</span>
+    </div>
+    <div class="fp d4" style="display:flex;flex-direction:column;gap:16px">
+      <video data-video="assets/third-person.mp4" autoPlay="{{ true }}" muted="{{ true }}" loop="{{ true }}" playsInline="{{ true }}" style="display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:24px;box-shadow:0 20px 60px rgba(0,0,0,.18)"></video>
+      <span style="font-size:27px;font-weight:400;color:#6e6e73">Third-person view of the same flight</span>
+    </div>
+  </div>
+</section>
+
+<section data-label="The Handoff" data-speaker-notes="גיא: תסתכלו על זה. רחפן בסיור והסוללה שלו נחלשת. למערכת כבר יש מחליף באוויר. הסיור לא ממצמץ. אף אחד לא נגע בכלום." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:44px;padding:80px 140px;text-align:center" data-om-slide-id="23a4a62e">
+  <div style="display:flex;flex-direction:column;gap:18px;align-items:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">IN ACTION</p>
+    <h2 class="fx d1" style="margin:0;font-size:84px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">A patrol that never blinks</h2>
+    <p class="fx d2" style="margin:0;font-size:32px;font-weight:400;color:#6e6e73">Battery runs low. Another drone continues the patrol without missing a moment.</p>
+  </div>
+  <video class="fz d3" data-video="assets/patrol-demo.mp4" autoPlay="{{ true }}" muted="{{ true }}" loop="{{ true }}" playsInline="{{ true }}" style="display:block;width:100%;max-width:1240px;aspect-ratio:16/9;object-fit:cover;border-radius:26px;box-shadow:0 26px 80px rgba(0,0,0,.2)"></video>
+</section>
+
+<section data-label="Live Demo" data-speaker-notes="גיא עובר למערכת החיה: זו הייתה הקלטה. עכשיו נעשה את זה בשידור חי. (דמו: המפה עם כל רחפן וסוללה ← יצירת משימה, תכנון ושיגור ← החלפת סוללה.) וזה הצד המשימתי. כל מה שראיתם רץ בענן אמיתי — וזה סיפור בפני עצמו. טוני." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;align-items:center;justify-content:center;gap:100px;padding:90px 140px" data-om-slide-id="6a27a87d">
+  <div style="display:flex;flex-direction:column;gap:26px;text-align:left;max-width:620px">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">LIVE DEMO</p>
+    <h2 class="fx d1" style="margin:0;font-size:84px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">The operating picture</h2>
+    <p class="fx d2" style="margin:0;font-size:34px;font-weight:400;color:#6e6e73;line-height:1.45">Every drone, its battery and its mission. One map.<br><br>Watch a patrol hand off to a fresh drone, live.</p>
+  </div>
+  <img class="fz d2" src="assets/map.png" alt="SwarmOps live map" style="width:760px;aspect-ratio:720/718;object-fit:cover;border-radius:28px;box-shadow:0 24px 80px rgba(0,0,0,.25)">
+</section>
+
+<section data-label="§ Tony" data-speaker-notes="טוני: תודה, גיא. אני טוני. צלף, מפעיל רחפנים, ובפרויקט הזה — איש הענן. גיא הראה מה SwarmOps עושה. אני אראה איפה היא חיה, כי איך שהיא רצה זה חצי מההנדסה." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;padding:90px 140px;text-align:center" data-om-slide-id="e17cf431">
+  <img class="fp" src="assets/tony.jpg" alt="Tony" style="width:190px;height:190px;border-radius:50%;object-fit:cover;filter:grayscale(1) contrast(1.05);box-shadow:0 12px 40px rgba(0,0,0,.15)">
+  <p class="fx d1" style="margin:0;font-size:28px;font-weight:600;letter-spacing:.2em;color:#6e6e73">TONY&nbsp;&nbsp;·&nbsp;&nbsp;SNIPER, DRONE OPERATOR</p>
+  <h2 class="grad fx d2" style="margin:0;font-size:160px;font-weight:700;letter-spacing:-0.03em;line-height:1">The Cloud</h2>
+  <p class="fx d3" style="margin:0;font-size:34px;font-weight:400;color:#6e6e73">Architecture&nbsp;&nbsp;·&nbsp;&nbsp;Deployment&nbsp;&nbsp;·&nbsp;&nbsp;Cost</p>
+</section>
+
+<section data-label="Six Services" data-speaker-notes="טוני: SwarmOps היא לא תוכנה אחת גדולה. היא שישה שירותים קטנים, וכל אחד יכול ליפול ולהתאושש לבד. ▸ gateway אחד הוא הדלת הציבורית היחידה; כל בקשה עוברת דרכו. ▸ auth מטפל בהתחברות, טוקנים והרשאות. fleet הוא מרשם הרחפנים: מצב, סוללה, מטען. ▸ mission מנהל פקודות מהיצירה ועד הסיום. ו־planning, המוח: מקצה רחפנים למשימות ומתכנן מחדש באוויר. ▸ telemetry מזרים מיקומים חיים; notify דוחף התראות ברגע שהן חשובות. ▸ ומתחת לכולם, RabbitMQ: השירותים מדברים דרך תורים, אף פעם לא ישירות. ומזין את הכול — סימולטור הרחפנים שלנו." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;padding:80px 140px;text-align:center" data-om-slide-id="00866904">
+  <div style="display:flex;flex-direction:column;gap:16px;align-items:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">ARCHITECTURE</p>
+    <h2 class="fx d1" style="margin:0;font-size:80px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">Six services, one gateway</h2>
+    <p class="fx d2" style="margin:0;font-size:31px;font-weight:400;color:#6e6e73">Small pieces instead of one big program. Each can fail and recover on its own.</p>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:0;width:100%;max-width:1600px">
+    <div class="fp d3" style="background:#1d1d1f;color:#f5f5f7;border-radius:100px;padding:18px 60px;display:flex;flex-direction:column;gap:2px">
+      <span style="font-size:29px;font-weight:700">gateway</span>
+      <span style="font-size:24px;font-weight:400;color:#a1a1a6">the only public door, routes every request</span>
+    </div>
+    <div class="fx d3" style="width:2px;height:36px;background:#c7c7cc"></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;width:100%">
+      <div class="fp d4" style="background:#fff;border-radius:22px;padding:24px 28px;display:flex;flex-direction:column;gap:6px;text-align:left;box-shadow:0 2px 12px rgba(0,0,0,.05)">
+        <span style="font-size:29px;font-weight:700">auth</span>
+        <span style="font-size:24px;font-weight:400;color:#6e6e73">log-in, tokens and roles</span>
+      </div>
+      <div class="fp d4" style="background:#fff;border-radius:22px;padding:24px 28px;display:flex;flex-direction:column;gap:6px;text-align:left;box-shadow:0 2px 12px rgba(0,0,0,.05)">
+        <span style="font-size:29px;font-weight:700">fleet</span>
+        <span style="font-size:24px;font-weight:400;color:#6e6e73">the drone registry: state, battery, payload</span>
+      </div>
+      <div class="fp d5" style="background:#fff;border-radius:22px;padding:24px 28px;display:flex;flex-direction:column;gap:6px;text-align:left;box-shadow:0 2px 12px rgba(0,0,0,.05)">
+        <span style="font-size:29px;font-weight:700">mission</span>
+        <span style="font-size:24px;font-weight:400;color:#6e6e73">orders and their lifecycle, creation to completion</span>
+      </div>
+      <div class="fp d5" style="background:#fff;border:2px solid #ff5f3c;border-radius:22px;padding:22px 26px;display:flex;flex-direction:column;gap:6px;text-align:left">
+        <span style="font-size:29px;font-weight:700;color:#ff5f3c">planning</span>
+        <span style="font-size:24px;font-weight:400;color:#6e6e73">the brain: assigns drones to missions, replans in flight</span>
+      </div>
+      <div class="fp d6" style="background:#fff;border-radius:22px;padding:24px 28px;display:flex;flex-direction:column;gap:6px;text-align:left;box-shadow:0 2px 12px rgba(0,0,0,.05)">
+        <span style="font-size:29px;font-weight:700">telemetry</span>
+        <span style="font-size:24px;font-weight:400;color:#6e6e73">live positions and battery, streamed off the bus</span>
+      </div>
+      <div class="fp d6" style="background:#fff;border-radius:22px;padding:24px 28px;display:flex;flex-direction:column;gap:6px;text-align:left;box-shadow:0 2px 12px rgba(0,0,0,.05)">
+        <span style="font-size:29px;font-weight:700">notify</span>
+        <span style="font-size:24px;font-weight:400;color:#6e6e73">pushes alerts to operators the moment they matter</span>
+      </div>
+    </div>
+    <div class="fx d6" style="width:2px;height:36px;background:#c7c7cc"></div>
+    <div class="fp d7" style="display:flex;gap:20px;align-items:stretch;width:100%;justify-content:center">
+      <div style="background:#1d1d1f;color:#f5f5f7;border-radius:22px;padding:20px 60px;display:flex;flex-direction:column;gap:2px">
+        <span style="font-size:28px;font-weight:700">RabbitMQ message bus</span>
+        <span style="font-size:24px;font-weight:400;color:#a1a1a6">services talk through queues, never directly</span>
+      </div>
+      <div style="background:#fff;border-radius:22px;padding:20px 40px;display:flex;flex-direction:column;gap:2px;box-shadow:0 2px 12px rgba(0,0,0,.05)">
+        <span style="font-size:28px;font-weight:700;color:#1d1d1f">drone simulator</span>
+        <span style="font-size:24px;font-weight:400;color:#6e6e73">virtual drones feeding the bus</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section data-label="Cloud Footprint" data-speaker-notes="טוני: הכול רץ על AWS, וכל מה שעל השקף הזה אמיתי — נקרא מה־Terraform שלנו. חשבון אחד. ריג׳ן us-east-1. בתוכו VPC פרטי, מפוצל על שני אזורי זמינות: שני שרתים ו־MongoDB באזור A, שלושה שרתים ו־RabbitMQ באזור B. מחוץ ל־VPC: מישור הבקרה של EKS בניהול AWS, מאגר האימג׳ים וה־DNS. שני אזורים אומר שאובדן דאטה־סנטר לא מפיל אותנו. וכל התשתית היא קוד: הורסים בלילה, בונים מחדש בדקות. (השקף נבנה לבד תוך כדי דיבור; בלי קליקים.)" style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:36px;padding:80px 140px;text-align:center" data-om-slide-id="0794a74e">
+  <div style="display:flex;flex-direction:column;gap:16px;align-items:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">THE CLOUD</p>
+    <h2 class="fx d1" style="margin:0;font-size:80px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">Where it actually runs</h2>
+  </div>
+  <div class="fp d2" style="border:2px solid #d2d2d7;background:#fff;border-radius:32px;padding:26px 34px 30px;width:100%;max-width:1520px;display:flex;flex-direction:column;gap:18px;text-align:left">
+    <span style="font-size:25px;font-weight:600;color:#6e6e73;letter-spacing:.06em">AWS ACCOUNT · SWARMOPS</span>
+    <div class="fp d3" style="border:2px dashed #0e8a8c;border-radius:26px;padding:22px 30px 26px;display:flex;flex-direction:column;gap:16px">
+      <span style="font-size:25px;font-weight:600;color:#0e8a8c;letter-spacing:.06em">REGION · US-EAST-1</span>
+      <div class="fp d4" style="border:2px solid #6f42d8;border-radius:22px;padding:20px 28px 24px;display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:20px">
+          <span style="font-size:25px;font-weight:600;color:#6f42d8;letter-spacing:.06em">PRIVATE VPC</span>
+          <span style="font-size:24px;font-weight:400;color:#6e6e73">public + private subnets in each zone</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+          <div class="fp d5" style="background:#f5f5f7;border-radius:18px;padding:20px 28px;display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:29px;font-weight:700">Availability Zone A</span>
+            <span style="font-size:25px;font-weight:400;color:#6e6e73">2 EKS nodes · MongoDB, 5 Gi</span>
+          </div>
+          <div class="fp d5" style="background:#f5f5f7;border-radius:18px;padding:20px 28px;display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:29px;font-weight:700">Availability Zone B</span>
+            <span style="font-size:25px;font-weight:400;color:#6e6e73">3 EKS nodes · RabbitMQ, 8 Gi</span>
+          </div>
+        </div>
+      </div>
+      <div class="fp d6" style="display:flex;gap:16px;flex-wrap:wrap">
+        <span style="background:#f5f5f7;border-radius:100px;padding:14px 30px;font-size:25px;color:#1d1d1f"><b style="font-weight:700">EKS control plane</b>&nbsp; <span style="color:#6e6e73">managed by AWS</span></span>
+        <span style="background:#f5f5f7;border-radius:100px;padding:14px 30px;font-size:25px;color:#1d1d1f"><b style="font-weight:700">ECR</b>&nbsp; <span style="color:#6e6e73">9 service images, a tag per change</span></span>
+        <span style="background:#f5f5f7;border-radius:100px;padding:14px 30px;font-size:25px;color:#1d1d1f"><b style="font-weight:700">Route 53</b>&nbsp; <span style="color:#6e6e73">DNS for the public endpoint</span></span>
+      </div>
+    </div>
+  </div>
+  <p class="fx d7" style="margin:0;font-size:29px;font-weight:400;color:#6e6e73;max-width:1300px;line-height:1.4">Two zones, so losing a data center doesn’t take the system down. The entire footprint is Terraform: destroy it at night, rebuild it in minutes.</p>
+</section>
+
+<section data-label="Inside the Cluster" data-speaker-notes="טוני: בתוך ה־VPC — קוברנטיס. EKS מריץ 62 קונטיינרים על חמישה שרתים ברי־החלפה. ▸ אזור A: שני שרתים, ועוד MongoDB על דיסק משלו. ▸ אזור B: שלושה שרתים, ועוד RabbitMQ. ▸ כל שרת הוא spot — זול בכ־70 אחוז. אם AWS לוקח אחד בחזרה, קוברנטיס מפזר את הפודים שלו על השאר. שום דבר לא קדוש — וזה בכוונה." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:48px;padding:90px 140px;text-align:center" data-om-slide-id="4883b4ed">
+  <div style="display:flex;flex-direction:column;gap:18px;align-items:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">KUBERNETES</p>
+    <h2 class="fx d1" style="margin:0;font-size:84px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">Inside the cluster</h2>
+    <p class="fx d2" style="margin:0;font-size:32px;font-weight:400;color:#6e6e73">EKS schedules 62 containers across five interchangeable spot nodes.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;width:100%;max-width:1560px">
+    <div class="fp d3" style="border:2px solid #d2d2d7;background:#fff;border-radius:28px;padding:28px 32px;display:flex;flex-direction:column;gap:18px;text-align:left">
+      <span style="font-size:26px;font-weight:600;color:#6e6e73;letter-spacing:.06em">AVAILABILITY ZONE A</span>
+      <div style="display:flex;gap:18px">
+        <div style="background:#f5f5f7;border-radius:18px;padding:22px 26px;flex:1;display:flex;flex-direction:column;gap:10px">
+          <span style="font-size:27px;font-weight:700">node 1</span>
+          <span style="font-size:24px;color:#6e6e73">t3.medium · spot</span>
+        </div>
+        <div style="background:#f5f5f7;border-radius:18px;padding:22px 26px;flex:1;display:flex;flex-direction:column;gap:10px">
+          <span style="font-size:27px;font-weight:700">node 2</span>
+          <span style="font-size:24px;color:#6e6e73">t3.medium · spot</span>
+        </div>
+        <div style="background:#f5f5f7;border:1px solid #13aa52;border-radius:18px;padding:22px 26px;flex:1;display:flex;flex-direction:column;gap:10px">
+          <span style="font-size:27px;font-weight:700;color:#0e7a3a">MongoDB</span>
+          <span style="font-size:24px;color:#6e6e73">5 Gi gp3</span>
+        </div>
+      </div>
+    </div>
+    <div class="fp d4" style="border:2px solid #d2d2d7;background:#fff;border-radius:28px;padding:28px 32px;display:flex;flex-direction:column;gap:18px;text-align:left">
+      <span style="font-size:26px;font-weight:600;color:#6e6e73;letter-spacing:.06em">AVAILABILITY ZONE B</span>
+      <div style="display:flex;gap:18px">
+        <div style="background:#f5f5f7;border-radius:18px;padding:22px 26px;flex:1;display:flex;flex-direction:column;gap:10px">
+          <span style="font-size:27px;font-weight:700">node 3</span>
+          <span style="font-size:24px;color:#6e6e73">t3.medium · spot</span>
+        </div>
+        <div style="background:#f5f5f7;border-radius:18px;padding:22px 26px;flex:1;display:flex;flex-direction:column;gap:10px">
+          <span style="font-size:27px;font-weight:700">node 4</span>
+          <span style="font-size:24px;color:#6e6e73">t3.medium · spot</span>
+        </div>
+        <div style="background:#f5f5f7;border-radius:18px;padding:22px 26px;flex:1;display:flex;flex-direction:column;gap:10px">
+          <span style="font-size:27px;font-weight:700">node 5</span>
+          <span style="font-size:24px;color:#6e6e73">t3.medium · spot</span>
+        </div>
+        <div style="background:#f5f5f7;border:1px solid #ff8a3c;border-radius:18px;padding:22px 26px;flex:1;display:flex;flex-direction:column;gap:10px">
+          <span style="font-size:27px;font-weight:700;color:#c65a10">RabbitMQ</span>
+          <span style="font-size:24px;color:#6e6e73">8 Gi gp3</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="fx d5" style="margin:0;font-size:29px;font-weight:400;color:#6e6e73">Spot instances cost ~70% less. If AWS reclaims one, Kubernetes reschedules its pods on the rest.</p>
+</section><section data-label="The Network" data-speaker-notes="טוני: הרשת בנויה על עיקרון אחד: דלת אחת פנימה, דלת אחת החוצה. ▸ רק ה־load balancer ציבורי. כל שרת וכל שירות חיים ברשתות פרטיות, בלתי נגישים מהאינטרנט. ▸ תעבורה יוצאת עוברת דרך NAT gateway יחיד. החלטה מודעת: יציאה משותפת אחת חוסכת בערך 65 דולר בחודש. ▸ ושתי השכבות קיימות בכל אזור, כך שגם נתיב הכניסה שורד נפילת אזור." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;align-items:center;justify-content:center;gap:90px;padding:90px 140px" data-om-slide-id="436d3018">
+  <div style="display:flex;flex-direction:column;gap:26px;text-align:left;max-width:640px">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">NETWORKING</p>
+    <h2 class="fx d1" style="margin:0;font-size:80px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">One door in,<br>one door out</h2>
+    <div style="display:flex;flex-direction:column;gap:24px;margin-top:16px">
+      <p class="fx d3" style="margin:0;font-size:30px;font-weight:400;color:#6e6e73;line-height:1.4"><span style="color:#1d1d1f;font-weight:600">Only the load balancer is public.</span> Every node and service lives in private subnets.</p>
+      <p class="fx d4" style="margin:0;font-size:30px;font-weight:400;color:#6e6e73;line-height:1.4"><span style="color:#1d1d1f;font-weight:600">Outbound goes through a single NAT gateway.</span> A deliberate call: one shared exit saves ~$65 a month.</p>
+      <p class="fx d5" style="margin:0;font-size:30px;font-weight:400;color:#6e6e73;line-height:1.4"><span style="color:#1d1d1f;font-weight:600">Public and private subnets in each zone,</span> so the entry path survives a zone failure too.</p>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:0;width:680px">
+    <div class="fp d1" style="background:#1d1d1f;color:#f5f5f7;border-radius:100px;padding:16px 54px;font-size:27px;font-weight:700">Internet</div>
+    <div class="fx d2" style="width:2px;height:38px;background:#c7c7cc"></div>
+    <div class="fp d2" style="border:2px dashed #5c7d10;background:#fff;border-radius:24px;padding:22px 28px 26px;width:100%;display:flex;flex-direction:column;gap:14px">
+      <span style="font-size:24px;font-weight:600;color:#5c7d10;letter-spacing:.06em;text-align:left">PUBLIC SUBNETS · ONE PER ZONE</span>
+      <div style="display:flex;gap:18px">
+        <div style="background:#f5f5f7;border-radius:16px;padding:20px 28px;flex:1;display:flex;flex-direction:column;gap:4px">
+          <span style="font-size:27px;font-weight:700">Load balancer</span>
+          <span style="font-size:24px;color:#6e6e73">ALB · 2 AZ</span>
+        </div>
+        <div style="background:#f5f5f7;border-radius:16px;padding:20px 28px;flex:1;display:flex;flex-direction:column;gap:4px">
+          <span style="font-size:27px;font-weight:700">NAT gateway</span>
+          <span style="font-size:24px;color:#6e6e73">×1 · egress only</span>
+        </div>
+      </div>
+    </div>
+    <div class="fx d3" style="width:2px;height:38px;background:#c7c7cc"></div>
+    <div class="fp d4" style="border:2px solid #0e8a8c;background:#fff;border-radius:24px;padding:22px 28px 26px;width:100%;display:flex;flex-direction:column;gap:14px">
+      <span style="font-size:24px;font-weight:600;color:#0e8a8c;letter-spacing:.06em;text-align:left">PRIVATE SUBNETS · ONE PER ZONE</span>
+      <div style="display:flex;gap:18px">
+        <div style="background:#f5f5f7;border-radius:16px;padding:20px 28px;flex:1;display:flex;flex-direction:column;gap:4px">
+          <span style="font-size:27px;font-weight:700">EKS nodes</span>
+          <span style="font-size:24px;color:#6e6e73">all workloads</span>
+        </div>
+        <div style="background:#f5f5f7;border-radius:16px;padding:20px 28px;flex:1;display:flex;flex-direction:column;gap:4px">
+          <span style="font-size:27px;font-weight:700">Data stores</span>
+          <span style="font-size:24px;color:#6e6e73">MongoDB · RabbitMQ</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section data-label="By the Numbers" data-speaker-notes="טוני: תמונת מצב חיה, מספרים אמיתיים: ▸ חמישה שרתים, עשרה vCPU. ▸ 62 קונטיינרים רצים. ▸ 23 דיפלוימנטים. ▸ 25 ג׳יגה אחסון קבוע. ▸ תשעה אימג׳ים במאגר. ▸ על פני שני אזורי זמינות." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:80px;padding:90px 140px;text-align:center" data-om-slide-id="ca24d16a">
+  <div style="display:flex;flex-direction:column;gap:18px;align-items:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">A LIVE SNAPSHOT</p>
+    <h2 class="fx d1" style="margin:0;font-size:84px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">The cluster, by the numbers</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:80px 120px;width:100%;max-width:1500px">
+    <div class="fp d2" style="display:flex;flex-direction:column;gap:8px">
+      <span class="grad" style="font-size:120px;font-weight:700;letter-spacing:-0.03em;line-height:1">5</span>
+      <span style="font-size:28px;font-weight:400;color:#6e6e73">spot nodes · 10 vCPU · 18.7 Gi</span>
+    </div>
+    <div class="fp d3" style="display:flex;flex-direction:column;gap:8px">
+      <span class="grad" style="font-size:120px;font-weight:700;letter-spacing:-0.03em;line-height:1">62</span>
+      <span style="font-size:28px;font-weight:400;color:#6e6e73">running containers</span>
+    </div>
+    <div class="fp d4" style="display:flex;flex-direction:column;gap:8px">
+      <span class="grad" style="font-size:120px;font-weight:700;letter-spacing:-0.03em;line-height:1">23</span>
+      <span style="font-size:28px;font-weight:400;color:#6e6e73">deployments</span>
+    </div>
+    <div class="fp d5" style="display:flex;flex-direction:column;gap:8px">
+      <span class="grad" style="font-size:120px;font-weight:700;letter-spacing:-0.03em;line-height:1">25&nbsp;Gi</span>
+      <span style="font-size:28px;font-weight:400;color:#6e6e73">persistent storage · 6 gp3 volumes</span>
+    </div>
+    <div class="fp d6" style="display:flex;flex-direction:column;gap:8px">
+      <span class="grad" style="font-size:120px;font-weight:700;letter-spacing:-0.03em;line-height:1">9</span>
+      <span style="font-size:28px;font-weight:400;color:#6e6e73">service images in ECR</span>
+    </div>
+    <div class="fp d7" style="display:flex;flex-direction:column;gap:8px">
+      <span class="grad" style="font-size:120px;font-weight:700;letter-spacing:-0.03em;line-height:1">2</span>
+      <span style="font-size:28px;font-weight:400;color:#6e6e73">availability zones</span>
+    </div>
+  </div>
+</section>
+
+<section data-label="Commit to Cluster" data-speaker-notes="טוני: עכשיו, איך קוד מגיע לשם. אף אחד לא מדפלה ידנית. אף פעם. ▸ דוחפים קומיט. ▸ ה־CI בונה אימג׳ ומתייג. ▸ האימג׳ נוחת במאגר. ▸ Argo CD מזהה שגיט השתנה. ▸ הקלאסטר מושך את השינוי ומתיישר. ▸ שימו לב לכיוון: משיכה, לא דחיפה. הקלאסטר מסנכרן את עצמו לגיט. הקוד הוא מקור האמת היחיד." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:70px;padding:90px 140px;text-align:center" data-om-slide-id="bb0c7f76">
+  <div style="display:flex;flex-direction:column;gap:18px;align-items:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">DEPLOYMENT</p>
+    <h2 class="fx d1" style="margin:0;font-size:84px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">From commit to cluster</h2>
+  </div>
+  <div style="display:flex;align-items:center;gap:24px">
+    <div class="fp d2" style="background:#fff;border-radius:24px;padding:34px 40px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 14px rgba(0,0,0,.05)">
+      <span style="font-size:30px;font-weight:700">Commit</span>
+      <span style="font-size:24px;color:#6e6e73">git push</span>
+    </div>
+    <span class="fp d3" style="font-size:34px;color:#b6b6bc">→</span>
+    <div class="fp d3" style="background:#fff;border-radius:24px;padding:34px 40px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 14px rgba(0,0,0,.05)">
+      <span style="font-size:30px;font-weight:700">Build</span>
+      <span style="font-size:24px;color:#6e6e73">CI · image + tag</span>
+    </div>
+    <span class="fp d4" style="font-size:34px;color:#b6b6bc">→</span>
+    <div class="fp d4" style="background:#fff;border-radius:24px;padding:34px 40px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 14px rgba(0,0,0,.05)">
+      <span style="font-size:30px;font-weight:700">Registry</span>
+      <span style="font-size:24px;color:#6e6e73">push to ECR</span>
+    </div>
+    <span class="fp d5" style="font-size:34px;color:#b6b6bc">→</span>
+    <div class="fp d5" style="background:#fff;border:2px solid #ff5f3c;border-radius:24px;padding:32px 40px;display:flex;flex-direction:column;gap:6px">
+      <span style="font-size:30px;font-weight:700;color:#ff5f3c">Argo CD</span>
+      <span style="font-size:24px;color:#6e6e73">detects the change</span>
+    </div>
+    <span class="fp d6" style="font-size:34px;color:#b6b6bc">→</span>
+    <div class="fp d6" style="background:#fff;border-radius:24px;padding:34px 40px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 14px rgba(0,0,0,.05)">
+      <span style="font-size:30px;font-weight:700">Cluster</span>
+      <span style="font-size:24px;color:#6e6e73">pulls &amp; converges</span>
+    </div>
+  </div>
+  <p class="fx d7" style="margin:0;font-size:32px;font-weight:400;color:#6e6e73;max-width:1200px;line-height:1.45"><span style="color:#1d1d1f;font-weight:600">Pull-based, not push.</span> The cluster continuously syncs itself to what’s in git. Code is the single source of truth.</p>
+</section>
+
+<section data-label="GitOps in Production" data-speaker-notes="טוני: זו לא דיאגרמה; זה מסך הפרודקשן שלנו. 12 אפליקציות מסונכרנות, 27 משאבים בריאים. ▸ תסתכלו מי חתום על הסנכרון האחרון: swarmops-ci-bot. המדפלה הוא בוט. בני אדם כותבים קוד; הבוט מריץ את הקלאסטר." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:36px;padding:70px 140px;text-align:center" data-om-slide-id="5c495608">
+  <div style="display:flex;flex-direction:column;gap:16px;align-items:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">DEPLOYMENT</p>
+    <h2 class="fx d1" style="margin:0;font-size:76px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">The deployer is a bot</h2>
+  </div>
+  <div class="fz d2" style="border:1px solid rgba(0,0,0,.1);border-radius:22px;overflow:hidden;box-shadow:0 26px 80px rgba(0,0,0,.22);width:100%;max-width:1310px">
+    <img src="assets/base_argo.png" alt="Argo CD: all SwarmOps services healthy and synced" style="display:block;width:100%;height:auto">
+  </div>
+  <p class="fx d3" style="margin:0;font-size:27px;font-weight:400;color:#6e6e73"><span style="color:#1d1d1f;font-weight:600">12 synced · 27 healthy</span> · last sync authored by <span style="color:#1d1d1f;font-weight:600">swarmops-ci-bot</span>, not a human.</p>
+</section>
+
+<section data-label="Zero Downtime" data-speaker-notes="טוני: עדכוני גרסה בלי שנייה אחת של השבתה. ▸ בזמן rollout, הגרסה הישנה והחדשה רצות זו לצד זו. זה צילום אמיתי. ▸ שלושים שניות אחר כך — החדשה השתלטה והישנה נעלמה. המשתמשים לא מרגישים את התפר." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:44px;padding:90px 140px;text-align:center" data-om-slide-id="93e91dbf">
+  <div style="display:flex;flex-direction:column;gap:16px;align-items:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">DEPLOYMENT</p>
+    <h2 class="fx d1" style="margin:0;font-size:80px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">A new version, and nobody notices</h2>
+    <p class="fx d2" style="margin:0;font-size:32px;font-weight:400;color:#6e6e73">Blue-green: the old version keeps serving until the new one is ready.</p>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:36px;width:100%;max-width:1360px">
+    <div class="fp d3" style="display:flex;flex-direction:column;gap:16px;align-items:flex-start">
+      <div style="border:1px solid rgba(0,0,0,.12);border-radius:18px;overflow:hidden;width:100%;background:#0e1116">
+        <img src="assets/pods_blue_green.png" alt="Two frontend versions running side by side" style="display:block;width:100%;height:auto">
+      </div>
+      <span style="font-size:27px;font-weight:400;color:#6e6e73">During the rollout: old and new run side by side</span>
+    </div>
+    <div class="fp d5" style="display:flex;flex-direction:column;gap:16px;align-items:flex-start">
+      <div style="border:1px solid rgba(0,0,0,.12);border-radius:18px;overflow:hidden;width:100%;background:#0e1116">
+        <img src="assets/pods_green.png" alt="Only the new frontend version remains" style="display:block;width:100%;height:auto">
+      </div>
+      <span style="font-size:27px;font-weight:400;color:#6e6e73">Thirty seconds later: only the new version remains</span>
+    </div>
+  </div>
+</section>
+
+<section data-label="Canary Rollouts" data-speaker-notes="טוני: לשירות ה־planning, המוח, אנחנו הולכים צעד רחוק יותר: canary. ▸ הגרסה החדשה מתחילה עם 20 אחוז מהתעבורה. ▸ ניתוח אוטומטי בודק את המדדים. ▸ ואז 50 אחוז. ▸ בדיקה נוספת. ▸ ורק אז — 100. אם בדיקה נכשלת, ה־rollout מתהפך מעצמו. בלי ביפר, בלי rollback ידני בשלוש בלילה." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;align-items:center;justify-content:center;gap:110px;padding:90px 140px" data-om-slide-id="5c3cf592">
+  <div style="display:flex;flex-direction:column;gap:26px;text-align:left;max-width:660px">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">DEPLOYMENT</p>
+    <h2 class="fx d1" style="margin:0;font-size:80px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">20% first,<br>then everyone</h2>
+    <p class="fx d2" style="margin:0;font-size:31px;font-weight:400;color:#6e6e73;line-height:1.45">The brain of the system, <span style="color:#ff5f3c;font-weight:600">planning</span>, ships as a canary, with an automated metric check between every step.</p>
+    <p class="fx d3" style="margin:0;font-size:31px;font-weight:400;color:#6e6e73;line-height:1.45"><span style="color:#1d1d1f;font-weight:600">If a check fails, the rollout reverses itself.</span> No pager, no 3am rollback by hand.</p>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:14px;align-items:stretch">
+    <span class="fp d2" style="background:#fff;border:1px solid #248a3d;border-radius:16px;padding:20px 44px;font-size:29px;font-weight:600;color:#248a3d;box-shadow:0 2px 12px rgba(0,0,0,.04)">Set weight: 20%</span>
+    <span class="fp d3" style="background:#fff;border-radius:16px;padding:20px 44px;font-size:29px;font-weight:600;color:#6e6e73;box-shadow:0 2px 12px rgba(0,0,0,.04)">Analysis · automated check</span>
+    <span class="fp d4" style="background:#fff;border:1px solid #248a3d;border-radius:16px;padding:20px 44px;font-size:29px;font-weight:600;color:#248a3d;box-shadow:0 2px 12px rgba(0,0,0,.04)">Set weight: 50%</span>
+    <span class="fp d5" style="background:#fff;border-radius:16px;padding:20px 44px;font-size:29px;font-weight:600;color:#6e6e73;box-shadow:0 2px 12px rgba(0,0,0,.04)">Analysis · automated check</span>
+    <span class="fp d6" style="background:#fff;border:1px solid #ff5f3c;border-radius:16px;padding:20px 44px;font-size:29px;font-weight:700;color:#ff5f3c;box-shadow:0 2px 12px rgba(0,0,0,.04)">Set weight: 100%</span>
+  </div>
+</section>
+
+<section data-label="Rollout Timeline" data-speaker-notes="טוני: הנה canary אחד מהקלאסטר שלנו, מההתחלה עד הסוף. ▸ באמצע: שתי גרסאות חיות, תעבורה מפוצלת. ▸ וסיום: ה־canary קודם, הגרסה הישנה ירדה לאפס." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:44px;padding:80px 140px;text-align:center" data-om-slide-id="ae1c26ea">
+  <div style="display:flex;flex-direction:column;gap:16px;align-items:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">DEPLOYMENT</p>
+    <h2 class="fx d1" style="margin:0;font-size:80px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">A rollout, start to finish</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:44px;width:100%;max-width:1480px;align-items:start">
+    <div class="fp d2" style="display:flex;flex-direction:column;gap:16px">
+      <div style="border:1px solid rgba(0,0,0,.12);border-radius:20px;overflow:hidden;box-shadow:0 16px 50px rgba(0,0,0,.16)">
+        <img src="assets/canary_in_progress.png" alt="Mid-rollout: two revisions running" style="display:block;width:100%;height:auto">
+      </div>
+      <span style="font-size:27px;font-weight:400;color:#6e6e73">Mid-rollout: two revisions live, traffic split</span>
+    </div>
+    <div class="fp d4" style="display:flex;flex-direction:column;gap:16px">
+      <div style="border:1px solid rgba(0,0,0,.12);border-radius:20px;overflow:hidden;box-shadow:0 16px 50px rgba(0,0,0,.16)">
+        <img src="assets/canary_final.png" alt="Rollout finished: old revision scaled to zero" style="display:block;width:100%;height:auto">
+      </div>
+      <span style="font-size:27px;font-weight:400;color:#6e6e73">Finished: canary promoted, the old revision at zero</span>
+    </div>
+  </div>
+</section>
+
+<section data-label="Cost Engineering" data-speaker-notes="טוני: אז כמה כל זה עולה? ▸ בקונפיגורציה נאיבית, התשתית הזאת היא בערך 250 דולר בחודש. ▸ אחרי כיוונון — spot, NAT יחיד, מידות נכונות — 140. ▸ מה ששילמנו בפועל, על כל הפרויקט: 43 דולר. סך הכול. ▸ כי הסביבה כובתה בסוף כל יום עבודה, ותשתית־כקוד הפכה את הבנייה מחדש לשורה אחת. הראל ימשיך מכאן." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:64px;padding:90px 160px" data-om-slide-id="ffc6a67e">
+  <div style="display:flex;flex-direction:column;gap:18px;align-items:center;text-align:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">COST</p>
+    <h2 class="fx d1" style="margin:0;font-size:84px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">What all of this cost</h2>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:44px;width:100%;max-width:1440px">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <span class="fx d2" style="font-size:28px;font-weight:600;color:#6e6e73">Default configuration, per month</span>
+      <div style="display:flex;align-items:center;gap:28px">
+        <div class="bar d2" style="height:56px;width:100%;background:#1d1d1f;border-radius:12px"></div>
+        <span class="fx d3" style="font-size:44px;font-weight:700;flex:none">$250</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <span class="fx d3" style="font-size:28px;font-weight:600;color:#6e6e73">After tuning: spot nodes, one NAT, right-sizing</span>
+      <div style="display:flex;align-items:center;gap:28px">
+        <div class="bar d4" style="height:56px;width:56%;background:#a1a1a6;border-radius:12px"></div>
+        <span class="fx d5" style="font-size:44px;font-weight:700;flex:none">$140</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <span class="fx d5" style="font-size:28px;font-weight:600;color:#ff5f3c">Actually paid: total, entire project</span>
+      <div style="display:flex;align-items:center;gap:28px">
+        <div class="bar d6" style="height:56px;width:17.2%;background:linear-gradient(90deg,#ff9d2e,#ff4530);border-radius:12px"></div>
+        <span class="fx d7" style="font-size:44px;font-weight:700;color:#ff4530;flex:none">$43</span>
+      </div>
+    </div>
+  </div>
+  <p class="fx d8" style="margin:0;font-size:30px;font-weight:400;color:#6e6e73;text-align:center">The whole environment shut down at the end of every workday. Infrastructure as code made rebuilding it a one-liner.</p>
+</section>
+
+<section data-label="§ Harel" data-speaker-notes="הראל: תודה, טוני. אני הראל. הייתי תותחן טנק. בטנק, או שאתה סומך על המכשירים שלך או שאתה עיוור. אז החלק שלי הוא בדיוק זה: איך אנחנו רואים את המערכת, ואיך שומרים עליה." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;padding:90px 140px;text-align:center" data-om-slide-id="e7863f74">
+  <img class="fp" src="assets/harel.jpg" alt="Harel" style="width:190px;height:190px;border-radius:50%;object-fit:cover;filter:grayscale(1) contrast(1.05);box-shadow:0 12px 40px rgba(0,0,0,.15)">
+  <p class="fx d1" style="margin:0;font-size:28px;font-weight:600;letter-spacing:.2em;color:#6e6e73">HAREL&nbsp;&nbsp;·&nbsp;&nbsp;TANK GUNNER</p>
+  <h2 class="grad fx d2" style="margin:0;font-size:160px;font-weight:700;letter-spacing:-0.03em;line-height:1">Operations</h2>
+  <p class="fx d3" style="margin:0;font-size:34px;font-weight:400;color:#6e6e73">Monitoring&nbsp;&nbsp;·&nbsp;&nbsp;Security</p>
+</section>
+
+<section data-label="Monitoring" data-speaker-notes="הראל: כלל מספר אחת בתפעול: לדעת לפני שמישהו מתלונן. כל שירות מייצא מדדים. ▸ זה מסך ה־Grafana שלנו: בקשות, שגיאות, זמני תגובה, ריסטארטים — לכל השירותים בבת אחת. כשמשהו סוטה, המערכת מרימה את ההתראה בעצמה." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;padding:80px 140px;text-align:center" data-om-slide-id="f28194b3">
+  <div style="display:flex;flex-direction:column;gap:16px;align-items:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">MONITORING</p>
+    <h2 class="fx d1" style="margin:0;font-size:80px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">Know before anyone complains</h2>
+    <p class="fx d2" style="margin:0;font-size:32px;font-weight:400;color:#6e6e73">Every service exports metrics. When something drifts, the system raises the alarm itself.</p>
+  </div>
+  <div class="fz d3" style="border:1px solid rgba(0,0,0,.1);border-radius:22px;overflow:hidden;box-shadow:0 26px 80px rgba(0,0,0,.22);width:100%;max-width:1560px">
+    <img src="assets/grafana.png" alt="Grafana: the SwarmOps overview dashboard" style="display:block;width:100%;height:auto">
+  </div>
+  <p class="fx d4" style="margin:0;font-size:26px;font-weight:400;color:#6e6e73">Grafana · Prometheus · Loki · the SwarmOps overview dashboard</p>
+</section>
+
+<section data-label="What We Measure" data-speaker-notes="הראל: שלושה פאנלים מספרים את הסיפור. ▸ כמה שירותים למעלה, עכשיו, במבט אחד. ▸ ריסטארטים של קונטיינרים: רואים דיפלוי רע קופץ, ואז מתייצב חזרה לאפס. ▸ והאהוב עליי: כמה זמן לוקח למתכנן לחשב תוכנית טיסה — חציון ומקרה גרוע. אנחנו לא רק יודעים שזה עובד. אנחנו יודעים כמה מהר." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:56px;padding:90px 140px;text-align:center" data-om-slide-id="08f0c580">
+  <div style="display:flex;flex-direction:column;gap:16px;align-items:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">MONITORING</p>
+    <h2 class="fx d1" style="margin:0;font-size:80px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">Not just alive. Measured.</h2>
+    <p class="fx d2" style="margin:0;font-size:32px;font-weight:400;color:#6e6e73">Requests, failures, and how long it takes to compute a flight plan.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:40px;width:100%;max-width:1600px">
+    <div class="fp d3" style="display:flex;flex-direction:column;gap:16px">
+      <div style="aspect-ratio:750/190;border:1px solid rgba(0,0,0,.15);border-radius:16px;box-shadow:0 10px 32px rgba(0,0,0,.14);background-image:url(assets/grafana.png);background-repeat:no-repeat;background-size:458.667% 694.211%;background-position:12.528% 19.043%"></div>
+      <span style="font-size:27px;font-weight:400;color:#6e6e73">Service targets up, right now</span>
+    </div>
+    <div class="fp d4" style="display:flex;flex-direction:column;gap:16px">
+      <div style="aspect-ratio:1121/283;border:1px solid rgba(0,0,0,.15);border-radius:16px;box-shadow:0 10px 32px rgba(0,0,0,.14);background-image:url(assets/grafana.png);background-repeat:no-repeat;background-size:306.868% 466.078%;background-position:96.291% 22.201%"></div>
+      <span style="font-size:27px;font-weight:400;color:#6e6e73">Container restarts, settling to zero</span>
+    </div>
+    <div class="fp d5" style="display:flex;flex-direction:column;gap:16px">
+      <div style="aspect-ratio:1001/253;border:1px solid rgba(0,0,0,.15);border-radius:16px;box-shadow:0 10px 32px rgba(0,0,0,.14);background-image:url(assets/grafana.png);background-repeat:no-repeat;background-size:343.656% 521.344%;background-position:13.817% 100%"></div>
+      <span style="font-size:27px;font-weight:400;color:#6e6e73">Plan solve time, p50 / p95</span>
+    </div>
+  </div>
+</section>
+
+<section data-label="Security" data-speaker-notes="הראל: אבטחנו את המערכת כמו שהצבא מאבטח בסיס, כי הדוקטרינות האלה עובדות. ▸ הגנה היקפית: שער אחד מאויש. רק ה־load balancer ציבורי; כל השירותים ברשתות פרטיות, בלתי נראים מבחוץ. ▸ צריך־לדעת: לכל שירות זהות משלו והמינימום הרשאות לתפקידו. שירות שנפרץ לא מגיע מעבר לתפקיד שלו. ▸ ביטחון מידע: אין סודות קבועים. ההרשאות קצרות־חיים ומונפקות בזמן ריצה; אין מה לגנוב. ▸ פקודות קבע: גיט הוא פקודת היום. שינוי ידני על שרת הוא סטייה לא מורשית, ו־Argo CD מחזיר את מה שכתוב בגיט תוך דקות. ▸ והבא בתור: אינטגרציה לרשתות צבאיות סגורות. הדוקטרינה כבר קיימת; רק ההיקף זז." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:48px;padding:80px 150px">
+  <div style="display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">SECURITY</p>
+    <h2 class="fx d1" style="margin:0;font-size:80px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">Military doctrine, applied to the cloud</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px;width:100%;max-width:1560px">
+    <div class="fp d2" style="background:#fff;border-radius:24px;padding:34px 38px;display:flex;flex-direction:column;gap:10px;text-align:left;box-shadow:0 2px 14px rgba(0,0,0,.05)">
+      <span style="font-size:23px;font-weight:700;letter-spacing:.12em;color:#ff5f3c">PERIMETER DEFENSE</span>
+      <span style="font-size:30px;font-weight:700;line-height:1.25">One guarded checkpoint</span>
+      <span style="font-size:26px;font-weight:400;color:#6e6e73;line-height:1.4">Like a base with a single gate: only the load balancer is public. Every service sits in private subnets, invisible from the internet.</span>
+    </div>
+    <div class="fp d3" style="background:#fff;border-radius:24px;padding:34px 38px;display:flex;flex-direction:column;gap:10px;text-align:left;box-shadow:0 2px 14px rgba(0,0,0,.05)">
+      <span style="font-size:23px;font-weight:700;letter-spacing:.12em;color:#ff5f3c">NEED TO KNOW</span>
+      <span style="font-size:30px;font-weight:700;line-height:1.25">Least privilege, per service</span>
+      <span style="font-size:26px;font-weight:400;color:#6e6e73;line-height:1.4">Each service has its own identity and only the permissions its job requires. A breached service can&rsquo;t reach beyond its role.</span>
+    </div>
+    <div class="fp d4" style="background:#fff;border-radius:24px;padding:34px 38px;display:flex;flex-direction:column;gap:10px;text-align:left;box-shadow:0 2px 14px rgba(0,0,0,.05)">
+      <span style="font-size:23px;font-weight:700;letter-spacing:.12em;color:#ff5f3c">OPSEC</span>
+      <span style="font-size:30px;font-weight:700;line-height:1.25">No standing secrets</span>
+      <span style="font-size:26px;font-weight:400;color:#6e6e73;line-height:1.4">You don&rsquo;t leave codes lying around. Credentials are short-lived and issued at runtime; there is nothing permanent to steal.</span>
+    </div>
+    <div class="fp d5" style="background:#fff;border-radius:24px;padding:34px 38px;display:flex;flex-direction:column;gap:10px;text-align:left;box-shadow:0 2px 14px rgba(0,0,0,.05)">
+      <span style="font-size:23px;font-weight:700;letter-spacing:.12em;color:#ff5f3c">STANDING ORDERS</span>
+      <span style="font-size:30px;font-weight:700;line-height:1.25">Git is the order of the day</span>
+      <span style="font-size:26px;font-weight:400;color:#6e6e73;line-height:1.4">Any hand-made change on a server is unauthorized drift. Argo CD detects it and restores what&rsquo;s written in git, within minutes.</span>
+    </div>
+  </div>
+  <p class="fx d6" style="margin:0;font-size:29px;font-weight:400;color:#6e6e73"><span style="color:#ff5f3c;font-weight:700">NEXT&nbsp;&nbsp;</span>Integration into closed military networks. The doctrine holds; only the perimeter moves.</p>
+</section>
+
+<section data-label="Request Path" data-speaker-notes="הראל: כך הדוקטרינה נראית עבור פקודה אחת, מקצה לקצה. ▸ פקודת המפעיל נוסעת מוצפנת, דרך DNS, אל ה־load balancer — הדלת הציבורית היחידה. ▸ ב־gateway, המחסום: בלי טוקן תקף, הבקשה נדחית לפני שנגעה בשירות כלשהו. ▸ עם טוקן תקף היא נכנסת לרשת הפרטית: השירות פועל בתוך תפקידו, מעביר עבודה לתור, planning מחליט, והפקודה מגיעה לרחפן. חמש בדיקות, אפס אמון עיוור." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:44px;padding:80px 130px">
+  <div style="display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">SECURITY</p>
+    <h2 class="fx d1" style="margin:0;font-size:76px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">One command, five checks</h2>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:22px;width:100%;max-width:1640px">
+    <div class="fp d2" style="display:flex;align-items:center;gap:16px;justify-content:center">
+      <div style="background:#1d1d1f;color:#f5f5f7;border-radius:18px;padding:20px 32px;display:flex;flex-direction:column;gap:2px"><span style="font-size:27px;font-weight:700">Operator</span><span style="font-size:23px;color:#a1a1a6">sends a command</span></div>
+      <span style="font-size:24px;color:#248a3d;font-weight:600">&#8594;&nbsp;TLS</span>
+      <div style="background:#fff;border-radius:18px;padding:20px 32px;display:flex;flex-direction:column;gap:2px;box-shadow:0 2px 12px rgba(0,0,0,.05)"><span style="font-size:27px;font-weight:700">Route 53</span><span style="font-size:23px;color:#6e6e73">DNS</span></div>
+      <span style="font-size:24px;color:#b6b6bc">&#8594;</span>
+      <div style="background:#fff;border-radius:18px;padding:20px 32px;display:flex;flex-direction:column;gap:2px;box-shadow:0 2px 12px rgba(0,0,0,.05)"><span style="font-size:27px;font-weight:700">Load balancer</span><span style="font-size:23px;color:#6e6e73">the only public door</span></div>
+      <span style="font-size:24px;color:#b6b6bc">&#8594;</span>
+      <div style="background:#fff;border:2px solid #ff5f3c;border-radius:18px;padding:18px 32px;display:flex;flex-direction:column;gap:2px"><span style="font-size:27px;font-weight:700;color:#ff5f3c">gateway</span><span style="font-size:23px;color:#6e6e73">checkpoint · token check</span></div>
+    </div>
+    <div class="fp d3" style="display:flex;align-items:center;gap:16px;justify-content:center">
+      <span style="font-size:25px;font-weight:700;color:#c22c1e">&#10007;&nbsp;no valid token</span>
+      <span style="font-size:24px;color:#c22c1e">&#8594;</span>
+      <div style="background:#fdeceb;border:1px solid #c22c1e;border-radius:100px;padding:14px 34px"><span style="font-size:25px;font-weight:600;color:#c22c1e">Rejected at the door · 401 · never reaches a service</span></div>
+    </div>
+    <div class="fp d4" style="display:flex;align-items:center;gap:16px;justify-content:center">
+      <span style="font-size:25px;font-weight:700;color:#248a3d">&#10003;&nbsp;valid token</span>
+      <span style="font-size:24px;color:#248a3d">&#8594;</span>
+      <div style="border:2px dashed #0e8a8c;border-radius:20px;padding:18px 24px;display:flex;align-items:center;gap:16px">
+        <span style="font-size:22px;font-weight:600;color:#0e8a8c;letter-spacing:.06em;writing-mode:vertical-rl;transform:rotate(180deg)">PRIVATE VPC</span>
+        <div style="background:#fff;border-radius:16px;padding:16px 26px;display:flex;flex-direction:column;gap:2px;box-shadow:0 2px 12px rgba(0,0,0,.05)"><span style="font-size:26px;font-weight:700">service</span><span style="font-size:22px;color:#6e6e73">least-privilege role</span></div>
+        <span style="font-size:24px;color:#b6b6bc">&#8594;</span>
+        <div style="background:#fff;border-radius:16px;padding:16px 26px;display:flex;flex-direction:column;gap:2px;box-shadow:0 2px 12px rgba(0,0,0,.05)"><span style="font-size:26px;font-weight:700">RabbitMQ</span><span style="font-size:22px;color:#6e6e73">queued, never direct</span></div>
+        <span style="font-size:24px;color:#b6b6bc">&#8594;</span>
+        <div style="background:#fff;border-radius:16px;padding:16px 26px;display:flex;flex-direction:column;gap:2px;box-shadow:0 2px 12px rgba(0,0,0,.05)"><span style="font-size:26px;font-weight:700">planning</span><span style="font-size:22px;color:#6e6e73">decides &amp; assigns</span></div>
+        <span style="font-size:24px;color:#b6b6bc">&#8594;</span>
+        <div style="background:#1d1d1f;color:#f5f5f7;border-radius:16px;padding:16px 26px;display:flex;flex-direction:column;gap:2px"><span style="font-size:26px;font-weight:700">drone</span><span style="font-size:22px;color:#a1a1a6">executes</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section data-label="Self-Healing" data-speaker-notes="הראל: וכשמשהו נשבר — ומשהו תמיד נשבר — אף אחד לא מקבל טלפון. ▸ AWS לוקח שרת spot: קוברנטיס מפזר את הפודים על הנותרים, תפוקה מלאה תוך כשתי דקות. ▸ מדדי canary נכשלים: ה־rollout מתהפך מעצמו והגרסה הישנה ממשיכה לשרת. ▸ מישהו משנה שרת ידנית: Argo CD מזהה סטייה ומחזיר את גרסת הגיט. שלוש תקלות, אפס בני אדם." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:44px;padding:80px 140px">
+  <div style="display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">RESILIENCE</p>
+    <h2 class="fx d1" style="margin:0;font-size:76px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">It breaks. It heals. Nobody gets paged.</h2>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:24px;width:100%;max-width:1620px">
+    <div class="fp d2" style="display:grid;grid-template-columns:1fr auto 1.2fr auto 1fr;gap:18px;align-items:center">
+      <div style="background:#fdeceb;border:1px solid #c22c1e;border-radius:18px;padding:22px 30px;display:flex;flex-direction:column;gap:2px"><span style="font-size:26px;font-weight:700;color:#c22c1e">Spot node reclaimed</span><span style="font-size:22px;color:#6e6e73">AWS takes a node back</span></div>
+      <span style="font-size:26px;color:#b6b6bc">&#8594;</span>
+      <div style="background:#fff;border-radius:18px;padding:22px 30px;display:flex;flex-direction:column;gap:2px;box-shadow:0 2px 12px rgba(0,0,0,.05)"><span style="font-size:26px;font-weight:700">Kubernetes reschedules</span><span style="font-size:22px;color:#6e6e73">pods land on the remaining nodes</span></div>
+      <span style="font-size:26px;color:#b6b6bc">&#8594;</span>
+      <div style="background:#eaf6ee;border:1px solid #248a3d;border-radius:18px;padding:22px 30px;display:flex;flex-direction:column;gap:2px"><span style="font-size:26px;font-weight:700;color:#248a3d">Full capacity</span><span style="font-size:22px;color:#6e6e73">~2 minutes · no human</span></div>
+    </div>
+    <div class="fp d3" style="display:grid;grid-template-columns:1fr auto 1.2fr auto 1fr;gap:18px;align-items:center">
+      <div style="background:#fdeceb;border:1px solid #c22c1e;border-radius:18px;padding:22px 30px;display:flex;flex-direction:column;gap:2px"><span style="font-size:26px;font-weight:700;color:#c22c1e">Canary metrics fail</span><span style="font-size:22px;color:#6e6e73">new version underperforms</span></div>
+      <span style="font-size:26px;color:#b6b6bc">&#8594;</span>
+      <div style="background:#fff;border-radius:18px;padding:22px 30px;display:flex;flex-direction:column;gap:2px;box-shadow:0 2px 12px rgba(0,0,0,.05)"><span style="font-size:26px;font-weight:700">Rollout reverses itself</span><span style="font-size:22px;color:#6e6e73">traffic returns to the stable version</span></div>
+      <span style="font-size:26px;color:#b6b6bc">&#8594;</span>
+      <div style="background:#eaf6ee;border:1px solid #248a3d;border-radius:18px;padding:22px 30px;display:flex;flex-direction:column;gap:2px"><span style="font-size:26px;font-weight:700;color:#248a3d">Old version serving</span><span style="font-size:22px;color:#6e6e73">automatic · no 3am rollback</span></div>
+    </div>
+    <div class="fp d4" style="display:grid;grid-template-columns:1fr auto 1.2fr auto 1fr;gap:18px;align-items:center">
+      <div style="background:#fdeceb;border:1px solid #c22c1e;border-radius:18px;padding:22px 30px;display:flex;flex-direction:column;gap:2px"><span style="font-size:26px;font-weight:700;color:#c22c1e">Manual change on a server</span><span style="font-size:22px;color:#6e6e73">unauthorized drift</span></div>
+      <span style="font-size:26px;color:#b6b6bc">&#8594;</span>
+      <div style="background:#fff;border-radius:18px;padding:22px 30px;display:flex;flex-direction:column;gap:2px;box-shadow:0 2px 12px rgba(0,0,0,.05)"><span style="font-size:26px;font-weight:700">Argo CD detects drift</span><span style="font-size:22px;color:#6e6e73">compares cluster to git</span></div>
+      <span style="font-size:26px;color:#b6b6bc">&#8594;</span>
+      <div style="background:#eaf6ee;border:1px solid #248a3d;border-radius:18px;padding:22px 30px;display:flex;flex-direction:column;gap:2px"><span style="font-size:26px;font-weight:700;color:#248a3d">Git state restored</span><span style="font-size:22px;color:#6e6e73">~3 minutes · self-reverting</span></div>
+    </div>
+  </div>
+</section>
+
+<section data-label="Recap" data-speaker-notes="הראל: אז — SwarmOps, בשקף אחד. ▸ מפעיל אחד מפקד על צי שלם, ▸ תוכניות בשניות, תכנון מחדש באוויר. ▸ שישה מיקרו־שירותים ▸ על EKS, ב־VPC פרטי על פני שני אזורים. ▸ דיפלוי על ידי בוט, blue-green ו־canary, ▸ ריפוי עצמי, רולבקים אוטומטיים, הכול נמדד. ▸ וכל זה עלה לנו 43 דולר." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:70px;padding:90px 160px;text-align:center" data-om-slide-id="9d040a3e">
+  <h2 class="fx" style="margin:0;font-size:64px;font-weight:700;letter-spacing:-0.015em"><span class="grad">SwarmOps.</span> <span style="color:#6e6e73">In one slide.</span></h2>
+  <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:26px 44px;max-width:1560px;line-height:1.3">
+    <span class="fp d1" style="font-size:44px;font-weight:700">One operator, a whole fleet</span>
+    <span class="fp d1" style="font-size:44px;font-weight:700;color:#a1a1a6">Plans in seconds</span>
+    <span class="fp d2" style="font-size:44px;font-weight:700">Replanning in flight</span>
+    <span class="fp d2" style="font-size:44px;font-weight:700;color:#a1a1a6">6 microservices</span>
+    <span class="fp d3" style="font-size:44px;font-weight:700">EKS on AWS</span>
+    <span class="fp d3" style="font-size:44px;font-weight:700;color:#a1a1a6">Private VPC · 2 zones</span>
+    <span class="fp d4" style="font-size:44px;font-weight:700">5 spot nodes</span>
+    <span class="fp d4" style="font-size:44px;font-weight:700;color:#a1a1a6">62 containers</span>
+    <span class="fp d5" style="font-size:44px;font-weight:700">Deployed by a bot</span>
+    <span class="fp d5" style="font-size:44px;font-weight:700;color:#a1a1a6">Blue-green + canary</span>
+    <span class="fp d6" style="font-size:44px;font-weight:700">Self-healing</span>
+    <span class="fp d6" style="font-size:44px;font-weight:700;color:#a1a1a6">Zero-trust network</span>
+    <span class="fp d6" style="font-size:44px;font-weight:700">Automatic rollback</span>
+    <span class="fp d6" style="font-size:44px;font-weight:700;color:#a1a1a6">Metrics on everything</span>
+    <span class="grad fp d7" style="font-size:44px;font-weight:700">$43 total spend</span>
+  </div>
+</section>
+
+<section data-label="Thank You" data-speaker-notes="הראל סוגר: זו SwarmOps. נבנתה על ידי שלושה אנשים שהיו צריכים אותה. תודה רבה. נשמח לשאלות." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;padding:90px 140px;text-align:center" data-om-slide-id="cf62f2e3">
+  <img class="fx" src="assets/logo-mark.png" alt="SwarmOps logo" style="width:150px;height:auto">
+  <h2 class="fx d1" style="margin:0;font-size:120px;font-weight:700;letter-spacing:-0.025em;line-height:1">Thank you.</h2>
+  <p class="fx d2" style="margin:0;font-size:32px;font-weight:400;color:#6e6e73">Questions welcome.</p>
+  <p class="fx d3" style="margin:24px 0 0;font-size:28px;font-weight:500;color:#6e6e73;letter-spacing:.04em">Guy&nbsp;&nbsp;·&nbsp;&nbsp;Tony&nbsp;&nbsp;·&nbsp;&nbsp;Harel&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;SwarmOps</p>
+</section>
+
+</x-import>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  componentDidMount() {
+    this._urls = [];
+    const load = () => {
+      document.querySelectorAll('video[data-video]').forEach((v) => {
+        if (v.dataset.loaded) return;
+        v.dataset.loaded = '1';
+        fetch(v.dataset.video).then((r) => r.blob()).then((b) => {
+          const u = URL.createObjectURL(new Blob([b], { type: 'video/mp4' }));
+          this._urls.push(u);
+          v.src = u; v.muted = true; v.loop = true; v.playsInline = true;
+          v.play().catch(() => {});
+        });
+      });
+    };
+    load();
+    this._t = setInterval(load, 1500);
+    setTimeout(() => clearInterval(this._t), 15000);
+    this._setupBuilds();
+  }
+  _setupBuilds() {
+    const STEPS = {
+      'The Problem': ['.d2', '.d3', '.d4'],
+      'The Cost': ['.d2', '.d3', '.d4', '.d5', '.d6,.d7'],
+      'Replanning': ['.d2', '.d3', '.d4'],
+      'Constraints': ['.d2', '.d3', '.d4', '.d5', '.d6', '.d7'],
+      'Six Services': ['.d3', '.d4', '.d5', '.d6', '.d7'],
+      'The Network': ['.d3', '.d4', '.d5'],
+      'Inside the Cluster': ['.d3', '.d4', '.d5'],
+      'By the Numbers': ['.d2', '.d3', '.d4', '.d5', '.d6', '.d7'],
+      'Commit to Cluster': ['.d2', '.d3', '.d4', '.d5', '.d6', '.d7'],
+      'GitOps in Production': ['.d3'],
+      'Zero Downtime': ['.d3', '.d5'],
+      'Canary Rollouts': ['.d2', '.d3', '.d4', '.d5', '.d6'],
+      'Rollout Timeline': ['.d2', '.d4'],
+      'Cost Engineering': ['.d2,.d3', '.d4,.d5', '.d6,.d7', '.d8'],
+      'Monitoring': ['.d3,.d4'],
+      'What We Measure': ['.d3', '.d4', '.d5'],
+      'Security': ['.d2', '.d3', '.d4', '.d5', '.d6'],
+      'Request Path': ['.d2', '.d3', '.d4'],
+      'Self-Healing': ['.d2', '.d3', '.d4'],
+      'Recap': ['.d1', '.d2', '.d3', '.d4', '.d5', '.d6', '.d7']
+    };
+    const st = { section: null, index: 0, steps: [], at: 0 };
+    const prep = (section, builtAll) => {
+      st.section = section;
+      const groups = STEPS[section.getAttribute('data-label')] || [];
+      st.steps = groups.map((sel) => Array.from(section.querySelectorAll(sel)));
+      st.at = builtAll ? st.steps.length : 0;
+      st.steps.forEach((els, i) => els.forEach((el) => {
+        el.classList.remove('step-live');
+        el.classList.toggle('step-hidden', i >= st.at);
+      }));
+    };
+    const revealNext = () => {
+      if (st.at >= st.steps.length) return false;
+      st.steps[st.at].forEach((el) => { el.classList.add('step-live'); el.classList.remove('step-hidden'); });
+      st.at++;
+      return true;
+    };
+    document.addEventListener('slidechange', (e) => {
+      st.index = e.detail.index;
+      prep(e.detail.slide, e.detail.previousIndex > e.detail.index);
+    });
+    const initPoll = setInterval(() => {
+      const cur = document.querySelector('section[data-deck-active]');
+      if (cur) { clearInterval(initPoll); if (!st.section) prep(cur, false); }
+    }, 200);
+    setTimeout(() => clearInterval(initPoll), 6000);
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        if (revealNext()) { e.preventDefault(); e.stopImmediatePropagation(); }
+      }
+    }, true);
+    document.addEventListener('click', (e) => {
+      if (!st.section || !e.composedPath().includes(st.section)) return;
+      if (revealNext()) { e.preventDefault(); e.stopImmediatePropagation(); }
+      else {
+        const stage = document.querySelector('deck-stage');
+        if (stage && stage.goTo && st.index < stage.querySelectorAll('section').length - 1) stage.goTo(st.index + 1);
+      }
+    }, true);
+  }
+  componentWillUnmount() {
+    clearInterval(this._t);
+    (this._urls || []).forEach((u) => URL.revokeObjectURL(u));
+  }
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
