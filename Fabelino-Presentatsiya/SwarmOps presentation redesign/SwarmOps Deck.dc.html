@@ -901,11 +901,11 @@ class Component extends DCLogic {
           ${ke('M600,764 V806 H1115 V404', 's-c4')}
           ${ke('M1215,175 H1150', 's-c5')}
           ${ke('M1215,370 H1170 V630 H700 V574', 's-c5')}
-          ${ke('M1010,712 H1120 V555 H1215', 's-c5')}
+          ${ke('M1010,712 H1145 V555 H1215', 's-c5')}
           ${ke('M1500,415 V440 H1350 V520', 's-c5')}
           ${ke('M1305,620 V590', 's-c5')}
           ${ke('M1395,555 H1420', 's-c5')}
-          ${ke('M1360,520 V500 H1715 V520', 's-c5')}
+          ${ke('M1250,590 V606 H1715 V590', 's-c5')}
           ${ke('M1600,840 H1580', 's-c5')}
           ${ke('M1150,940 H1700 V880', 's-c5')}
           ${ke('M1500,800 V590', 's-c5')}
@@ -921,7 +921,8 @@ class Component extends DCLogic {
         ${kf(30, 70, 1120, 790, 'NAMESPACE: SWARMOPS', '#6f42d8')}
         ${kf(1180, 70, 650, 180, 'NAMESPACE: ARGOCD', '#3f7fd8').replace('class="kfrm"', 'class="kfrm s-c5"')}
         ${kf(1180, 275, 650, 165, 'NAMESPACE: ARGO-ROLLOUTS', '#7b4fd8').replace('class="kfrm"', 'class="kfrm s-c5"')}
-        ${kf(1180, 465, 650, 250, 'NAMESPACE: MONITORING', '#8e8e93').replace('class="kfrm"', 'class="kfrm s-c5"')}
+        <div class="kfrm s-c5" style="left:1180px;top:465px;width:650px;height:250px;border-color:#8e8e93">
+          <b style="color:#8e8e93;left:auto;right:22px">NAMESPACE: MONITORING</b></div>
         ${kf(1180, 740, 650, 240, 'NAMESPACE: LOGGING', '#8e8e93').replace('class="kfrm"', 'class="kfrm s-c5"')}
 
         ${kb(70, 150, 200, 84, 'edge', 'Ingress', 'ALB target', 's-c1')}
