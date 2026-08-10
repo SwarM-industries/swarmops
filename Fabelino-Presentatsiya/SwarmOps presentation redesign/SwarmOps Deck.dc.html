@@ -786,7 +786,7 @@ class Component extends DCLogic {
        reserve ~56px of header so an inner frame never sits on the outer
        frame's label. Boxes and paths share one flat coordinate system. */
     const footprint = `
-      <div class="frm lyr" data-depth="1" data-w="footprint" style="left:150px;top:100px;width:1860px;height:1020px;border:none;background:transparent">
+      <div class="frm lyr" data-depth="0" data-w="footprint" style="left:150px;top:100px;width:1860px;height:1020px;border:none;background:transparent">
         <svg class="wires" viewBox="0 0 1860 1020" preserveAspectRatio="none">
           <defs>
             <marker id="fh" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
@@ -848,7 +848,7 @@ class Component extends DCLogic {
       </div>`;
 
     const cluster = `
-      <div class="frm lyr" data-depth="2" data-w="cluster" style="left:150px;top:1300px;width:1860px;height:1020px;border:2px solid #6f42d8;border-radius:30px;background:#fdfcff">
+      <div class="frm lyr" data-depth="0" data-w="cluster" style="left:150px;top:1300px;width:1860px;height:1020px;border:2px solid #6f42d8;border-radius:30px;background:#fdfcff">
         <svg class="wires" viewBox="0 0 1860 1020" preserveAspectRatio="none">
           <defs>
             <marker id="kh" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
@@ -1026,11 +1026,30 @@ class Component extends DCLogic {
       const prev = e.detail.previousSlide;
       enter(e.detail.slide, prev ? prev.getAttribute('data-label') : null);
     });
-    const poll = setInterval(() => {
+
+    // Slides are not in the DOM at mount - the deck renders them async, which is
+    // why the step engine polls too. Build every camera world as soon as they
+    // exist, rather than on first visit: the step engine binds its clicks on
+    // slidechange, and a world built later than that binds nothing.
+    const boot = () => {
+      document.querySelectorAll('section[data-label]').forEach((section) => {
+        if (!CAM[section.getAttribute('data-label')]) return;
+        const host = section.querySelector('[data-world]');
+        if (!host || host.querySelector('.world')) return;
+        host.innerHTML = this._worldHTML();
+        host._m = measure(host.querySelector('.world'));
+      });
       const cur = document.querySelector('section[data-deck-active]');
-      if (cur) { clearInterval(poll); enter(cur, null); }
-    }, 200);
-    setTimeout(() => clearInterval(poll), 6000);
+      if (!cur) return;
+      // re-announce the current slide so the step engine binds against the
+      // worlds that now exist (covers opening straight onto a camera slide)
+      document.dispatchEvent(new CustomEvent('slidechange', { bubbles: true, detail: {
+        index: 0, previousIndex: -1, slide: cur, previousSlide: null, reason: 'worlds-ready' } }));
+    };
+    const poll = setInterval(() => {
+      if (document.querySelector('section[data-deck-active]')) { clearInterval(poll); boot(); }
+    }, 120);
+    setTimeout(() => clearInterval(poll), 8000);
   }
 
   _setupBuilds() {
