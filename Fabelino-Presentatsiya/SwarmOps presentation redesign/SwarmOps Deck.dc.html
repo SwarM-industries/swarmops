@@ -54,6 +54,9 @@ a:hover{color:#ff5f3c}
 .wv{position:absolute;inset:0;overflow:hidden;background:#eef0f3}
 .world{position:absolute;left:0;top:0;width:2200px;height:3700px;transform-origin:0 0;
   transition:transform 1250ms cubic-bezier(.22,1,.28,1);will-change:transform}
+/* the CI world is its own layer with a single region - GitHub is not inside
+   the AWS account, so it must not share the main world's coordinate space */
+.world.ciw{height:1220px}
 .world.nofly{transition:none !important}
 /* while measuring targets we neutralise the layer transform, or the camera
    would frame the pre-reveal position instead of the real one */
@@ -469,6 +472,12 @@ a:hover{color:#ff5f3c}
   </div>
 </section>
 
+<section class="camslide" data-label="CI Pipeline" data-speaker-notes="טוני: ועכשיו איך קוד הופך לגרסה שרצה. נכנסים לתוך ה־CI עצמו — צינור אחד, זהה בכל אחד מהשירותים. ▸ כל בקשת משיכה מפעילה את שלב האימות: התקנה, לינט, בדיקות טיפוסים, ובנייה של אימג׳ דוקר — שנבנה רק כדי לוודא שהוא נבנה, ואף פעם לא נדחף. ▸ אם זו רק בקשת משיכה, כאן זה נגמר. אין אימג׳, אין נגיעה בקלאסטר. רק מיזוג ל־main ממשיך הלאה. ▸ ואז שלב הפרסום: תג ייחודי — גרסה ועוד שבעה תווים של הקומיט, אף פעם לא latest — והזדהות מול AWS דרך OIDC. הרשאה קצרת־חיים לריצה הזאת בלבד; אין שום מפתח קבוע שאפשר לגנוב. ▸ האימג׳ נבנה ונדחף ל־ECR, והתג שם הוא בלתי ניתן לשינוי — גרסה שיצאה לא משתנה לעולם. ▸ והצעד האחרון הוא ההפתעה: ה־CI לא מדפלה. הוא כותב שורה אחת בקובץ בריפו הדיפלוימנטים ועושה קומיט, חתום swarmops-ci-bot. זה הכול. הוא אף פעם לא מדבר עם הקלאסטר. מי שכן — זה כבר החלק של הראל." style="background:#eef0f3;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif" data-om-slide-id="7d41ba6e">
+  <div class="wv" data-world data-dense="0"></div>
+  <div class="crumb">GITHUB<span>&rsaquo;</span><b>ACTIONS &middot; CI</b></div>
+  <div class="tstrip"><b>CONTINUOUS INTEGRATION</b><span>How an image gets built</span></div>
+</section>
+
 <section data-label="Cost Engineering" data-speaker-notes="טוני: אז כמה כל זה עולה? ▸ בקונפיגורציה נאיבית, התשתית הזאת היא בערך 250 דולר בחודש. ▸ אחרי כיוונון — spot, NAT יחיד, מידות נכונות — 140. ▸ מה ששילמנו בפועל, על כל הפרויקט: 43 דולר. סך הכול. ▸ כי הסביבה כובתה בסוף כל יום עבודה, ותשתית־כקוד הפכה את הבנייה מחדש לשורה אחת. זו הארכיטקטורה והמחיר שלה. איך היא נשארת חיה, איך מעדכנים אותה בלי להפיל אותה, ואיך שומרים עליה — זה של הראל." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:64px;padding:90px 160px" data-om-slide-id="ffc6a67e">
   <div style="display:flex;flex-direction:column;gap:18px;align-items:center;text-align:center">
     <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">COST</p>
@@ -545,38 +554,42 @@ a:hover{color:#ff5f3c}
   </div>
 </section>
 
-<section data-label="Commit to Cluster" data-speaker-notes="הראל: וכדי שכל זה יישאר נכון, צריך שגם הדרך שבה קוד מגיע לקלאסטר תהיה מדודה בדיוק כמו המדדים. אף אחד לא מדפלה ידנית. אף פעם. ▸ דוחפים קומיט. ▸ ה־CI בונה אימג׳ ומתייג. ▸ האימג׳ נוחת במאגר. ▸ Argo CD מזהה שגיט השתנה. ▸ הקלאסטר מושך את השינוי ומתיישר. ▸ שימו לב לכיוון: משיכה, לא דחיפה. הקלאסטר מסנכרן את עצמו לגיט. הקוד הוא מקור האמת היחיד." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:70px;padding:90px 140px;text-align:center" data-om-slide-id="bb0c7f76">
+<section data-label="Reconciliation" data-speaker-notes="הראל: ועכשיו לשאלה איך קוד בכלל מגיע לקלאסטר הזה. טוני עצר בדיוק ברגע שהקומיט נכתב — משם זה שלי. ▸ בגיט יושב המצב הרצוי, אותו קובץ שה־CI בדיוק עדכן עם התג החדש. ▸ ובתוך הקלאסטר יושב Argo CD, ומשווה כל הזמן בין מה שכתוב בגיט לבין מה שבאמת רץ. ▸ ברגע שנפתח פער הוא מסנכרן: מושך את התג החדש, מחיל את הצ׳ארט, והקלאסטר שוב זהה לגיט. ▸ והחלק החשוב הוא שהלולאה הזאת אף פעם לא נעצרת. אם מישהו ישנה משהו ידנית על השרת, זה נחשב סטייה — ו־Argo מחזיר את מה שכתוב בגיט תוך דקות. שימו לב לכיוון: משיכה, לא דחיפה. אף אחד כאן לא מריץ helm upgrade ביד." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:52px;padding:80px 130px;text-align:center" data-om-slide-id="4b7e29c1">
   <div style="display:flex;flex-direction:column;gap:18px;align-items:center">
-    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">DEPLOYMENT</p>
-    <h2 class="fx d1" style="margin:0;font-size:84px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">From commit to cluster</h2>
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">OPERATIONS</p>
+    <h2 class="fx d1" style="margin:0;font-size:82px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">The cluster syncs itself</h2>
   </div>
-  <div style="display:flex;align-items:center;gap:24px">
-    <div class="fp d2" style="background:#fff;border-radius:24px;padding:34px 40px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 14px rgba(0,0,0,.05)">
-      <span style="font-size:30px;font-weight:700">Commit</span>
-      <span style="font-size:24px;color:#6e6e73">git push</span>
+
+  <!-- a closed cycle, not a chain: the return path is the whole point, so it is
+       drawn rather than described -->
+  <div style="position:relative;width:100%;max-width:1560px;padding-bottom:170px">
+    <div style="display:flex;align-items:stretch;justify-content:center;gap:18px">
+      <div class="fp d2" style="flex:1;background:#fff;border-radius:24px;padding:28px 26px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 14px rgba(0,0,0,.05)">
+        <span style="font-size:29px;font-weight:700">git</span>
+        <span style="font-size:23px;color:#6e6e73;line-height:1.35">the desired state &mdash; the file CI just bumped</span>
+      </div>
+      <span class="fp d3" style="align-self:center;font-size:34px;color:#b6b6bc">&rarr;</span>
+      <div class="fp d3" style="flex:1;background:#fff;border:2px solid #ff5f3c;border-radius:24px;padding:26px 26px;display:flex;flex-direction:column;gap:8px">
+        <span style="font-size:29px;font-weight:700;color:#ff5f3c">Argo CD diffs</span>
+        <span style="font-size:23px;color:#6e6e73;line-height:1.35">desired vs. live, over and over</span>
+      </div>
+      <span class="fp d4" style="align-self:center;font-size:34px;color:#b6b6bc">&rarr;</span>
+      <div class="fp d4" style="flex:1;background:#fff;border-radius:24px;padding:28px 26px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 14px rgba(0,0,0,.05)">
+        <span style="font-size:29px;font-weight:700">Sync</span>
+        <span style="font-size:23px;color:#6e6e73;line-height:1.35">pulls the new tag, applies the chart</span>
+      </div>
+      <span class="fp d4" style="align-self:center;font-size:34px;color:#b6b6bc">&rarr;</span>
+      <div class="fp d4" style="flex:1;background:#fff;border-radius:24px;padding:28px 26px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 14px rgba(0,0,0,.05)">
+        <span style="font-size:29px;font-weight:700">Live state</span>
+        <span style="font-size:23px;color:#6e6e73;line-height:1.35">the cluster now matches git</span>
+      </div>
     </div>
-    <span class="fp d3" style="font-size:34px;color:#b6b6bc">→</span>
-    <div class="fp d3" style="background:#fff;border-radius:24px;padding:34px 40px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 14px rgba(0,0,0,.05)">
-      <span style="font-size:30px;font-weight:700">Build</span>
-      <span style="font-size:24px;color:#6e6e73">CI · image + tag</span>
-    </div>
-    <span class="fp d4" style="font-size:34px;color:#b6b6bc">→</span>
-    <div class="fp d4" style="background:#fff;border-radius:24px;padding:34px 40px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 14px rgba(0,0,0,.05)">
-      <span style="font-size:30px;font-weight:700">Registry</span>
-      <span style="font-size:24px;color:#6e6e73">push to ECR</span>
-    </div>
-    <span class="fp d5" style="font-size:34px;color:#b6b6bc">→</span>
-    <div class="fp d5" style="background:#fff;border:2px solid #ff5f3c;border-radius:24px;padding:32px 40px;display:flex;flex-direction:column;gap:6px">
-      <span style="font-size:30px;font-weight:700;color:#ff5f3c">Argo CD</span>
-      <span style="font-size:24px;color:#6e6e73">detects the change</span>
-    </div>
-    <span class="fp d6" style="font-size:34px;color:#b6b6bc">→</span>
-    <div class="fp d6" style="background:#fff;border-radius:24px;padding:34px 40px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 14px rgba(0,0,0,.05)">
-      <span style="font-size:30px;font-weight:700">Cluster</span>
-      <span style="font-size:24px;color:#6e6e73">pulls &amp; converges</span>
-    </div>
+    <div class="fp d5" style="position:absolute;left:120px;right:120px;bottom:62px;height:80px;border:2px dashed #ff5f3c;border-top:none;border-radius:0 0 30px 30px"></div>
+    <span class="fx d5" style="position:absolute;left:106px;bottom:128px;font-size:34px;line-height:1;color:#ff5f3c">&uarr;</span>
+    <span class="fx d5" style="position:absolute;left:0;right:0;bottom:6px;font-size:27px;font-weight:600;color:#ff5f3c">drift detected &mdash; Argo puts git&rsquo;s version back, within minutes</span>
   </div>
-  <p class="fx d7" style="margin:0;font-size:32px;font-weight:400;color:#6e6e73;max-width:1200px;line-height:1.45"><span style="color:#1d1d1f;font-weight:600">Pull-based, not push.</span> The cluster continuously syncs itself to what’s in git. Code is the single source of truth.</p>
+
+  <p class="fx d5" style="margin:0;font-size:31px;font-weight:400;color:#6e6e73;max-width:1240px;line-height:1.45"><span style="color:#1d1d1f;font-weight:600">Pull, not push.</span> The cluster converges on git on its own. Nobody runs <span style="font-weight:600;color:#1d1d1f">helm upgrade</span> by hand &mdash; not once.</p>
 </section>
 
 <section data-label="GitOps in Production" data-speaker-notes="הראל: זו לא דיאגרמה; זה מסך הפרודקשן שלנו. 12 אפליקציות מסונכרנות, 27 משאבים בריאים. ▸ תסתכלו מי חתום על הסנכרון האחרון: swarmops-ci-bot. המדפלה הוא בוט. בני אדם כותבים קוד; הבוט מריץ את הקלאסטר." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:36px;padding:70px 140px;text-align:center" data-om-slide-id="5c495608">
@@ -799,9 +812,12 @@ class Component extends DCLogic {
     this._setupCamera();
   }
 
-  /* One architecture world, rendered per camera slide. Slides 15-20 are camera
-     positions over it, so moving between them is a flight, not a cut. */
-  _worldHTML() {
+  /* Two worlds. 'main' is the architecture: footprint > cluster > optimizer,
+     nested places inside one AWS account, so moving between those slides is a
+     flight rather than a cut. 'ci' is separate on purpose - GitHub Actions is
+     not a place inside the account, and putting it in the same coordinate
+     space would imply it is. */
+  _worldHTML(name) {
     const kf = (x, y, w, h, label, colour) =>
       `<div class="kfrm" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;border-color:${colour}">${label ? `<b style="color:${colour}">${label}</b>` : ""}</div>`;
     const kb = (x, y, w, h, kind, title, sub, step) =>
@@ -972,6 +988,64 @@ class Component extends DCLogic {
         ${ostage(5, 'Replan trigger', 'rabbitmq', 'an event lands and the whole pipeline runs again')}
       </div>`;
 
+    /* ── the CI pipeline ─────────────────────────────────────────────────
+       Its own world: this is GitHub, not the AWS account, so it gets its own
+       coordinate space rather than a fourth region in the architecture world.
+       Authored at 1:1 like the optimizer. Local helpers because this region is
+       sparse enough to want real type sizes, not the dense-diagram defaults. */
+    const cf = (x, y, w, h, label, colour, step) =>
+      `<div class="kfrm ${step || ''}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;border-color:${colour}">
+        <b style="color:${colour};font-size:25px">${label}</b></div>`;
+    const cb = (x, y, w, h, kind, title, sub, step) =>
+      `<div class="kbox ${kind} ${step || ''}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;padding:10px 24px;gap:4px">
+        <i style="font-size:31px">${title}</i>${sub ? `<u style="font-size:22px">${sub}</u>` : ''}</div>`;
+    const cl = (x, y, t, step) => `<text x="${x}" y="${y}" class="et ${step || ''}" style="font-size:22px">${t}</text>`;
+
+    const ci = `
+      <div class="frm lyr" data-depth="0" data-w="ci" style="left:150px;top:100px;width:1860px;height:1020px;border:2px solid #3f7fd8;border-radius:30px;background:#fdfdff">
+        <svg class="wires" viewBox="0 0 1860 1020" preserveAspectRatio="none">
+          <defs>
+            <marker id="kh" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+              <path d="M0,0 L9,4.5 L0,9 z" fill="#9a9aa4"/>
+            </marker>
+          </defs>
+          ${ke('M460,170 H560', 's-ci1')}
+          ${ke('M460,350 H560', 's-ci2')}
+          ${ke('M1180,225 H1235 V170 H1290', 's-ci2')}
+          ${ke('M870,390 V460', 's-ci3')}
+          ${ke('M880,810 V850', 's-ci4')}
+          ${ke('M1510,810 V850', 's-ci5')}
+          ${cl(884, 432, 'only if ref == refs/heads/main', 's-ci3')}
+        </svg>
+
+        ${cb(40, 120, 420, 100, 'edge', 'Pull request', 'opened against main', 's-ci1')}
+        ${cb(40, 300, 420, 100, 'gw', 'Push to main', 'the merge lands', 's-ci2')}
+
+        ${cf(560, 60, 620, 330, 'JOB: VERIFY', '#3f9e4d', 's-ci1')}
+        ${cb(595, 130, 550, 84, 'sys', 'install &middot; lint &middot; typecheck', 'planning: import sanity check', 's-ci1')}
+        ${cb(595, 235, 550, 84, 'sys', 'docker build', 'validated, never pushed', 's-ci1')}
+
+        ${cb(1290, 120, 500, 100, 'sys', 'A PR stops here', 'no image, no cluster', 's-ci2')}
+
+        ${cf(560, 460, 1230, 350, 'JOB: PUBLISH', '#7b4fd8', 's-ci3')}
+        ${cb(595, 535, 570, 84, 'app', 'Tag &nbsp;0.1.0-a1b2c3d', 'semver + 7-char commit hash', 's-ci3')}
+        ${cb(595, 645, 570, 84, 'app', 'OIDC &rarr; AWS', 'short-lived role, no static keys', 's-ci3')}
+        ${cb(1195, 535, 560, 84, 'app', 'Build + push image', 'immutable tag, never latest', 's-ci4')}
+        ${cb(1195, 645, 560, 84, 'hero', 'yq bump &rarr; git commit', 'authored by swarmops-ci-bot', 's-ci5')}
+
+        ${cb(560, 850, 560, 100, 'sim', 'ECR', '9 service images', 's-ci4')}
+        ${cb(1230, 850, 560, 100, 'data', 'swarmops-deployments', 'environments/production/images/', 's-ci5')}
+
+        <!-- z-index: anything in a world region must clear the .wires svg (z 2),
+             or it renders underneath it and simply never appears -->
+        <div class="s-ci5" style="position:absolute;left:40px;top:520px;width:490px;text-align:left;z-index:3">
+          <div style="font-size:36px;font-weight:700;color:#c2400f;line-height:1.25">CI&rsquo;s last act is a git commit.</div>
+          <div style="margin-top:14px;font-size:28px;font-weight:400;color:#6e6e73;line-height:1.4">It never talks to the cluster. Not once.</div>
+        </div>
+      </div>`;
+
+    if (name === 'ci') return `<div class="world ciw">${ci}</div>`;
+
     return `<div class="world">
       ${footprint}
       ${cluster}
@@ -983,7 +1057,11 @@ class Component extends DCLogic {
     const CAM = {
       'Cloud Footprint':          { t: 'footprint', d: 0, p: 34 },
       'Inside the Cluster':       { t: 'cluster',   d: 0, p: 34 },
-      'The Optimizer':            { t: 'optimizer', d: 0, p: 34 }
+      'The Optimizer':            { t: 'optimizer', d: 0, p: 34 },
+      // w:'ci' is a different world, so arriving here is always a zoom-in from
+      // half scale rather than a pan - which is what we want coming off the
+      // flat "by the numbers" slide.
+      'CI Pipeline':              { t: 'ci', w: 'ci', d: 0, p: 34 }
     };
     const measure = (world) => {
       world.classList.add('nofly', 'measuring');
@@ -1032,13 +1110,17 @@ class Component extends DCLogic {
       if (!host) return;
       let world = host.querySelector('.world');
       if (!world) {
-        host.innerHTML = this._worldHTML();
+        host.innerHTML = this._worldHTML(cfg.w);
         world = host.querySelector('.world');
         host._m = measure(world);
       }
       const m = host._m;
       const to = camOf(m, cfg);
-      const from = CAM[prevLabel] ? camOf(m, CAM[prevLabel]) : camOf(m, cfg, 0.5);
+      // Panning from the previous slide only makes sense within one world; a
+      // slide in the other world has no coordinates here, so fly in instead.
+      const prev = CAM[prevLabel];
+      const sameWorld = prev && (prev.w || 'main') === (cfg.w || 'main');
+      const from = sameWorld ? camOf(m, prev) : camOf(m, cfg, 0.5);
       world.classList.add('nofly');
       world.style.transform = from;
       setDepth(world, -1);
@@ -1064,10 +1146,11 @@ class Component extends DCLogic {
     // slidechange, and a world built later than that binds nothing.
     const boot = () => {
       document.querySelectorAll('section[data-label]').forEach((section) => {
-        if (!CAM[section.getAttribute('data-label')]) return;
+        const cfg = CAM[section.getAttribute('data-label')];
+        if (!cfg) return;
         const host = section.querySelector('[data-world]');
         if (!host || host.querySelector('.world')) return;
-        host.innerHTML = this._worldHTML();
+        host.innerHTML = this._worldHTML(cfg.w);
         host._m = measure(host.querySelector('.world'));
       });
       const cur = document.querySelector('section[data-deck-active]');
@@ -1094,7 +1177,8 @@ class Component extends DCLogic {
       'Inside the Cluster': ['.s-c1', '.s-c2', '.s-c3', '.s-c4', '.s-c5'],
       'The Optimizer': ['.s-o1', '.s-o2', '.s-o3', '.s-o4', '.s-o5'],
       'By the Numbers': ['.d2', '.d3', '.d4', '.d5', '.d6', '.d7'],
-      'Commit to Cluster': ['.d2', '.d3', '.d4', '.d5', '.d6', '.d7'],
+      'CI Pipeline': ['.s-ci1', '.s-ci2', '.s-ci3', '.s-ci4', '.s-ci5'],
+      'Reconciliation': ['.d2', '.d3', '.d4', '.d5'],
       'GitOps in Production': ['.d3'],
       'Zero Downtime': ['.d3', '.d5'],
       'Canary Rollouts': ['.d2', '.d3', '.d4', '.d5', '.d6'],
