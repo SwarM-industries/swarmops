@@ -406,7 +406,7 @@ a:hover{color:#ff5f3c}
   <div class="tstrip"><b>THE CLOUD</b><span>Where it actually runs</span></div>
 </section>
 
-<section class="camslide" data-label="Inside the Cluster" data-speaker-notes="טוני: וזה מה שבאמת רץ בתוך הקלאסטר — כל הרכיבים, וגם מה מדבר עם מה. ▸ כל בקשה נכנסת דרך ה־Ingress אל ה־gateway, והוא גם זה שמגיש את הפרונטאנד. ▸ מה־gateway היא מנותבת לאחד מששת השירותים; אף אחד מהם לא חשוף החוצה. ▸ planning-service הוא היחיד שרץ כ־Rollout עם canary, ולידו הסימולטור שמזרים טלמטריה פנימה. ▸ המצב נשמר בשניים בלבד: MongoDB לנתונים, RabbitMQ לאירועים, ולכל שירות יש ServiceMonitor שחושף מדדים. ▸ ומסביב לאפליקציה — argocd שמדפלה את הכול, argo-rollouts ששולט בשלבי ה־canary, ומוניטורינג ולוגים שרואים הכול. חמישה namespaces, מערכת אחת." style="background:#eef0f3;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif" data-om-slide-id="4883b4ed">
+<section class="camslide" data-label="Inside the Cluster" data-speaker-notes="טוני: וזה מה שבאמת רץ בתוך הקלאסטר — כל הרכיבים, וגם מה מדבר עם מה. ▸ כל בקשה נכנסת דרך ה־Ingress אל ה־gateway, והוא גם זה שמגיש את הפרונטאנד. ▸ מה־gateway היא מנותבת לאחד מששת השירותים; אף אחד מהם לא חשוף החוצה. ▸ planning-service הוא היחיד שרץ כ־Rollout עם canary, ולידו הסימולטור שמזרים טלמטריה פנימה. ▸ המצב נשמר בשניים בלבד: MongoDB לנתונים, ו־RabbitMQ לאירועים — והוא לא תחנה סופית אלא הצומת. telemetry מפרסם לתוכו כל אירוע, ו־fleet, planning ו־notification צורכים ממנו, כל אחד לתור משלו. planning גם מפרסם התראות בחזרה, ו־notification צורך גם אותן. שני exchanges מסוג fanout, כי תור משותף היה מחלק את ההודעות בין הצרכנים במקום לתת לכל אחד עותק מלא. ולכל שירות יש ServiceMonitor שחושף מדדים. ▸ ומסביב לאפליקציה — argocd שמדפלה את הכול, argo-rollouts ששולט בשלבי ה־canary, ומוניטורינג ולוגים שרואים הכול. חמישה namespaces, מערכת אחת." style="background:#eef0f3;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif" data-om-slide-id="4883b4ed">
   <div class="wv" data-world data-dense="0"></div>
   <div class="crumb">VPC<span>›</span><b>EKS CLUSTER</b></div>
   <div class="tstrip"><b>KUBERNETES</b><span>Inside the cluster</span></div>
@@ -894,6 +894,10 @@ class Component extends DCLogic {
           ${ke('M168,404 V630 H150 V660', 's-c4')}
           ${ke('M520,574 V624 H270 V660', 's-c4')}
           ${ke('M810,404 V600 H530 V660', 's-c4')}
+          ${ke('M640,574 V660', 's-c4')}
+          ${ke('M430,660 V404', 's-c4')}
+          ${ke('M560,660 V574', 's-c4')}
+          ${ke('M600,764 V806 H1115 V404', 's-c4')}
           ${ke('M1215,175 H1150', 's-c5')}
           ${ke('M1215,370 H1170 V630 H700 V574', 's-c5')}
           ${ke('M1010,712 H1120 V555 H1215', 's-c5')}
@@ -905,6 +909,9 @@ class Component extends DCLogic {
           ${ke('M1150,940 H1700 V880', 's-c5')}
           ${ke('M1500,800 V590', 's-c5')}
           ${kl(842, 432, 'ingest', 's-c3')}
+          ${kl(690, 592, 'publishes', 's-c4')}
+          ${kl(652, 622, 'publishes alerts', 's-c4')}
+          ${kl(268, 486, 'fanout: own queue each', 's-c4')}
           ${kl(1000, 166, 'applies Helm chart', 's-c5')}
           ${kl(716, 654, 'controls canary steps', 's-c5')}
           ${kl(1024, 700, 'scrapes /metrics', 's-c5')}
@@ -931,7 +938,7 @@ class Component extends DCLogic {
         ${kb(850, 470, 250, 104, 'sim', 'drone-simulator', 'Deployment, no Service', 's-c3')}
 
         ${kb(70, 660, 280, 104, 'data', 'MongoDB', 'StatefulSet + PVC', 's-c4')}
-        ${kb(390, 660, 280, 104, 'mq', 'RabbitMQ', 'StatefulSet + PVC', 's-c4')}
+        ${kb(390, 660, 280, 104, 'mq', 'RabbitMQ', 'StatefulSet + PVC &middot; 2 fanout exchanges', 's-c4')}
         ${kb(710, 660, 300, 104, 'sys', 'ServiceMonitor(s)', 'one per service', 's-c4')}
 
         ${kb(1215, 125, 580, 100, 'edge', 'Argo CD', 'server &middot; repo-server &middot; app-controller', 's-c5')}
