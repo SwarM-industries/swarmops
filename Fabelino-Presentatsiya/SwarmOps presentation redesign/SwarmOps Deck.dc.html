@@ -406,7 +406,7 @@ a:hover{color:#ff5f3c}
   <div class="tstrip"><b>THE CLOUD</b><span>Where it actually runs</span></div>
 </section>
 
-<section class="camslide" data-label="Inside the Cluster" data-speaker-notes="טוני: וזה מה שבאמת רץ בתוך הקלאסטר — כל הרכיבים, וגם מה מדבר עם מה. ▸ כל בקשה נכנסת דרך ה־Ingress אל ה־gateway, והוא גם זה שמגיש את הפרונטאנד. ▸ מה־gateway היא מנותבת לאחד מששת השירותים; אף אחד מהם לא חשוף החוצה. ▸ planning-service הוא היחיד שרץ כ־Rollout עם canary, ולידו הסימולטור שמזרים טלמטריה פנימה. ▸ המצב נשמר בשניים בלבד: MongoDB לנתונים, ו־RabbitMQ לאירועים — והוא לא תחנה סופית אלא הצומת. telemetry מפרסם לתוכו כל אירוע, ו־fleet, planning ו־notification צורכים ממנו, כל אחד לתור משלו. planning גם מפרסם התראות בחזרה, ו־notification צורך גם אותן. שני exchanges מסוג fanout, כי תור משותף היה מחלק את ההודעות בין הצרכנים במקום לתת לכל אחד עותק מלא. ולכל שירות יש ServiceMonitor שחושף מדדים. ▸ ומסביב לאפליקציה — argocd שמדפלה את הכול, argo-rollouts ששולט בשלבי ה־canary, ומוניטורינג ולוגים שרואים הכול. חמישה namespaces, מערכת אחת." style="background:#eef0f3;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif" data-om-slide-id="4883b4ed">
+<section class="camslide" data-label="Inside the Cluster" data-speaker-notes="טוני: וזה מה שבאמת רץ בתוך הקלאסטר — כל הרכיבים, וגם מה מדבר עם מה. ▸ כל בקשה נכנסת דרך ה־Ingress אל ה־gateway, והוא גם זה שמגיש את הפרונטאנד. ▸ מה־gateway היא מנותבת לאחד מששת השירותים; אף אחד מהם לא חשוף החוצה. ▸ planning-service הוא היחיד שרץ כ־Rollout עם canary, ולידו הסימולטור. הסימולטור הוא לקוח לכל דבר: הוא מתחבר ל־auth עם חשבון שירות משלו, מושך את התוכניות מ־planning, ומזרים טלמטריה ל־telemetry — הכול ב־HTTP רגיל, ואף פעם לא ישירות מול התור. ▸ המצב נשמר בשניים בלבד: MongoDB לנתונים, ו־RabbitMQ לאירועים — והוא לא תחנה סופית אלא הצומת. telemetry מפרסם לתוכו כל אירוע, ו־fleet, planning ו־notification צורכים ממנו, כל אחד לתור משלו. planning גם מפרסם התראות בחזרה, ו־notification צורך גם אותן. שני ה־exchanges הם fanout, כי תור משותף היה מחלק את ההודעות בין הצרכנים במקום לתת לכל אחד עותק מלא — לכל צרכן יש תור משלו שקשור ל־exchange. ולכל שירות יש ServiceMonitor שחושף מדדים. ▸ ומסביב לאפליקציה — argocd שמדפלה את הכול, argo-rollouts ששולט בשלבי ה־canary, ומוניטורינג ולוגים שרואים הכול. חמישה namespaces, מערכת אחת." style="background:#eef0f3;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif" data-om-slide-id="4883b4ed">
   <div class="wv" data-world data-dense="0"></div>
   <div class="crumb">VPC<span>›</span><b>EKS CLUSTER</b></div>
   <div class="tstrip"><b>KUBERNETES</b><span>Inside the cluster</span></div>
@@ -891,13 +891,14 @@ class Component extends DCLogic {
           ${ke('M485,234 V275 H1024 V320', 's-c2')}
           ${ke('M485,234 V275 H489 V522 H498', 's-c3')}
           ${ke('M975,470 V440 H810 V404', 's-c3')}
+          ${ke('M850,522 H798', 's-c3')}
           ${ke('M168,404 V630 H150 V660', 's-c4')}
           ${ke('M520,574 V624 H270 V660', 's-c4')}
-          ${ke('M810,404 V600 H530 V660', 's-c4')}
-          ${ke('M640,574 V660', 's-c4')}
-          ${ke('M430,660 V404', 's-c4')}
-          ${ke('M560,660 V574', 's-c4')}
-          ${ke('M600,764 V806 H1115 V404', 's-c4')}
+          ${ke('M810,404 V600 H530 V636', 's-c4')}
+          ${ke('M640,574 V636', 's-c4')}
+          ${ke('M430,636 V404', 's-c4')}
+          ${ke('M560,636 V574', 's-c4')}
+          ${ke('M600,884 V924 H1115 V404', 's-c4')}
           ${ke('M1215,175 H1150', 's-c5')}
           ${ke('M1215,370 H1170 V630 H700 V574', 's-c5')}
           ${ke('M1010,712 H1120 V555 H1215', 's-c5')}
@@ -918,7 +919,7 @@ class Component extends DCLogic {
           ${kl(1196, 932, 'ships pod logs', 's-c5')}
         </svg>
 
-        ${kf(30, 70, 1120, 790, 'NAMESPACE: SWARMOPS', '#6f42d8')}
+        ${kf(30, 70, 1120, 880, 'NAMESPACE: SWARMOPS', '#6f42d8')}
         ${kf(1180, 70, 650, 180, 'NAMESPACE: ARGOCD', '#3f7fd8').replace('class="kfrm"', 'class="kfrm s-c5"')}
         ${kf(1180, 275, 650, 165, 'NAMESPACE: ARGO-ROLLOUTS', '#7b4fd8').replace('class="kfrm"', 'class="kfrm s-c5"')}
         ${kf(1180, 465, 650, 250, 'NAMESPACE: MONITORING', '#8e8e93').replace('class="kfrm"', 'class="kfrm s-c5"')}
@@ -935,10 +936,14 @@ class Component extends DCLogic {
         ${kb(926, 320, 196, 84, 'app', 'notification-service', '', 's-c2')}
 
         ${kb(498, 470, 300, 104, 'hero', 'planning-service', 'Rollout &middot; canary', 's-c3')}
-        ${kb(850, 470, 250, 104, 'sim', 'drone-simulator', 'Deployment, no Service', 's-c3')}
+        ${kb(850, 470, 250, 104, 'sim', 'drone-simulator', 'Deployment, no Service &middot; own service account', 's-c3')}
 
         ${kb(70, 660, 280, 104, 'data', 'MongoDB', 'StatefulSet + PVC', 's-c4')}
-        ${kb(390, 660, 280, 104, 'mq', 'RabbitMQ', 'StatefulSet + PVC &middot; 2 fanout exchanges', 's-c4')}
+        ${kf(380, 636, 310, 248, 'RABBITMQ', '#c2544c').replace('class="kfrm"', 'class="kfrm s-c4"')}
+        <div class="kbox mq s-c4" style="left:398px;top:696px;width:274px;height:76px">
+          <i style="font-size:17px">telemetry_events_exchange</i><u style="font-size:14px">fanout &middot; 3 queues bound</u></div>
+        <div class="kbox mq s-c4" style="left:398px;top:790px;width:274px;height:76px">
+          <i style="font-size:17px">alerts_exchange</i><u style="font-size:14px">fanout &middot; 1 queue bound</u></div>
         ${kb(710, 660, 300, 104, 'sys', 'ServiceMonitor(s)', 'one per service', 's-c4')}
 
         ${kb(1215, 125, 580, 100, 'edge', 'Argo CD', 'server &middot; repo-server &middot; app-controller', 's-c5')}
