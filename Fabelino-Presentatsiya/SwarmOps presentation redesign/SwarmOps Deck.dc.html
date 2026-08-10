@@ -400,7 +400,7 @@ a:hover{color:#ff5f3c}
   </div>
 </section>
 
-<section class="camslide" data-label="Cloud Footprint" data-speaker-notes="טוני: הכול רץ על AWS, וכל מה שעל השקף הזה נקרא מה־Terraform שלנו. ▸ מתחילים מבחוץ: משתמש נכנס ב־HTTPS דרך ה־Internet Gateway — זו הדלת היחידה פנימה. ▸ בפנים, VPC פרטי מפוצל לשני אזורי זמינות. בכל אזור רשת ציבורית עם load balancer, ו־NAT יחיד ליציאה החוצה. ▸ מתחת להן הרשתות הפרטיות: שם יושבים חמשת השרתים שמריצים את כל הפודים, ואליהם ה־ALB מנתב. ▸ הדיסקים של MongoDB ו־RabbitMQ נוצרים דינמית, ומישור הבקרה של EKS — שמנוהל על ידי AWS ויושב מחוץ ל־VPC — מדבר עם שני קבוצות השרתים. ▸ ומי בנה את כל זה: Terraform מקים את התשתית, ו־GitHub Actions דוחף אימג׳ים ל־ECR דרך OIDC בלי מפתחות קבועים. שני אזורים אומר שאובדן דאטה־סנטר לא מפיל אותנו, והכול קוד: הורסים בלילה, בונים מחדש בדקות." style="background:#eef0f3;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif" data-om-slide-id="0794a74e">
+<section class="camslide" data-label="Cloud Footprint" data-speaker-notes="טוני: הכול רץ על AWS, וכל מה שעל השקף הזה נקרא מה־Terraform שלנו. ▸ מתחילים מבחוץ: משתמש נכנס ב־HTTPS דרך ה־Internet Gateway — זו הדלת היחידה פנימה. ▸ בפנים, VPC פרטי מפוצל לשני אזורי זמינות. בכל אזור רשת ציבורית עם load balancer — אבל NAT gateway אחד בלבד לכל ה־VPC, ושני האזורים יוצאים החוצה דרכו. זו החלטת עלות מודעת: NAT לכל אזור היה מוסיף עוד כשישים דולר בחודש. ▸ מתחת להן הרשתות הפרטיות: שם יושבים חמשת השרתים שמריצים את כל הפודים, ואליהם ה־ALB מנתב. ▸ הדיסקים של MongoDB ו־RabbitMQ נוצרים דינמית, ומישור הבקרה של EKS — שמנוהל על ידי AWS ויושב מחוץ ל־VPC — מדבר עם שני קבוצות השרתים. ▸ ומי בנה את כל זה: Terraform מקים את התשתית, ו־GitHub Actions דוחף אימג׳ים ל־ECR דרך OIDC בלי מפתחות קבועים. שני אזורים אומר שאובדן דאטה־סנטר לא מפיל אותנו, והכול קוד: הורסים בלילה, בונים מחדש בדקות." style="background:#eef0f3;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif" data-om-slide-id="0794a74e">
   <div class="wv" data-world data-dense="0"></div>
   <div class="crumb"><b>AWS ACCOUNT</b></div>
   <div class="tstrip"><b>THE CLOUD</b><span>Where it actually runs</span></div>
@@ -823,7 +823,6 @@ class Component extends DCLogic {
           ${ke('M280,162 H330 V322 H700', 's-f1')}
           ${ke('M580,446 V396 H770 V348', 's-f2')}
           ${ke('M840,348 V396 H870 V446', 's-f2')}
-          ${ke('M1260,446 V380 H900 V348', 's-f2')}
           ${ke('M920,322 H1550 V446', 's-f2')}
           ${ke('M870,510 V576 H730 V646', 's-f3')}
           ${ke('M1550,510 V576 H1410 V646', 's-f3')}
@@ -836,7 +835,6 @@ class Component extends DCLogic {
           ${ke('M1400,184 H1264', 's-f5')}
           ${kl(600, 314, 'HTTPS', 's-f1')}
           ${kl(686, 390, 'egress only', 's-f2')}
-          ${kl(946, 372, 'egress only', 's-f2')}
           ${kl(736, 568, 'ingress &rarr; gateway', 's-f3')}
           ${kl(1416, 568, 'ingress &rarr; gateway', 's-f3')}
           ${kl(742, 766, 'dynamic PVC', 's-f4')}
@@ -859,9 +857,8 @@ class Component extends DCLogic {
 
         ${kb(30, 120, 250, 84, 'edge', 'Internet / Users', '', 's-f1')}
         ${kb(700, 296, 220, 52, 'gw', 'Internet Gateway', '', 's-f1')}
-        ${kb(455, 446, 250, 64, 'sys', 'NAT Gateway A', '', 's-f2')}
+        ${kb(455, 446, 250, 70, 'sys', 'NAT Gateway', 'shared by both AZs', 's-f2')}
         ${kb(735, 446, 270, 64, 'edge', 'ALB target group', '', 's-f2')}
-        ${kb(1135, 446, 250, 64, 'sys', 'NAT Gateway B', '', 's-f2')}
         ${kb(1415, 446, 270, 64, 'edge', 'ALB target group', '', 's-f2')}
         ${kb(455, 646, 550, 90, 'app', 'EKS Node Group A', '2 spot nodes &middot; all service pods', 's-f3')}
         ${kb(1135, 646, 550, 90, 'app', 'EKS Node Group B', '3 spot nodes &middot; all service pods', 's-f3')}
