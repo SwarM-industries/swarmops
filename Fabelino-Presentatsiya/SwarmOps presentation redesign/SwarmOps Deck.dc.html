@@ -516,41 +516,7 @@ a:hover{color:#ff5f3c}
     <img class="fp" src="assets/harel.jpg" alt="Harel" style="width:190px;height:190px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.35);filter:contrast(1.05);box-shadow:0 12px 40px rgba(0,0,0,.15)">
     <p class="fx d1" style="margin:0;font-size:28px;font-weight:600;letter-spacing:.2em;color:rgba(245,245,247,.75)">HAREL&nbsp;&nbsp;·&nbsp;&nbsp;TANK GUNNER</p>
     <h2 class="grad fx d2" style="margin:0;font-size:160px;font-weight:700;letter-spacing:-0.03em;line-height:1;text-shadow:none">Operations</h2>
-    <p class="fx d3" style="margin:0;font-size:34px;font-weight:400;color:rgba(245,245,247,.75)">Delivery&nbsp;&nbsp;·&nbsp;&nbsp;Monitoring&nbsp;&nbsp;·&nbsp;&nbsp;Security</p>
-  </div>
-</section>
-
-<section data-label="Monitoring" data-speaker-notes="הראל: כלל מספר אחת בתפעול: לדעת לפני שמישהו מתלונן. כל שירות מייצא מדדים. ▸ זה מסך ה־Grafana שלנו: בקשות, שגיאות, זמני תגובה, ריסטארטים — לכל השירותים בבת אחת. כשמשהו סוטה, המערכת מרימה את ההתראה בעצמה." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;padding:80px 140px;text-align:center" data-om-slide-id="f28194b3">
-  <div style="display:flex;flex-direction:column;gap:16px;align-items:center">
-    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">MONITORING</p>
-    <h2 class="fx d1" style="margin:0;font-size:80px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">Know before anyone complains</h2>
-    <p class="fx d2" style="margin:0;font-size:32px;font-weight:400;color:#6e6e73">Every service exports metrics. When something drifts, the system raises the alarm itself.</p>
-  </div>
-  <div class="fz d3" style="border:1px solid rgba(0,0,0,.1);border-radius:22px;overflow:hidden;box-shadow:0 26px 80px rgba(0,0,0,.22);width:100%;max-width:1560px">
-    <img src="assets/grafana.png" alt="Grafana: the SwarmOps overview dashboard" style="display:block;width:100%;height:auto">
-  </div>
-  <p class="fx d4" style="margin:0;font-size:26px;font-weight:400;color:#6e6e73">Grafana · Prometheus · Loki · the SwarmOps overview dashboard</p>
-</section>
-
-<section data-label="What We Measure" data-speaker-notes="הראל: שלושה פאנלים מספרים את הסיפור. ▸ כמה שירותים למעלה, עכשיו, במבט אחד. ▸ ריסטארטים של קונטיינרים: רואים דיפלוי רע קופץ, ואז מתייצב חזרה לאפס. ▸ והאהוב עליי: כמה זמן לוקח למתכנן לחשב תוכנית טיסה — חציון ומקרה גרוע. אנחנו לא רק יודעים שזה עובד. אנחנו יודעים כמה מהר." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:56px;padding:90px 140px;text-align:center" data-om-slide-id="08f0c580">
-  <div style="display:flex;flex-direction:column;gap:16px;align-items:center">
-    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">MONITORING</p>
-    <h2 class="fx d1" style="margin:0;font-size:80px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">Not just alive. Measured.</h2>
-    <p class="fx d2" style="margin:0;font-size:32px;font-weight:400;color:#6e6e73">Requests, failures, and how long it takes to compute a flight plan.</p>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:40px;width:100%;max-width:1600px">
-    <div class="fp d3" style="display:flex;flex-direction:column;gap:16px">
-      <div style="aspect-ratio:750/190;border:1px solid rgba(0,0,0,.15);border-radius:16px;box-shadow:0 10px 32px rgba(0,0,0,.14);background-image:url(assets/grafana.png);background-repeat:no-repeat;background-size:458.667% 694.211%;background-position:12.528% 19.043%"></div>
-      <span style="font-size:27px;font-weight:400;color:#6e6e73">Service targets up, right now</span>
-    </div>
-    <div class="fp d4" style="display:flex;flex-direction:column;gap:16px">
-      <div style="aspect-ratio:1121/283;border:1px solid rgba(0,0,0,.15);border-radius:16px;box-shadow:0 10px 32px rgba(0,0,0,.14);background-image:url(assets/grafana.png);background-repeat:no-repeat;background-size:306.868% 466.078%;background-position:96.291% 22.201%"></div>
-      <span style="font-size:27px;font-weight:400;color:#6e6e73">Container restarts, settling to zero</span>
-    </div>
-    <div class="fp d5" style="display:flex;flex-direction:column;gap:16px">
-      <div style="aspect-ratio:1001/253;border:1px solid rgba(0,0,0,.15);border-radius:16px;box-shadow:0 10px 32px rgba(0,0,0,.14);background-image:url(assets/grafana.png);background-repeat:no-repeat;background-size:343.656% 521.344%;background-position:13.817% 100%"></div>
-      <span style="font-size:27px;font-weight:400;color:#6e6e73">Plan solve time, p50 / p95</span>
-    </div>
+    <p class="fx d3" style="margin:0;font-size:34px;font-weight:400;color:rgba(245,245,247,.75)">Deployment&nbsp;&nbsp;·&nbsp;&nbsp;Monitoring&nbsp;&nbsp;·&nbsp;&nbsp;Security</p>
   </div>
 </section>
 
