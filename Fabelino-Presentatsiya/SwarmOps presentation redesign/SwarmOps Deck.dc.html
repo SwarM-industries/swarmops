@@ -894,11 +894,11 @@ class Component extends DCLogic {
           ${ke('M850,522 H798', 's-c3')}
           ${ke('M168,404 V630 H150 V660', 's-c4')}
           ${ke('M520,574 V624 H270 V660', 's-c4')}
-          ${ke('M810,404 V600 H530 V636', 's-c4')}
-          ${ke('M640,574 V636', 's-c4')}
-          ${ke('M430,636 V404', 's-c4')}
-          ${ke('M560,636 V574', 's-c4')}
-          ${ke('M600,884 V924 H1115 V404', 's-c4')}
+          ${ke('M810,404 V600 H530 V660', 's-c4')}
+          ${ke('M640,574 V660', 's-c4')}
+          ${ke('M430,660 V404', 's-c4')}
+          ${ke('M560,660 V574', 's-c4')}
+          ${ke('M600,764 V806 H1115 V404', 's-c4')}
           ${ke('M1215,175 H1150', 's-c5')}
           ${ke('M1215,370 H1170 V630 H700 V574', 's-c5')}
           ${ke('M1010,712 H1120 V555 H1215', 's-c5')}
@@ -919,7 +919,7 @@ class Component extends DCLogic {
           ${kl(1196, 932, 'ships pod logs', 's-c5')}
         </svg>
 
-        ${kf(30, 70, 1120, 880, 'NAMESPACE: SWARMOPS', '#6f42d8')}
+        ${kf(30, 70, 1120, 790, 'NAMESPACE: SWARMOPS', '#6f42d8')}
         ${kf(1180, 70, 650, 180, 'NAMESPACE: ARGOCD', '#3f7fd8').replace('class="kfrm"', 'class="kfrm s-c5"')}
         ${kf(1180, 275, 650, 165, 'NAMESPACE: ARGO-ROLLOUTS', '#7b4fd8').replace('class="kfrm"', 'class="kfrm s-c5"')}
         ${kf(1180, 465, 650, 250, 'NAMESPACE: MONITORING', '#8e8e93').replace('class="kfrm"', 'class="kfrm s-c5"')}
@@ -939,11 +939,7 @@ class Component extends DCLogic {
         ${kb(850, 470, 250, 104, 'sim', 'drone-simulator', 'Deployment, no Service &middot; own service account', 's-c3')}
 
         ${kb(70, 660, 280, 104, 'data', 'MongoDB', 'StatefulSet + PVC', 's-c4')}
-        ${kf(380, 636, 310, 248, 'RABBITMQ', '#c2544c').replace('class="kfrm"', 'class="kfrm s-c4"')}
-        <div class="kbox mq s-c4" style="left:398px;top:696px;width:274px;height:76px">
-          <i style="font-size:17px">telemetry_events_exchange</i><u style="font-size:14px">fanout &middot; 3 queues bound</u></div>
-        <div class="kbox mq s-c4" style="left:398px;top:790px;width:274px;height:76px">
-          <i style="font-size:17px">alerts_exchange</i><u style="font-size:14px">fanout &middot; 1 queue bound</u></div>
+        ${kb(390, 660, 280, 104, 'mq', 'RabbitMQ', 'StatefulSet + PVC', 's-c4')}
         ${kb(710, 660, 300, 104, 'sys', 'ServiceMonitor(s)', 'one per service', 's-c4')}
 
         ${kb(1215, 125, 580, 100, 'edge', 'Argo CD', 'server &middot; repo-server &middot; app-controller', 's-c5')}
