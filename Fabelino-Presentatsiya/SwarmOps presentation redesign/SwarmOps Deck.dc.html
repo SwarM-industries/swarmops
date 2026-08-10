@@ -369,7 +369,7 @@ a:hover{color:#ff5f3c}
   <div class="tstrip"><b>KUBERNETES</b><span>Inside the cluster</span></div>
 </section>
 
-<section class="camslide" data-label="The Optimizer" data-speaker-notes="טוני: ועכשיו נכנסים לחלק שהוא באמת הלב של הפרויקט — לתוך planning-service עצמו. ▸ שלב ראשון, greedy: פתרון התחלתי מהיר, כדי שתמיד תהיה תשובה. ▸ שלב שני, Hungarian דרך scipy: ההתאמה האופטימלית בין רחפנים למשימות. ▸ שלב שלישי, OR-Tools: לכל רחפן בנפרד, סדר הנקודות הכי קצר. ▸ שלב רביעי, בדיקת היתכנות סוללה: אם המסלול לא אפשרי — נכנסת תחנת טעינה באמצע. ▸ וכשמגיע אירוע מהשטח דרך התור, כל הצינור הזה רץ מחדש תוך שניות. זה מה שהופך את זה מתכנון חד־פעמי למערכת חיה." style="background:#eef0f3;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif" data-om-slide-id="b93e5502">
+<section class="camslide" data-label="The Optimizer" data-speaker-notes="טוני: ועכשיו נכנסים לחלק שהוא באמת הלב של הפרויקט — לתוך planning-service עצמו. ▸ שלב ראשון, greedy: ממיינים את המשימות לפי עדיפות ואז לפי דדליין, וכל משימה מקבלת את הרחפן הפנוי הכי קרוב שיש לו את סוג המטען הנכון ומספיק סוללה כדי להגיע. משימה אחת בכל פעם — וזה גם הבייסליין שכל פתרון מאוחר יותר נמדד מולו. ▸ שלב שני, Hungarian דרך scipy: ההתאמה האופטימלית בין רחפנים למשימות. ▸ שלב שלישי, OR-Tools: רק למשימות עם כמה נקודות עצירה — הסדר הכי קצר לעבור בהן, מהמקום שבו הרחפן כבר נמצא. זה מסלול פתוח ולא הלוך־חזור: הרגל הביתה לא נספרת, כדי שלא תעוות את הסדר. ▸ שלב רביעי, בדיקת היתכנות סוללה: אם המסלול לא אפשרי — נכנסת תחנת טעינה באמצע. ▸ וכשמגיע אירוע מהשטח דרך התור, כל הצינור הזה רץ מחדש תוך שניות. זה מה שהופך את זה מתכנון חד־פעמי למערכת חיה." style="background:#eef0f3;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif" data-om-slide-id="b93e5502">
   <div class="wv" data-world data-dense="0"></div>
   <div class="crumb">VPC<span>›</span>NODE 3<span>›</span><b>PLANNING-SERVICE</b></div>
   <div class="tstrip"><b>THE OPTIMIZER</b><span>Inside the planner</span></div>
@@ -891,23 +891,24 @@ class Component extends DCLogic {
     /* ── the optimizer ───────────────────────────────────────────────────
        Authored at 1:1 with the stage (1860x1020) like the other two regions,
        so the camera lands at ~1.0 and the type renders at the size it says. */
-    const ostage = (i, name, tech, body) => `
+    const ostage = (i, name, tech, body, note) => `
       <div class="kbox hero s-o${i}" style="left:60px;top:${86 + (i - 1) * 176}px;width:1740px;height:150px;
         flex-direction:row;align-items:center;gap:34px;padding:0 40px">
         <span style="flex:0 0 92px;height:92px;border-radius:50%;background:#ff5f3c;color:#fff;
           font-size:44px;font-weight:700;display:flex;align-items:center;justify-content:center">${i}</span>
-        <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
-          <i style="font-size:42px">${name}</i>
-          <u style="font-size:26px">${body}</u>
+        <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+          <i style="font-size:38px">${name}</i>
+          <u style="font-size:25px">${body}</u>
+          ${note ? `<u style="font-size:21px;color:#c2400f">${note}</u>` : ''}
         </span>
         <span class="pod infra" style="flex:0 0 auto;font-size:26px;padding:12px 20px">${tech}</span>
       </div>`;
 
     const optimizer = `
       <div class="frm lyr" data-depth="0" data-w="optimizer" style="left:150px;top:2500px;width:1860px;height:1020px;border:2px solid #ff5f3c;border-radius:30px;background:#fff">
-        ${ostage(1, 'Greedy', 'baseline', 'a fast first answer, so there is always a plan')}
+        ${ostage(1, 'Greedy', 'baseline', 'Missions by priority, then deadline. Each takes the nearest idle drone with the right payload and the battery to reach it.', 'One mission at a time &mdash; and still the baseline every later solve is scored against.')}
         ${ostage(2, 'Hungarian matching', 'scipy', 'optimal drone &rarr; mission assignment')}
-        ${ostage(3, 'Per-drone routing', 'ortools', 'shortest waypoint order for each drone')}
+        ${ostage(3, 'Per-drone routing', 'ortools', 'Multi-stop missions only: the shortest order to visit the stops, starting from where the drone already is.', 'An open path, not a round trip &mdash; the leg home costs nothing, so it never skews the order.')}
         ${ostage(4, 'Battery feasibility', 'constraint', 'range vs. distance and payload &mdash; else a charging stop')}
         ${ostage(5, 'Replan trigger', 'rabbitmq', 'an event lands and the whole pipeline runs again')}
       </div>`;
