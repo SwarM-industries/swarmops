@@ -355,14 +355,14 @@ a:hover{color:#ff5f3c}
   <img class="fz d2" src="assets/map.png" alt="SwarmOps live map" style="width:760px;aspect-ratio:720/718;object-fit:cover;border-radius:28px;box-shadow:0 24px 80px rgba(0,0,0,.25)">
 </section>
 
-<section data-label="§ Tony" data-speaker-notes="טוני: תודה, גיא. אני טוני. צלף, מפעיל רחפנים, ובפרויקט הזה — איש הענן. גיא הראה מה SwarmOps עושה. אני אראה איפה היא חיה, כי איך שהיא רצה זה חצי מההנדסה." data-om-slide-id="e17cf431" style="background:#000;color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif">
+<section data-label="§ Tony" data-speaker-notes="טוני: תודה, גיא. אני טוני. צלף, מפעיל רחפנים, ובפרויקט הזה — איש הענן. גיא הראה מה SwarmOps עושה. אני אראה איפה היא חיה ומה זה עלה, כי איך שהיא רצה זה חצי מההנדסה." data-om-slide-id="e17cf431" style="background:#000;color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif">
   <img class="fz" src="assets/drone4.jpeg" alt="Night launch from the field" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%" />
   <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.78))"></div>
   <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;padding:90px 140px;text-align:center">
     <img class="fp" src="assets/tony.jpg" alt="Tony" style="width:190px;height:190px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.35);filter:contrast(1.05);box-shadow:0 12px 40px rgba(0,0,0,.15)">
     <p class="fx d1" style="margin:0;font-size:28px;font-weight:600;letter-spacing:.2em;color:rgba(245,245,247,.75)">TONY&nbsp;&nbsp;·&nbsp;&nbsp;SNIPER, DRONE OPERATOR</p>
     <h2 class="grad fx d2" style="margin:0;font-size:160px;font-weight:700;letter-spacing:-0.03em;line-height:1;text-shadow:none">The Cloud</h2>
-    <p class="fx d3" style="margin:0;font-size:34px;font-weight:400;color:rgba(245,245,247,.75)">Architecture&nbsp;&nbsp;·&nbsp;&nbsp;Deployment&nbsp;&nbsp;·&nbsp;&nbsp;Cost</p>
+    <p class="fx d3" style="margin:0;font-size:34px;font-weight:400;color:rgba(245,245,247,.75)">Architecture&nbsp;&nbsp;·&nbsp;&nbsp;Scale&nbsp;&nbsp;·&nbsp;&nbsp;Cost</p>
   </div>
 </section>
 
@@ -436,8 +436,6 @@ a:hover{color:#ff5f3c}
   <div class="tstrip"><b>THE OPTIMIZER</b><span>Inside the planner</span></div>
 </section>
 
-
-
 <section data-label="By the Numbers" data-speaker-notes="טוני: תמונת מצב חיה, מספרים אמיתיים: ▸ חמישה שרתים, עשרה vCPU. ▸ 62 קונטיינרים רצים. ▸ 23 דיפלוימנטים. ▸ 25 ג׳יגה אחסון קבוע. ▸ תשעה אימג׳ים במאגר. ▸ על פני שני אזורי זמינות." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:80px;padding:90px 140px;text-align:center" data-om-slide-id="ca24d16a">
   <div style="display:flex;flex-direction:column;gap:18px;align-items:center">
     <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">A LIVE SNAPSHOT</p>
@@ -471,111 +469,7 @@ a:hover{color:#ff5f3c}
   </div>
 </section>
 
-<section data-label="Commit to Cluster" data-speaker-notes="טוני: עכשיו, איך קוד מגיע לשם. אף אחד לא מדפלה ידנית. אף פעם. ▸ דוחפים קומיט. ▸ ה־CI בונה אימג׳ ומתייג. ▸ האימג׳ נוחת במאגר. ▸ Argo CD מזהה שגיט השתנה. ▸ הקלאסטר מושך את השינוי ומתיישר. ▸ שימו לב לכיוון: משיכה, לא דחיפה. הקלאסטר מסנכרן את עצמו לגיט. הקוד הוא מקור האמת היחיד." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:70px;padding:90px 140px;text-align:center" data-om-slide-id="bb0c7f76">
-  <div style="display:flex;flex-direction:column;gap:18px;align-items:center">
-    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">DEPLOYMENT</p>
-    <h2 class="fx d1" style="margin:0;font-size:84px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">From commit to cluster</h2>
-  </div>
-  <div style="display:flex;align-items:center;gap:24px">
-    <div class="fp d2" style="background:#fff;border-radius:24px;padding:34px 40px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 14px rgba(0,0,0,.05)">
-      <span style="font-size:30px;font-weight:700">Commit</span>
-      <span style="font-size:24px;color:#6e6e73">git push</span>
-    </div>
-    <span class="fp d3" style="font-size:34px;color:#b6b6bc">→</span>
-    <div class="fp d3" style="background:#fff;border-radius:24px;padding:34px 40px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 14px rgba(0,0,0,.05)">
-      <span style="font-size:30px;font-weight:700">Build</span>
-      <span style="font-size:24px;color:#6e6e73">CI · image + tag</span>
-    </div>
-    <span class="fp d4" style="font-size:34px;color:#b6b6bc">→</span>
-    <div class="fp d4" style="background:#fff;border-radius:24px;padding:34px 40px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 14px rgba(0,0,0,.05)">
-      <span style="font-size:30px;font-weight:700">Registry</span>
-      <span style="font-size:24px;color:#6e6e73">push to ECR</span>
-    </div>
-    <span class="fp d5" style="font-size:34px;color:#b6b6bc">→</span>
-    <div class="fp d5" style="background:#fff;border:2px solid #ff5f3c;border-radius:24px;padding:32px 40px;display:flex;flex-direction:column;gap:6px">
-      <span style="font-size:30px;font-weight:700;color:#ff5f3c">Argo CD</span>
-      <span style="font-size:24px;color:#6e6e73">detects the change</span>
-    </div>
-    <span class="fp d6" style="font-size:34px;color:#b6b6bc">→</span>
-    <div class="fp d6" style="background:#fff;border-radius:24px;padding:34px 40px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 14px rgba(0,0,0,.05)">
-      <span style="font-size:30px;font-weight:700">Cluster</span>
-      <span style="font-size:24px;color:#6e6e73">pulls &amp; converges</span>
-    </div>
-  </div>
-  <p class="fx d7" style="margin:0;font-size:32px;font-weight:400;color:#6e6e73;max-width:1200px;line-height:1.45"><span style="color:#1d1d1f;font-weight:600">Pull-based, not push.</span> The cluster continuously syncs itself to what’s in git. Code is the single source of truth.</p>
-</section>
-
-<section data-label="GitOps in Production" data-speaker-notes="טוני: זו לא דיאגרמה; זה מסך הפרודקשן שלנו. 12 אפליקציות מסונכרנות, 27 משאבים בריאים. ▸ תסתכלו מי חתום על הסנכרון האחרון: swarmops-ci-bot. המדפלה הוא בוט. בני אדם כותבים קוד; הבוט מריץ את הקלאסטר." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:36px;padding:70px 140px;text-align:center" data-om-slide-id="5c495608">
-  <div style="display:flex;flex-direction:column;gap:16px;align-items:center">
-    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">DEPLOYMENT</p>
-    <h2 class="fx d1" style="margin:0;font-size:76px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">The deployer is a bot</h2>
-  </div>
-  <div class="fz d2" style="border:1px solid rgba(0,0,0,.1);border-radius:22px;overflow:hidden;box-shadow:0 26px 80px rgba(0,0,0,.22);width:100%;max-width:1310px">
-    <img src="assets/base_argo.png" alt="Argo CD: all SwarmOps services healthy and synced" style="display:block;width:100%;height:auto">
-  </div>
-  <p class="fx d3" style="margin:0;font-size:27px;font-weight:400;color:#6e6e73"><span style="color:#1d1d1f;font-weight:600">12 synced · 27 healthy</span> · last sync authored by <span style="color:#1d1d1f;font-weight:600">swarmops-ci-bot</span>, not a human.</p>
-</section>
-
-<section data-label="Zero Downtime" data-speaker-notes="טוני: עדכוני גרסה בלי שנייה אחת של השבתה. ▸ בזמן rollout, הגרסה הישנה והחדשה רצות זו לצד זו. זה צילום אמיתי. ▸ שלושים שניות אחר כך — החדשה השתלטה והישנה נעלמה. המשתמשים לא מרגישים את התפר." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:44px;padding:90px 140px;text-align:center" data-om-slide-id="93e91dbf">
-  <div style="display:flex;flex-direction:column;gap:16px;align-items:center">
-    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">DEPLOYMENT</p>
-    <h2 class="fx d1" style="margin:0;font-size:80px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">A new version, and nobody notices</h2>
-    <p class="fx d2" style="margin:0;font-size:32px;font-weight:400;color:#6e6e73">Blue-green: the old version keeps serving until the new one is ready.</p>
-  </div>
-  <div style="display:flex;flex-direction:column;gap:36px;width:100%;max-width:1360px">
-    <div class="fp d3" style="display:flex;flex-direction:column;gap:16px;align-items:flex-start">
-      <div style="border:1px solid rgba(0,0,0,.12);border-radius:18px;overflow:hidden;width:100%;background:#0e1116">
-        <img src="assets/pods_blue_green.png" alt="Two frontend versions running side by side" style="display:block;width:100%;height:auto">
-      </div>
-      <span style="font-size:27px;font-weight:400;color:#6e6e73">During the rollout: old and new run side by side</span>
-    </div>
-    <div class="fp d5" style="display:flex;flex-direction:column;gap:16px;align-items:flex-start">
-      <div style="border:1px solid rgba(0,0,0,.12);border-radius:18px;overflow:hidden;width:100%;background:#0e1116">
-        <img src="assets/pods_green.png" alt="Only the new frontend version remains" style="display:block;width:100%;height:auto">
-      </div>
-      <span style="font-size:27px;font-weight:400;color:#6e6e73">Thirty seconds later: only the new version remains</span>
-    </div>
-  </div>
-</section>
-
-<section data-label="Canary Rollouts" data-speaker-notes="טוני: לשירות ה־planning, המוח, אנחנו הולכים צעד רחוק יותר: canary. ▸ הגרסה החדשה מתחילה עם 20 אחוז מהתעבורה. ▸ ניתוח אוטומטי בודק את המדדים. ▸ ואז 50 אחוז. ▸ בדיקה נוספת. ▸ ורק אז — 100. אם בדיקה נכשלת, ה־rollout מתהפך מעצמו. בלי ביפר, בלי rollback ידני בשלוש בלילה." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;align-items:center;justify-content:center;gap:110px;padding:90px 140px" data-om-slide-id="5c3cf592">
-  <div style="display:flex;flex-direction:column;gap:26px;text-align:left;max-width:660px">
-    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">DEPLOYMENT</p>
-    <h2 class="fx d1" style="margin:0;font-size:80px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">20% first,<br>then everyone</h2>
-    <p class="fx d2" style="margin:0;font-size:31px;font-weight:400;color:#6e6e73;line-height:1.45">The brain of the system, <span style="color:#ff5f3c;font-weight:600">planning</span>, ships as a canary, with an automated metric check between every step.</p>
-    <p class="fx d3" style="margin:0;font-size:31px;font-weight:400;color:#6e6e73;line-height:1.45"><span style="color:#1d1d1f;font-weight:600">If a check fails, the rollout reverses itself.</span> No pager, no 3am rollback by hand.</p>
-  </div>
-  <div style="display:flex;flex-direction:column;gap:14px;align-items:stretch">
-    <span class="fp d2" style="background:#fff;border:1px solid #248a3d;border-radius:16px;padding:20px 44px;font-size:29px;font-weight:600;color:#248a3d;box-shadow:0 2px 12px rgba(0,0,0,.04)">Set weight: 20%</span>
-    <span class="fp d3" style="background:#fff;border-radius:16px;padding:20px 44px;font-size:29px;font-weight:600;color:#6e6e73;box-shadow:0 2px 12px rgba(0,0,0,.04)">Analysis · automated check</span>
-    <span class="fp d4" style="background:#fff;border:1px solid #248a3d;border-radius:16px;padding:20px 44px;font-size:29px;font-weight:600;color:#248a3d;box-shadow:0 2px 12px rgba(0,0,0,.04)">Set weight: 50%</span>
-    <span class="fp d5" style="background:#fff;border-radius:16px;padding:20px 44px;font-size:29px;font-weight:600;color:#6e6e73;box-shadow:0 2px 12px rgba(0,0,0,.04)">Analysis · automated check</span>
-    <span class="fp d6" style="background:#fff;border:1px solid #ff5f3c;border-radius:16px;padding:20px 44px;font-size:29px;font-weight:700;color:#ff5f3c;box-shadow:0 2px 12px rgba(0,0,0,.04)">Set weight: 100%</span>
-  </div>
-</section>
-
-<section data-label="Rollout Timeline" data-speaker-notes="טוני: הנה canary אחד מהקלאסטר שלנו, מההתחלה עד הסוף. ▸ באמצע: שתי גרסאות חיות, תעבורה מפוצלת. ▸ וסיום: ה־canary קודם, הגרסה הישנה ירדה לאפס." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:44px;padding:80px 140px;text-align:center" data-om-slide-id="ae1c26ea">
-  <div style="display:flex;flex-direction:column;gap:16px;align-items:center">
-    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">DEPLOYMENT</p>
-    <h2 class="fx d1" style="margin:0;font-size:80px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">A rollout, start to finish</h2>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:44px;width:100%;max-width:1480px;align-items:start">
-    <div class="fp d2" style="display:flex;flex-direction:column;gap:16px">
-      <div style="border:1px solid rgba(0,0,0,.12);border-radius:20px;overflow:hidden;box-shadow:0 16px 50px rgba(0,0,0,.16)">
-        <img src="assets/canary_in_progress.png" alt="Mid-rollout: two revisions running" style="display:block;width:100%;height:auto">
-      </div>
-      <span style="font-size:27px;font-weight:400;color:#6e6e73">Mid-rollout: two revisions live, traffic split</span>
-    </div>
-    <div class="fp d4" style="display:flex;flex-direction:column;gap:16px">
-      <div style="border:1px solid rgba(0,0,0,.12);border-radius:20px;overflow:hidden;box-shadow:0 16px 50px rgba(0,0,0,.16)">
-        <img src="assets/canary_final.png" alt="Rollout finished: old revision scaled to zero" style="display:block;width:100%;height:auto">
-      </div>
-      <span style="font-size:27px;font-weight:400;color:#6e6e73">Finished: canary promoted, the old revision at zero</span>
-    </div>
-  </div>
-</section>
-
-<section data-label="Cost Engineering" data-speaker-notes="טוני: אז כמה כל זה עולה? ▸ בקונפיגורציה נאיבית, התשתית הזאת היא בערך 250 דולר בחודש. ▸ אחרי כיוונון — spot, NAT יחיד, מידות נכונות — 140. ▸ מה ששילמנו בפועל, על כל הפרויקט: 43 דולר. סך הכול. ▸ כי הסביבה כובתה בסוף כל יום עבודה, ותשתית־כקוד הפכה את הבנייה מחדש לשורה אחת. הראל ימשיך מכאן." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:64px;padding:90px 160px" data-om-slide-id="ffc6a67e">
+<section data-label="Cost Engineering" data-speaker-notes="טוני: אז כמה כל זה עולה? ▸ בקונפיגורציה נאיבית, התשתית הזאת היא בערך 250 דולר בחודש. ▸ אחרי כיוונון — spot, NAT יחיד, מידות נכונות — 140. ▸ מה ששילמנו בפועל, על כל הפרויקט: 43 דולר. סך הכול. ▸ כי הסביבה כובתה בסוף כל יום עבודה, ותשתית־כקוד הפכה את הבנייה מחדש לשורה אחת. זו הארכיטקטורה והמחיר שלה. איך היא נשארת חיה, איך מעדכנים אותה בלי להפיל אותה, ואיך שומרים עליה — זה של הראל." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:64px;padding:90px 160px" data-om-slide-id="ffc6a67e">
   <div style="display:flex;flex-direction:column;gap:18px;align-items:center;text-align:center">
     <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">COST</p>
     <h2 class="fx d1" style="margin:0;font-size:84px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">What all of this cost</h2>
@@ -606,14 +500,14 @@ a:hover{color:#ff5f3c}
   <p class="fx d8" style="margin:0;font-size:30px;font-weight:400;color:#6e6e73;text-align:center">The whole environment shut down at the end of every workday. Infrastructure as code made rebuilding it a one-liner.</p>
 </section>
 
-<section data-label="§ Harel" data-speaker-notes="הראל: תודה, טוני. אני הראל. הייתי תותחן טנק. בטנק, או שאתה סומך על המכשירים שלך או שאתה עיוור. אז החלק שלי הוא בדיוק זה: איך אנחנו רואים את המערכת, ואיך שומרים עליה." data-om-slide-id="e7863f74" style="background:#000;color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif">
+<section data-label="§ Harel" data-speaker-notes="הראל: תודה, טוני. אני הראל. הייתי תותחן טנק. בטנק, או שאתה סומך על המכשירים שלך או שאתה עיוור. אז החלק שלי הוא בדיוק זה: איך אנחנו רואים את המערכת, איך מעדכנים אותה בלי להפיל אותה, ואיך שומרים עליה." data-om-slide-id="e7863f74" style="background:#000;color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif">
   <img class="fz" src="assets/drone2.jpeg" alt="Thermal feed on the controller at night" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 55%" />
   <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.78))"></div>
   <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;padding:90px 140px;text-align:center">
     <img class="fp" src="assets/harel.jpg" alt="Harel" style="width:190px;height:190px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.35);filter:contrast(1.05);box-shadow:0 12px 40px rgba(0,0,0,.15)">
     <p class="fx d1" style="margin:0;font-size:28px;font-weight:600;letter-spacing:.2em;color:rgba(245,245,247,.75)">HAREL&nbsp;&nbsp;·&nbsp;&nbsp;TANK GUNNER</p>
     <h2 class="grad fx d2" style="margin:0;font-size:160px;font-weight:700;letter-spacing:-0.03em;line-height:1;text-shadow:none">Operations</h2>
-    <p class="fx d3" style="margin:0;font-size:34px;font-weight:400;color:rgba(245,245,247,.75)">Monitoring&nbsp;&nbsp;·&nbsp;&nbsp;Security</p>
+    <p class="fx d3" style="margin:0;font-size:34px;font-weight:400;color:rgba(245,245,247,.75)">Monitoring&nbsp;&nbsp;·&nbsp;&nbsp;Delivery&nbsp;&nbsp;·&nbsp;&nbsp;Security</p>
   </div>
 </section>
 
@@ -647,6 +541,110 @@ a:hover{color:#ff5f3c}
     <div class="fp d5" style="display:flex;flex-direction:column;gap:16px">
       <div style="aspect-ratio:1001/253;border:1px solid rgba(0,0,0,.15);border-radius:16px;box-shadow:0 10px 32px rgba(0,0,0,.14);background-image:url(assets/grafana.png);background-repeat:no-repeat;background-size:343.656% 521.344%;background-position:13.817% 100%"></div>
       <span style="font-size:27px;font-weight:400;color:#6e6e73">Plan solve time, p50 / p95</span>
+    </div>
+  </div>
+</section>
+
+<section data-label="Commit to Cluster" data-speaker-notes="הראל: וכדי שכל זה יישאר נכון, צריך שגם הדרך שבה קוד מגיע לקלאסטר תהיה מדודה בדיוק כמו המדדים. אף אחד לא מדפלה ידנית. אף פעם. ▸ דוחפים קומיט. ▸ ה־CI בונה אימג׳ ומתייג. ▸ האימג׳ נוחת במאגר. ▸ Argo CD מזהה שגיט השתנה. ▸ הקלאסטר מושך את השינוי ומתיישר. ▸ שימו לב לכיוון: משיכה, לא דחיפה. הקלאסטר מסנכרן את עצמו לגיט. הקוד הוא מקור האמת היחיד." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:70px;padding:90px 140px;text-align:center" data-om-slide-id="bb0c7f76">
+  <div style="display:flex;flex-direction:column;gap:18px;align-items:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">DEPLOYMENT</p>
+    <h2 class="fx d1" style="margin:0;font-size:84px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">From commit to cluster</h2>
+  </div>
+  <div style="display:flex;align-items:center;gap:24px">
+    <div class="fp d2" style="background:#fff;border-radius:24px;padding:34px 40px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 14px rgba(0,0,0,.05)">
+      <span style="font-size:30px;font-weight:700">Commit</span>
+      <span style="font-size:24px;color:#6e6e73">git push</span>
+    </div>
+    <span class="fp d3" style="font-size:34px;color:#b6b6bc">→</span>
+    <div class="fp d3" style="background:#fff;border-radius:24px;padding:34px 40px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 14px rgba(0,0,0,.05)">
+      <span style="font-size:30px;font-weight:700">Build</span>
+      <span style="font-size:24px;color:#6e6e73">CI · image + tag</span>
+    </div>
+    <span class="fp d4" style="font-size:34px;color:#b6b6bc">→</span>
+    <div class="fp d4" style="background:#fff;border-radius:24px;padding:34px 40px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 14px rgba(0,0,0,.05)">
+      <span style="font-size:30px;font-weight:700">Registry</span>
+      <span style="font-size:24px;color:#6e6e73">push to ECR</span>
+    </div>
+    <span class="fp d5" style="font-size:34px;color:#b6b6bc">→</span>
+    <div class="fp d5" style="background:#fff;border:2px solid #ff5f3c;border-radius:24px;padding:32px 40px;display:flex;flex-direction:column;gap:6px">
+      <span style="font-size:30px;font-weight:700;color:#ff5f3c">Argo CD</span>
+      <span style="font-size:24px;color:#6e6e73">detects the change</span>
+    </div>
+    <span class="fp d6" style="font-size:34px;color:#b6b6bc">→</span>
+    <div class="fp d6" style="background:#fff;border-radius:24px;padding:34px 40px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 14px rgba(0,0,0,.05)">
+      <span style="font-size:30px;font-weight:700">Cluster</span>
+      <span style="font-size:24px;color:#6e6e73">pulls &amp; converges</span>
+    </div>
+  </div>
+  <p class="fx d7" style="margin:0;font-size:32px;font-weight:400;color:#6e6e73;max-width:1200px;line-height:1.45"><span style="color:#1d1d1f;font-weight:600">Pull-based, not push.</span> The cluster continuously syncs itself to what’s in git. Code is the single source of truth.</p>
+</section>
+
+<section data-label="GitOps in Production" data-speaker-notes="הראל: זו לא דיאגרמה; זה מסך הפרודקשן שלנו. 12 אפליקציות מסונכרנות, 27 משאבים בריאים. ▸ תסתכלו מי חתום על הסנכרון האחרון: swarmops-ci-bot. המדפלה הוא בוט. בני אדם כותבים קוד; הבוט מריץ את הקלאסטר." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:36px;padding:70px 140px;text-align:center" data-om-slide-id="5c495608">
+  <div style="display:flex;flex-direction:column;gap:16px;align-items:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">DEPLOYMENT</p>
+    <h2 class="fx d1" style="margin:0;font-size:76px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">The deployer is a bot</h2>
+  </div>
+  <div class="fz d2" style="border:1px solid rgba(0,0,0,.1);border-radius:22px;overflow:hidden;box-shadow:0 26px 80px rgba(0,0,0,.22);width:100%;max-width:1310px">
+    <img src="assets/base_argo.png" alt="Argo CD: all SwarmOps services healthy and synced" style="display:block;width:100%;height:auto">
+  </div>
+  <p class="fx d3" style="margin:0;font-size:27px;font-weight:400;color:#6e6e73"><span style="color:#1d1d1f;font-weight:600">12 synced · 27 healthy</span> · last sync authored by <span style="color:#1d1d1f;font-weight:600">swarmops-ci-bot</span>, not a human.</p>
+</section>
+
+<section data-label="Zero Downtime" data-speaker-notes="הראל: עדכוני גרסה בלי שנייה אחת של השבתה. ▸ בזמן rollout, הגרסה הישנה והחדשה רצות זו לצד זו. זה צילום אמיתי. ▸ שלושים שניות אחר כך — החדשה השתלטה והישנה נעלמה. המשתמשים לא מרגישים את התפר." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:44px;padding:90px 140px;text-align:center" data-om-slide-id="93e91dbf">
+  <div style="display:flex;flex-direction:column;gap:16px;align-items:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">DEPLOYMENT</p>
+    <h2 class="fx d1" style="margin:0;font-size:80px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">A new version, and nobody notices</h2>
+    <p class="fx d2" style="margin:0;font-size:32px;font-weight:400;color:#6e6e73">Blue-green: the old version keeps serving until the new one is ready.</p>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:36px;width:100%;max-width:1360px">
+    <div class="fp d3" style="display:flex;flex-direction:column;gap:16px;align-items:flex-start">
+      <div style="border:1px solid rgba(0,0,0,.12);border-radius:18px;overflow:hidden;width:100%;background:#0e1116">
+        <img src="assets/pods_blue_green.png" alt="Two frontend versions running side by side" style="display:block;width:100%;height:auto">
+      </div>
+      <span style="font-size:27px;font-weight:400;color:#6e6e73">During the rollout: old and new run side by side</span>
+    </div>
+    <div class="fp d5" style="display:flex;flex-direction:column;gap:16px;align-items:flex-start">
+      <div style="border:1px solid rgba(0,0,0,.12);border-radius:18px;overflow:hidden;width:100%;background:#0e1116">
+        <img src="assets/pods_green.png" alt="Only the new frontend version remains" style="display:block;width:100%;height:auto">
+      </div>
+      <span style="font-size:27px;font-weight:400;color:#6e6e73">Thirty seconds later: only the new version remains</span>
+    </div>
+  </div>
+</section>
+
+<section data-label="Canary Rollouts" data-speaker-notes="הראל: ולשירות ה־planning, המוח, אנחנו הולכים צעד רחוק יותר: canary. ▸ הגרסה החדשה מתחילה עם 20 אחוז מהתעבורה. ▸ ניתוח אוטומטי בודק את המדדים — בדיוק אותם מדדים שראיתם לפני רגע. ▸ ואז 50 אחוז. ▸ בדיקה נוספת. ▸ ורק אז — 100. אם בדיקה נכשלת, ה־rollout מתהפך מעצמו. בלי ביפר, בלי rollback ידני בשלוש בלילה." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;align-items:center;justify-content:center;gap:110px;padding:90px 140px" data-om-slide-id="5c3cf592">
+  <div style="display:flex;flex-direction:column;gap:26px;text-align:left;max-width:660px">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">DEPLOYMENT</p>
+    <h2 class="fx d1" style="margin:0;font-size:80px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">20% first,<br>then everyone</h2>
+    <p class="fx d2" style="margin:0;font-size:31px;font-weight:400;color:#6e6e73;line-height:1.45">The brain of the system, <span style="color:#ff5f3c;font-weight:600">planning</span>, ships as a canary, with an automated metric check between every step.</p>
+    <p class="fx d3" style="margin:0;font-size:31px;font-weight:400;color:#6e6e73;line-height:1.45"><span style="color:#1d1d1f;font-weight:600">If a check fails, the rollout reverses itself.</span> No pager, no 3am rollback by hand.</p>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:14px;align-items:stretch">
+    <span class="fp d2" style="background:#fff;border:1px solid #248a3d;border-radius:16px;padding:20px 44px;font-size:29px;font-weight:600;color:#248a3d;box-shadow:0 2px 12px rgba(0,0,0,.04)">Set weight: 20%</span>
+    <span class="fp d3" style="background:#fff;border-radius:16px;padding:20px 44px;font-size:29px;font-weight:600;color:#6e6e73;box-shadow:0 2px 12px rgba(0,0,0,.04)">Analysis · automated check</span>
+    <span class="fp d4" style="background:#fff;border:1px solid #248a3d;border-radius:16px;padding:20px 44px;font-size:29px;font-weight:600;color:#248a3d;box-shadow:0 2px 12px rgba(0,0,0,.04)">Set weight: 50%</span>
+    <span class="fp d5" style="background:#fff;border-radius:16px;padding:20px 44px;font-size:29px;font-weight:600;color:#6e6e73;box-shadow:0 2px 12px rgba(0,0,0,.04)">Analysis · automated check</span>
+    <span class="fp d6" style="background:#fff;border:1px solid #ff5f3c;border-radius:16px;padding:20px 44px;font-size:29px;font-weight:700;color:#ff5f3c;box-shadow:0 2px 12px rgba(0,0,0,.04)">Set weight: 100%</span>
+  </div>
+</section>
+
+<section data-label="Rollout Timeline" data-speaker-notes="הראל: הנה canary אחד מהקלאסטר שלנו, מההתחלה עד הסוף. ▸ באמצע: שתי גרסאות חיות, תעבורה מפוצלת. ▸ וסיום: ה־canary קודם, הגרסה הישנה ירדה לאפס." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:44px;padding:80px 140px;text-align:center" data-om-slide-id="ae1c26ea">
+  <div style="display:flex;flex-direction:column;gap:16px;align-items:center">
+    <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">DEPLOYMENT</p>
+    <h2 class="fx d1" style="margin:0;font-size:80px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">A rollout, start to finish</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:44px;width:100%;max-width:1480px;align-items:start">
+    <div class="fp d2" style="display:flex;flex-direction:column;gap:16px">
+      <div style="border:1px solid rgba(0,0,0,.12);border-radius:20px;overflow:hidden;box-shadow:0 16px 50px rgba(0,0,0,.16)">
+        <img src="assets/canary_in_progress.png" alt="Mid-rollout: two revisions running" style="display:block;width:100%;height:auto">
+      </div>
+      <span style="font-size:27px;font-weight:400;color:#6e6e73">Mid-rollout: two revisions live, traffic split</span>
+    </div>
+    <div class="fp d4" style="display:flex;flex-direction:column;gap:16px">
+      <div style="border:1px solid rgba(0,0,0,.12);border-radius:20px;overflow:hidden;box-shadow:0 16px 50px rgba(0,0,0,.16)">
+        <img src="assets/canary_final.png" alt="Rollout finished: old revision scaled to zero" style="display:block;width:100%;height:auto">
+      </div>
+      <span style="font-size:27px;font-weight:400;color:#6e6e73">Finished: canary promoted, the old revision at zero</span>
     </div>
   </div>
 </section>
