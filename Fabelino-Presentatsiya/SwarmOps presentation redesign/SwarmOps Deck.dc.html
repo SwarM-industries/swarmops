@@ -998,36 +998,34 @@ class Component extends DCLogic {
               <path d="M0,0 L9,4.5 L0,9 z" fill="#9a9aa4"/>
             </marker>
           </defs>
-          ${ke('M460,170 H560', 's-ci1')}
-          ${ke('M460,350 H560', 's-ci2')}
-          ${ke('M1180,225 H1235 V170 H1290', 's-ci2')}
-          ${ke('M870,390 V460', 's-ci3')}
-          ${ke('M880,810 V850', 's-ci4')}
-          ${ke('M1510,810 V850', 's-ci5')}
-          ${cl(884, 432, 'only if ref == refs/heads/main', 's-ci3')}
+          ${ke('M460,230 H560', 's-ci1')}
+          ${ke('M1180,265 H1235 V225 H1290', 's-ci2')}
+          ${ke('M870,435 V500', 's-ci3')}
+          ${ke('M880,840 V875', 's-ci4')}
+          ${ke('M1510,840 V875', 's-ci5')}
+          ${cl(884, 478, 'only if ref == refs/heads/main', 's-ci3')}
         </svg>
 
-        ${cb(40, 120, 420, 100, 'edge', 'Pull request', 'opened against main', 's-ci1')}
-        ${cb(40, 300, 420, 100, 'gw', 'Push to main', 'the merge lands', 's-ci2')}
+        ${cb(40, 180, 420, 100, 'edge', 'Pull request', 'opened against main', 's-ci1')}
 
-        ${cf(560, 60, 620, 330, 'JOB: VERIFY', '#3f9e4d', 's-ci1')}
-        ${cb(595, 130, 550, 84, 'sys', 'install &middot; lint &middot; typecheck', 'planning: import sanity check', 's-ci1')}
-        ${cb(595, 235, 550, 84, 'sys', 'docker build', 'validated, never pushed', 's-ci1')}
+        ${cf(560, 115, 620, 320, 'JOB: VERIFY', '#3f9e4d', 's-ci1')}
+        ${cb(595, 180, 550, 84, 'sys', 'install &middot; lint &middot; typecheck', 'planning: import sanity check', 's-ci1')}
+        ${cb(595, 285, 550, 84, 'sys', 'docker build', 'validated, never pushed', 's-ci1')}
 
-        ${cb(1290, 120, 500, 100, 'sys', 'A PR stops here', 'no image, no cluster', 's-ci2')}
+        ${cb(1290, 175, 500, 100, 'sys', 'A PR stops here', 'no image, no cluster', 's-ci2')}
 
-        ${cf(560, 460, 1230, 350, 'JOB: PUBLISH', '#7b4fd8', 's-ci3')}
-        ${cb(595, 535, 570, 84, 'app', 'Tag &nbsp;0.1.0-a1b2c3d', 'semver + 7-char commit hash', 's-ci3')}
-        ${cb(595, 645, 570, 84, 'app', 'OIDC &rarr; AWS', 'short-lived role, no static keys', 's-ci3')}
-        ${cb(1195, 535, 560, 84, 'app', 'Build + push image', 'immutable tag, never latest', 's-ci4')}
-        ${cb(1195, 645, 560, 84, 'hero', 'yq bump &rarr; git commit', 'authored by swarmops-ci-bot', 's-ci5')}
+        ${cf(560, 500, 1230, 340, 'JOB: PUBLISH', '#7b4fd8', 's-ci3')}
+        ${cb(595, 570, 570, 84, 'app', 'Tag &nbsp;0.1.0-a1b2c3d', 'semver + 7-char commit hash', 's-ci3')}
+        ${cb(595, 675, 570, 84, 'app', 'OIDC &rarr; AWS', 'short-lived role, no static keys', 's-ci3')}
+        ${cb(1195, 570, 560, 84, 'app', 'Build + push image', 'immutable tag, never latest', 's-ci4')}
+        ${cb(1195, 675, 560, 84, 'hero', 'yq bump &rarr; git commit', 'authored by swarmops-ci-bot', 's-ci5')}
 
-        ${cb(560, 850, 560, 100, 'sim', 'ECR', '9 service images', 's-ci4')}
-        ${cb(1230, 850, 560, 100, 'data', 'swarmops-deployments', 'environments/production/images/', 's-ci5')}
+        ${cb(560, 875, 560, 100, 'sim', 'ECR', '9 service images', 's-ci4')}
+        ${cb(1230, 875, 560, 100, 'data', 'swarmops-deployments', 'environments/production/images/', 's-ci5')}
 
         <!-- z-index: anything in a world region must clear the .wires svg (z 2),
              or it renders underneath it and simply never appears -->
-        <div class="s-ci5" style="position:absolute;left:40px;top:520px;width:490px;text-align:left;z-index:3">
+        <div class="s-ci5" style="position:absolute;left:40px;top:560px;width:490px;text-align:left;z-index:3">
           <div style="font-size:36px;font-weight:700;color:#c2400f;line-height:1.25">CI&rsquo;s last act is a git commit.</div>
           <div style="margin-top:14px;font-size:28px;font-weight:400;color:#6e6e73;line-height:1.4">It never talks to the cluster. Not once.</div>
         </div>
