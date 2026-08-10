@@ -52,7 +52,7 @@ a:hover{color:#ff5f3c}
 .camslide{overflow:hidden}
 [data-deck-active].camslide{animation:none !important}
 .wv{position:absolute;inset:0;overflow:hidden;background:#eef0f3}
-.world{position:absolute;left:0;top:0;width:5500px;height:4950px;transform-origin:0 0;
+.world{position:absolute;left:0;top:0;width:2200px;height:3700px;transform-origin:0 0;
   transition:transform 1250ms cubic-bezier(.22,1,.28,1);will-change:transform}
 .world.nofly{transition:none !important}
 /* while measuring targets we neutralise the layer transform, or the camera
@@ -95,6 +95,15 @@ a:hover{color:#ff5f3c}
 .kbox.sys{border-color:#dcdce1;background:#f7f7f9}
 .wires{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:2}
 .wires .e{fill:none;stroke:#9a9aa4;stroke-width:2.5;marker-end:url(#kh)}
+.wires .e[data-fp]{marker-end:url(#fh)}
+/* a pulse travelling the same path as each wire, so direction reads without
+   having to trace the arrowhead. Purely decorative - motion-safe. */
+.wires .flow{fill:none;stroke:#ff5f3c;stroke-width:3.5;stroke-linecap:round;
+  stroke-dasharray:12 999;opacity:.9}
+@media (prefers-reduced-motion:no-preference){
+  [data-deck-active] .wires .flow:not(.step-hidden){animation:pulse 2.6s linear infinite}
+}
+@keyframes pulse{from{stroke-dashoffset:12}to{stroke-dashoffset:-999}}
 .wires .et{fill:#86868b;font-size:18px;font-weight:700;letter-spacing:.02em;
   paint-order:stroke;stroke:#fdfcff;stroke-width:6px;stroke-linejoin:round}
 /* title strip: names the slide without a panel that can cover the diagram */
@@ -348,32 +357,16 @@ a:hover{color:#ff5f3c}
   </div>
 </section>
 
-<section class="camslide" data-label="Cloud Footprint" data-speaker-notes="טוני: הכול רץ על AWS, וכל מה שעל השקף הזה אמיתי — נקרא מה־Terraform שלנו. חשבון אחד. ריג׳ן us-east-1. בתוכו VPC פרטי, מפוצל על שני אזורי זמינות: שני שרתים ו־MongoDB באזור A, שלושה שרתים ו־RabbitMQ באזור B. מחוץ ל־VPC: מישור הבקרה של EKS בניהול AWS, מאגר האימג׳ים וה־DNS. שני אזורים אומר שאובדן דאטה־סנטר לא מפיל אותנו. וכל התשתית היא קוד: הורסים בלילה, בונים מחדש בדקות. (השקף נבנה לבד תוך כדי דיבור; בלי קליקים.)" style="background:#eef0f3;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif" data-om-slide-id="0794a74e">
+<section class="camslide" data-label="Cloud Footprint" data-speaker-notes="טוני: הכול רץ על AWS, וכל מה שעל השקף הזה נקרא מה־Terraform שלנו. ▸ מתחילים מבחוץ: משתמש נכנס ב־HTTPS דרך ה־Internet Gateway — זו הדלת היחידה פנימה. ▸ בפנים, VPC פרטי מפוצל לשני אזורי זמינות. בכל אזור רשת ציבורית עם load balancer, ו־NAT יחיד ליציאה החוצה. ▸ מתחת להן הרשתות הפרטיות: שם יושבים חמשת השרתים שמריצים את כל הפודים, ואליהם ה־ALB מנתב. ▸ הדיסקים של MongoDB ו־RabbitMQ נוצרים דינמית, ומישור הבקרה של EKS — שמנוהל על ידי AWS ויושב מחוץ ל־VPC — מדבר עם שני קבוצות השרתים. ▸ ומי בנה את כל זה: Terraform מקים את התשתית, ו־GitHub Actions דוחף אימג׳ים ל־ECR דרך OIDC בלי מפתחות קבועים. שני אזורים אומר שאובדן דאטה־סנטר לא מפיל אותנו, והכול קוד: הורסים בלילה, בונים מחדש בדקות." style="background:#eef0f3;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif" data-om-slide-id="0794a74e">
   <div class="wv" data-world data-dense="0"></div>
   <div class="crumb"><b>AWS ACCOUNT</b></div>
-  <div class="cap">
-    <p class="fx" style="margin:0 0 10px;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">THE CLOUD</p>
-    <h2 class="fx d1" style="margin:0;font-size:72px;font-weight:700;letter-spacing:-0.015em;line-height:1.04">Where it actually runs</h2>
-    <p class="fx d2" style="margin:18px 0 0;font-size:28px;font-weight:400;color:#6e6e73;line-height:1.4">Two zones, so losing a data center doesn’t take the system down. The entire footprint is Terraform: destroy it at night, rebuild it in minutes.</p>
-  </div>
+  <div class="tstrip"><b>THE CLOUD</b><span>Where it actually runs</span></div>
 </section>
 
 <section class="camslide" data-label="Inside the Cluster" data-speaker-notes="טוני: וזה מה שבאמת רץ בתוך הקלאסטר — כל הרכיבים, וגם מה מדבר עם מה. ▸ כל בקשה נכנסת דרך ה־Ingress אל ה־gateway, והוא גם זה שמגיש את הפרונטאנד. ▸ מה־gateway היא מנותבת לאחד מששת השירותים; אף אחד מהם לא חשוף החוצה. ▸ planning-service הוא היחיד שרץ כ־Rollout עם canary, ולידו הסימולטור שמזרים טלמטריה פנימה. ▸ המצב נשמר בשניים בלבד: MongoDB לנתונים, RabbitMQ לאירועים, ולכל שירות יש ServiceMonitor שחושף מדדים. ▸ ומסביב לאפליקציה — argocd שמדפלה את הכול, argo-rollouts ששולט בשלבי ה־canary, ומוניטורינג ולוגים שרואים הכול. חמישה namespaces, מערכת אחת." style="background:#eef0f3;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif" data-om-slide-id="4883b4ed">
   <div class="wv" data-world data-dense="0"></div>
   <div class="crumb">VPC<span>›</span><b>EKS CLUSTER</b></div>
   <div class="tstrip"><b>KUBERNETES</b><span>Inside the cluster</span></div>
-</section>
-
-<section class="camslide" data-label="The Network" data-speaker-notes="טוני: הרשת בנויה על עיקרון אחד: דלת אחת פנימה, דלת אחת החוצה. ▸ רק ה־load balancer ציבורי. כל שרת וכל שירות חיים ברשתות פרטיות, בלתי נגישים מהאינטרנט. ▸ תעבורה יוצאת עוברת דרך NAT gateway יחיד. החלטה מודעת: יציאה משותפת אחת חוסכת בערך 65 דולר בחודש. ▸ ושתי השכבות קיימות בכל אזור, כך שגם נתיב הכניסה שורד נפילת אזור." style="background:#eef0f3;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif" data-om-slide-id="436d3018">
-  <div class="wv" data-world data-dense="0"></div>
-  <div class="crumb">VPC<span>›</span><b>THE EDGE</b></div>
-  <div class="cap">
-    <p class="fx" style="margin:0 0 10px;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">NETWORKING</p>
-    <h2 class="fx d1" style="margin:0;font-size:72px;font-weight:700;letter-spacing:-0.015em;line-height:1.04">One door in,<br>one door out</h2>
-    <p class="d3" style="margin:20px 0 0;font-size:27px;color:#6e6e73;line-height:1.4"><b style="color:#1d1d1f">Only the load balancer is public.</b> Every node and service lives in private subnets.</p>
-    <p class="d4" style="margin:10px 0 0;font-size:27px;color:#6e6e73;line-height:1.4"><b style="color:#1d1d1f">Outbound goes through a single NAT gateway.</b> A deliberate call: one shared exit saves ~$65 a month.</p>
-    <p class="d5" style="margin:10px 0 0;font-size:27px;color:#6e6e73;line-height:1.4"><b style="color:#1d1d1f">Public and private subnets in each zone,</b> so the entry path survives a zone failure too.</p>
-  </div>
 </section>
 
 <section class="camslide" data-label="The Optimizer" data-speaker-notes="טוני: ועכשיו נכנסים לחלק שהוא באמת הלב של הפרויקט — לתוך planning-service עצמו. ▸ שלב ראשון, greedy: פתרון התחלתי מהיר, כדי שתמיד תהיה תשובה. ▸ שלב שני, Hungarian דרך scipy: ההתאמה האופטימלית בין רחפנים למשימות. ▸ שלב שלישי, OR-Tools: לכל רחפן בנפרד, סדר הנקודות הכי קצר. ▸ שלב רביעי, בדיקת היתכנות סוללה: אם המסלול לא אפשרי — נכנסת תחנת טעינה באמצע. ▸ וכשמגיע אירוע מהשטח דרך התור, כל הצינור הזה רץ מחדש תוך שניות. זה מה שהופך את זה מתכנון חד־פעמי למערכת חיה." style="background:#eef0f3;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif" data-om-slide-id="b93e5502">
@@ -749,89 +742,84 @@ class Component extends DCLogic {
 
   /* One architecture world, rendered per camera slide. Slides 15-20 are camera
      positions over it, so moving between them is a flight, not a cut. */
-  _worldHTML(dense) {
-    const P = (n, k) => `<span class="pod ${k}">${n}</span>`;
-    const PODS = {
-      n1: [['gateway','app'],['auth-service','app'],['frontend','app'],['mission-service','app'],['coredns','sys'],['kube-proxy','sys'],['aws-lb-controller','sys'],['ebs-csi-node','sys'],['metrics-server','sys'],['prometheus','infra'],['argocd-server','infra'],['argocd-repo','infra'],['alloy','infra']],
-      n2: [['fleet-service','app'],['mission-service','app'],['telemetry-service','app'],['notification-service','app'],['coredns','sys'],['kube-proxy','sys'],['ebs-csi-node','sys'],['grafana','infra'],['loki','infra'],['argocd-app-ctrl','infra'],['argocd-redis','infra'],['alloy','infra']],
-      n3: [['planning-service','app'],['planning · canary','app'],['telemetry-service','app'],['auth-service','app'],['gateway','app'],['fleet-service','app'],['drone-simulator','app'],['kube-proxy','sys'],['ebs-csi-node','sys'],['node-exporter','sys'],['argo-rollouts','infra'],['argocd-dex','infra'],['alloy','infra']],
-      n4: [['notification-service','app'],['drone-simulator','app'],['frontend','app'],['planning-service','app'],['mission-service','app'],['telemetry-service','app'],['kube-proxy','sys'],['ebs-csi-node','sys'],['node-exporter','sys'],['loki-gateway','infra'],['argocd-notif','infra'],['alloy','infra']],
-      n5: [['gateway','app'],['auth-service','app'],['fleet-service','app'],['frontend','app'],['drone-simulator','app'],['notification-service','app'],['kube-proxy','sys'],['ebs-csi-node','sys'],['node-exporter','sys'],['grafana-agent','infra'],['argocd-appset','infra'],['alloy','infra']]
-    };
-    const node = (id, name) => {
-      const list = PODS[id];
-      const tally = { app: 0, infra: 0, sys: 0 };
-      list.forEach((p) => { tally[p[1]] = (tally[p[1]] || 0) + 1; });
-      const inner = dense
-        ? list.map((p) => P(p[0], p[1])).join('')
-        : P(list.length + ' pods', 'sys') + P(tally.app + ' service', 'app') + P(tally.infra + ' platform', 'infra') + P(tally.sys + ' system', 'sys');
-      return `<div class="card lyr" data-depth="1" data-w="${id}" style="flex:1;min-width:0;padding:20px 22px;display:flex;flex-direction:column;gap:14px">
-        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
-          <span style="font-size:29px;font-weight:700">${name}</span>
-          <span style="font-size:21px;color:#86868b;white-space:nowrap">t3.medium · spot</span>
-        </div>
-        <div class="lyr" data-depth="${dense ? 2 : 1}" style="display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start">${inner}</div>
-      </div>`;
-    };
-    const store = (w, title, sub, colour, bg, border, chips) => `
-      <div class="card lyr" data-depth="1" data-w="${w}" style="border-color:${border};background:${bg};padding:18px 22px;display:flex;flex-direction:column;gap:12px">
-        <div style="display:flex;align-items:baseline;justify-content:space-between">
-          <span style="font-size:28px;font-weight:700;color:${colour}">${title}</span>
-          <span style="font-size:21px;color:#86868b">${sub}</span>
-        </div>
-        <div class="lyr" data-depth="2" style="display:flex;flex-wrap:wrap;gap:8px">${chips}</div>
-      </div>`;
-    const az = (letter, left, nodes, storeHTML, natHTML) => `
-      <div class="frm lyr" data-depth="0" data-w="az${letter}" style="left:${left}px;top:110px;width:1900px;height:1500px;border:2px solid #cfd3da;background:#fbfcfe">
-        <span class="lbl" style="color:#8e8e93">AVAILABILITY ZONE ${letter}</span>
-        <div class="sub lyr" data-depth="1" data-w="pub${letter}" style="position:absolute;left:30px;top:95px;width:1840px;height:250px;border:2px dashed #5c7d10;background:#fbfdf5;padding:16px 20px">
-          <span style="font-size:24px;font-weight:600;color:#5c7d10;letter-spacing:.07em">PUBLIC SUBNET</span>
-          <div style="display:flex;gap:14px;margin-top:14px">
-            <div class="card s-net-1" style="flex:1;padding:14px 18px;display:flex;flex-direction:column;gap:4px">
-              <span style="font-size:26px;font-weight:700">Load balancer</span>
-              <span style="font-size:21px;color:#86868b">ALB · public</span>
-            </div>
-            ${natHTML}
-          </div>
-        </div>
-        <div class="sub lyr s-net-3" data-depth="1" style="position:absolute;left:30px;top:380px;width:1840px;height:1090px;border:2px solid #0e8a8c;background:#f7fdfd;padding:16px 20px;display:flex;flex-direction:column;gap:16px">
-          <span style="font-size:24px;font-weight:600;color:#0e8a8c;letter-spacing:.07em">PRIVATE SUBNET</span>
-          <div style="display:flex;gap:16px;flex:1;min-height:0">${nodes}</div>
-          ${storeHTML}
-        </div>
-      </div>`;
-    const dbs = ['auth','fleet','missions','planning','telemetry'].map((d) => P('swarmops_' + d, 'data')).join('');
-    const qs = ['telemetry.position','mission.created','plan.updated','alert.raised','drone.status'];
-    const stage = (i, name, tech, body) => `
-      <div class="card s-opt-${i}" style="display:flex;align-items:center;gap:26px;padding:22px 28px">
-        <span style="flex:0 0 66px;height:66px;border-radius:50%;background:#ff5f3c;color:#fff;font-size:32px;font-weight:700;display:flex;align-items:center;justify-content:center">${i}</span>
-        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
-          <span style="font-size:33px;font-weight:700">${name}</span>
-          <span style="font-size:24px;color:#86868b">${body}</span>
-        </div>
-        <span class="pod infra" style="flex:0 0 auto">${tech}</span>
-      </div>`;
-    const pipe = (name, sub) => `
-      <div class="card" style="flex:1;padding:16px 20px;display:flex;flex-direction:column;gap:3px">
-        <span style="font-size:26px;font-weight:700">${name}</span>
-        <span style="font-size:20px;color:#86868b">${sub}</span>
-      </div>`;
-    const arrow = '<span style="font-size:34px;color:#c7c7cc;flex:0 0 auto">&rarr;</span>';
-
-    /* ── EKS cluster internals ───────────────────────────────────────────
-       Ported from architecture.drawio diagram 14, re-routed for a 16:9 frame.
-       Flat 1860x1020 space: every box and every path uses these same numbers,
-       and each path was checked against every box so nothing overlaps. */
+  _worldHTML() {
     const kf = (x, y, w, h, label, colour) =>
-      `<div class="kfrm" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;border-color:${colour}"><b style="color:${colour}">${label}</b></div>`;
+      `<div class="kfrm" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;border-color:${colour}">${label ? `<b style="color:${colour}">${label}</b>` : ""}</div>`;
     const kb = (x, y, w, h, kind, title, sub, step) =>
       `<div class="kbox ${kind} ${step || ''}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px">
         <i>${title}</i>${sub ? `<u>${sub}</u>` : ''}</div>`;
-    const ke = (d, step, cls) => `<path d="${d}" class="e ${cls || ''} ${step || ''}"/>`;
+    const ke = (d, step, cls) => `<path d="${d}" class="e ${cls || ''} ${step || ''}"/>`
+      + `<path d="${d}" class="flow ${step || ''}"/>`;
     const kl = (x, y, t, step) => `<text x="${x}" y="${y}" class="et ${step || ''}">${t}</text>`;
 
+    /* ── AWS footprint ───────────────────────────────────────────────────
+       architecture.drawio diagram 13, re-routed for 16:9. Nested frames each
+       reserve ~56px of header so an inner frame never sits on the outer
+       frame's label. Boxes and paths share one flat coordinate system. */
+    const footprint = `
+      <div class="frm lyr" data-depth="0" data-w="footprint" style="left:150px;top:100px;width:1860px;height:1020px;border:none;background:transparent">
+        <svg class="wires" viewBox="0 0 1860 1020" preserveAspectRatio="none">
+          <defs>
+            <marker id="fh" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+              <path d="M0,0 L9,4.5 L0,9 z" fill="#9a9aa4"/>
+            </marker>
+          </defs>
+          ${ke('M280,162 H330 V322 H700', 's-f1')}
+          ${ke('M580,446 V396 H770 V348', 's-f2')}
+          ${ke('M840,348 V396 H870 V446', 's-f2')}
+          ${ke('M1260,446 V380 H900 V348', 's-f2')}
+          ${ke('M920,322 H1550 V446', 's-f2')}
+          ${ke('M870,510 V576 H730 V646', 's-f3')}
+          ${ke('M1550,510 V576 H1410 V646', 's-f3')}
+          ${ke('M730,736 V776', 's-f4')}
+          ${ke('M1410,736 V776', 's-f4')}
+          ${ke('M420,228 V691 H455', 's-f4')}
+          ${ke('M550,228 V250 H1780 V691 H1685', 's-f4')}
+          ${ke('M280,298 H360', 's-f5')}
+          ${ke('M280,496 H340 V970 H1810 V184 H1700', 's-f5')}
+          ${ke('M1400,184 H1264', 's-f5')}
+          ${kl(600, 314, 'HTTPS', 's-f1')}
+          ${kl(686, 390, 'egress only', 's-f2')}
+          ${kl(946, 372, 'egress only', 's-f2')}
+          ${kl(736, 568, 'ingress &rarr; gateway', 's-f3')}
+          ${kl(1416, 568, 'ingress &rarr; gateway', 's-f3')}
+          ${kl(742, 766, 'dynamic PVC', 's-f4')}
+          ${kl(1422, 766, 'dynamic PVC', 's-f4')}
+          ${kl(432, 262, 'kubelet &harr; API server', 's-f4')}
+          ${kl(286, 286, 'provisions everything', 's-f5')}
+          ${kl(352, 962, 'OIDC assume role', 's-f5')}
+          ${kl(1284, 176, 'push image', 's-f5')}
+        </svg>
+
+        ${kf(300, 40, 1530, 950, '', '#c9c9d0').replace('class="kfrm"', 'class="kfrm s-f1"')}
+        ${kf(360, 90, 1440, 870, 'REGION &middot; US-EAST-1', '#0e8a8c').replace('class="kfrm"', 'class="kfrm s-f1"')}
+        ${kf(380, 280, 1390, 660, 'VPC &middot; 10.0.0.0/16', '#6f42d8').replace('class="kfrm"', 'class="kfrm s-f1"')}
+        ${kf(410, 350, 640, 570, 'AVAILABILITY ZONE A', '#8e8e93').replace('class="kfrm"', 'class="kfrm s-f2"')}
+        ${kf(1090, 350, 640, 570, 'AVAILABILITY ZONE B', '#8e8e93').replace('class="kfrm"', 'class="kfrm s-f2"')}
+        ${kf(435, 406, 590, 150, 'PUBLIC SUBNET &middot; 10.0.1.0/24', '#5c7d10').replace('class="kfrm"', 'class="kfrm s-f2"')}
+        ${kf(1115, 406, 590, 150, 'PUBLIC SUBNET &middot; 10.0.2.0/24', '#5c7d10').replace('class="kfrm"', 'class="kfrm s-f2"')}
+        ${kf(435, 596, 590, 300, 'PRIVATE SUBNET &middot; 10.0.11.0/24', '#0e8a8c').replace('class="kfrm"', 'class="kfrm s-f3"')}
+        ${kf(1115, 596, 590, 300, 'PRIVATE SUBNET &middot; 10.0.12.0/24', '#0e8a8c').replace('class="kfrm"', 'class="kfrm s-f3"')}
+
+        ${kb(30, 120, 250, 84, 'edge', 'Internet / Users', '', 's-f1')}
+        ${kb(700, 296, 220, 52, 'gw', 'Internet Gateway', '', 's-f1')}
+        ${kb(455, 446, 250, 64, 'sys', 'NAT Gateway A', '', 's-f2')}
+        ${kb(735, 446, 270, 64, 'edge', 'ALB target group', '', 's-f2')}
+        ${kb(1135, 446, 250, 64, 'sys', 'NAT Gateway B', '', 's-f2')}
+        ${kb(1415, 446, 270, 64, 'edge', 'ALB target group', '', 's-f2')}
+        ${kb(455, 646, 550, 90, 'app', 'EKS Node Group A', '2 spot nodes &middot; all service pods', 's-f3')}
+        ${kb(1135, 646, 550, 90, 'app', 'EKS Node Group B', '3 spot nodes &middot; all service pods', 's-f3')}
+        ${kb(455, 776, 550, 90, 'data', 'EBS volumes (gp3)', 'MongoDB + RabbitMQ PVCs', 's-f4')}
+        ${kb(1135, 776, 550, 90, 'data', 'EBS volumes (gp3)', 'MongoDB + RabbitMQ PVCs', 's-f4')}
+        ${kb(380, 140, 340, 88, 'hero', 'EKS Control Plane', 'AWS-managed', 's-f4')}
+        ${kb(940, 140, 320, 88, 'sim', 'ECR', '9 images &middot; node groups pull from here', 's-f5')}
+        ${kb(1400, 140, 300, 88, 'sys', 'IAM', 'cluster + node roles &middot; OIDC', 's-f5')}
+        ${kb(30, 250, 250, 96, 'sys', 'Terraform Cloud', 'VCS-driven runs &middot; remote state', 's-f5')}
+        ${kb(30, 400, 250, 96, 'sys', 'GitHub Actions', 'per-service CI &middot; OIDC', 's-f5')}
+      </div>`;
+
     const cluster = `
-      <div class="frm lyr" data-depth="2" data-w="cluster" style="left:150px;top:3800px;width:1860px;height:1020px;border:2px solid #6f42d8;background:#fdfcff">
+      <div class="frm lyr" data-depth="0" data-w="cluster" style="left:150px;top:1300px;width:1860px;height:1020px;border:2px solid #6f42d8;border-radius:30px;background:#fdfcff">
         <svg class="wires" viewBox="0 0 1860 1020" preserveAspectRatio="none">
           <defs>
             <marker id="kh" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
@@ -853,14 +841,15 @@ class Component extends DCLogic {
           ${ke('M1215,175 H1150', 's-c5')}
           ${ke('M1215,370 H1170 V630 H700 V574', 's-c5')}
           ${ke('M1010,712 H1120 V555 H1215', 's-c5')}
-          ${ke('M1400,415 V480 H1250 V520', 's-c5')}
+          ${ke('M1500,415 V440 H1350 V520', 's-c5')}
+          ${ke('M1305,620 V590', 's-c5')}
           ${ke('M1395,555 H1420', 's-c5')}
           ${ke('M1360,520 V500 H1715 V520', 's-c5')}
           ${ke('M1600,840 H1580', 's-c5')}
           ${ke('M1150,940 H1700 V880', 's-c5')}
           ${ke('M1500,800 V590', 's-c5')}
           ${kl(842, 432, 'ingest', 's-c3')}
-          ${kl(1186, 206, 'applies Helm chart', 's-c5')}
+          ${kl(1000, 166, 'applies Helm chart', 's-c5')}
           ${kl(716, 654, 'controls canary steps', 's-c5')}
           ${kl(1024, 700, 'scrapes /metrics', 's-c5')}
           ${kl(1196, 932, 'ships pod logs', 's-c5')}
@@ -899,79 +888,49 @@ class Component extends DCLogic {
         ${kb(1600, 800, 200, 80, 'sys', 'Grafana Alloy', 'per-node', 's-c5')}
       </div>`;
 
+    /* ── the optimizer ───────────────────────────────────────────────────
+       Authored at 1:1 with the stage (1860x1020) like the other two regions,
+       so the camera lands at ~1.0 and the type renders at the size it says. */
+    const ostage = (i, name, tech, body) => `
+      <div class="kbox hero s-o${i}" style="left:60px;top:${86 + (i - 1) * 176}px;width:1740px;height:150px;
+        flex-direction:row;align-items:center;gap:34px;padding:0 40px">
+        <span style="flex:0 0 92px;height:92px;border-radius:50%;background:#ff5f3c;color:#fff;
+          font-size:44px;font-weight:700;display:flex;align-items:center;justify-content:center">${i}</span>
+        <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+          <i style="font-size:42px">${name}</i>
+          <u style="font-size:26px">${body}</u>
+        </span>
+        <span class="pod infra" style="flex:0 0 auto;font-size:26px;padding:12px 20px">${tech}</span>
+      </div>`;
+
+    const optimizer = `
+      <div class="frm lyr" data-depth="0" data-w="optimizer" style="left:150px;top:2500px;width:1860px;height:1020px;border:2px solid #ff5f3c;border-radius:30px;background:#fff">
+        ${ostage(1, 'Greedy', 'baseline', 'a fast first answer, so there is always a plan')}
+        ${ostage(2, 'Hungarian matching', 'scipy', 'optimal drone &rarr; mission assignment')}
+        ${ostage(3, 'Per-drone routing', 'ortools', 'shortest waypoint order for each drone')}
+        ${ostage(4, 'Battery feasibility', 'constraint', 'range vs. distance and payload &mdash; else a charging stop')}
+        ${ostage(5, 'Replan trigger', 'rabbitmq', 'an event lands and the whole pipeline runs again')}
+      </div>`;
+
     return `<div class="world">
-      <div class="frm lyr" data-depth="4" data-w="delivery" style="left:240px;top:90px;width:4900px;height:470px;border:2px dashed #b9b9c2;background:#fbfbfd">
-        <span class="lbl" style="color:#8e8e93">DELIVERY PIPELINE &middot; NOBODY DEPLOYS BY HAND</span>
-        <div style="position:absolute;left:46px;right:46px;top:150px;display:flex;align-items:center;gap:18px">
-          ${pipe('git push','feature merged to main')}${arrow}
-          ${pipe('GitHub Actions','lint · test · build · OIDC')}${arrow}
-          ${pipe('ECR','1.2.0-a1b2c3d')}${arrow}
-          ${pipe('deployments repo','yq bumps the tag')}${arrow}
-          ${pipe('Argo CD','sync · self-heal · prune')}
-        </div>
-      </div>
-
-      <div class="frm" data-w="account" style="left:150px;top:700px;width:5160px;height:2930px;border:2px solid #c9c9d0;background:#fff">
-        <span class="lbl" style="color:#6e6e73">AWS ACCOUNT &middot; SWARMOPS</span>
-        <div class="frm lyr" data-depth="0" data-w="region" style="left:70px;top:100px;width:5020px;height:2830px;border:2px dashed #0e8a8c;background:#fdfefe">
-          <span class="lbl" style="color:#0e8a8c">REGION &middot; US-EAST-1</span>
-
-          <div class="frm lyr" data-depth="0" data-w="vpc" style="left:60px;top:120px;width:4020px;height:2710px;border:2px solid #6f42d8;background:#fdfcff">
-            <span class="lbl" style="color:#6f42d8">PRIVATE VPC</span>
-            <div data-w="edge" style="position:absolute;left:60px;top:185px;width:3840px;height:280px;pointer-events:none"></div>
-            ${az('A', 50, node('n1','node 1') + node('n2','node 2'),
-                 store('mongo','MongoDB','5 Gi gp3 · StatefulSet','#0e7a3a','#f6fdf8','#a6e2ba', dbs),
-                 `<div class="card s-net-2" style="flex:1;padding:14px 18px;display:flex;flex-direction:column;gap:4px">
-                    <span style="font-size:26px;font-weight:700">NAT gateway</span>
-                    <span style="font-size:21px;color:#86868b">&times;1 &middot; egress only</span>
-                  </div>`)}
-            ${az('B', 2000, node('n3','node 3') + node('n4','node 4') + node('n5','node 5'),
-                 store('rabbit','RabbitMQ','8 Gi gp3 · StatefulSet','#c65a10','#fffaf6','#ffc9a0', qs.map((q) => P(q,'app')).join('')),
-                 `<div class="card" style="flex:1;padding:14px 18px;display:flex;flex-direction:column;gap:4px;border-style:dashed">
-                    <span style="font-size:26px;font-weight:700;color:#86868b">no NAT here</span>
-                    <span style="font-size:21px;color:#86868b">shares zone A's exit</span>
-                  </div>`)}
-
-            <div class="frm lyr" data-depth="3" data-w="optimizer" style="left:300px;top:300px;width:3400px;height:1900px;border:2px solid #ff5f3c;background:#fff;z-index:40;box-shadow:0 60px 170px rgba(0,0,0,.24)">
-              <span class="lbl" style="color:#ff5f3c">PLANNING-SERVICE &middot; PYTHON 3.11 &middot; FASTAPI</span>
-              <div style="position:absolute;left:70px;right:70px;top:150px;display:flex;flex-direction:column;gap:20px">
-                ${stage(1,'Greedy','baseline','a fast first answer, so there is always a plan')}
-                ${stage(2,'Hungarian matching','scipy','optimal drone &rarr; mission assignment')}
-                ${stage(3,'Per-drone routing','ortools','shortest waypoint order for each drone')}
-                ${stage(4,'Battery feasibility','constraint','range vs. distance and payload &mdash; else insert a charging stop')}
-                ${stage(5,'Replan trigger','rabbitmq','an event lands and the whole pipeline runs again')}
-              </div>
-            </div>
-          </div>
-
-          <div class="frm lyr" data-depth="1" data-w="ext" style="left:4130px;top:120px;width:830px;height:2710px;border:1px solid #dcdce1;background:#fafafc">
-            <span class="lbl" style="color:#8e8e93">MANAGED &middot; OUTSIDE THE VPC</span>
-            <div style="position:absolute;left:34px;right:34px;top:120px;display:flex;flex-direction:column;gap:16px">
-              ${pipe('EKS control plane','managed by AWS')}
-              ${pipe('ECR','9 service images, a tag per change')}
-              ${pipe('Route 53','DNS for the public endpoint')}
-              ${pipe('Internet gateway','the only way in')}
-            </div>
-          </div>
-        </div>
-      </div>
+      ${footprint}
       ${cluster}
+      ${optimizer}
     </div>`;
   }
 
   _setupCamera() {
     const CAM = {
-      'Cloud Footprint':          { t: 'account',   d: 1, p: 55 },
-      'Inside the Cluster':       { t: 'cluster',   d: 2, p: 40 },
-      'The Network':              { t: 'edge',      d: 1, p: 60, oy: -280 },
-      'The Optimizer':            { t: 'optimizer', d: 3, p: 70, dim: true }
+      'Cloud Footprint':          { t: 'footprint', d: 0, p: 34 },
+      'Inside the Cluster':       { t: 'cluster',   d: 0, p: 34 },
+      'The Optimizer':            { t: 'optimizer', d: 0, p: 34 }
     };
     const measure = (world) => {
       world.classList.add('nofly', 'measuring');
       const prev = world.style.transform;
       world.style.transform = 'none';
       const wr = world.getBoundingClientRect();
-      const k = (wr.width / (world.offsetWidth || 5500)) || 1;
+      const k = (wr.width / (world.offsetWidth || 2200)) || 1;
       const m = {};
       world.querySelectorAll('[data-w]').forEach((el) => {
         const r = el.getBoundingClientRect();
@@ -1013,7 +972,7 @@ class Component extends DCLogic {
       if (!host) return;
       let world = host.querySelector('.world');
       if (!world) {
-        host.innerHTML = this._worldHTML(host.dataset.dense === '1');
+        host.innerHTML = this._worldHTML();
         world = host.querySelector('.world');
         host._m = measure(world);
       }
@@ -1038,22 +997,41 @@ class Component extends DCLogic {
       const prev = e.detail.previousSlide;
       enter(e.detail.slide, prev ? prev.getAttribute('data-label') : null);
     });
-    const poll = setInterval(() => {
+
+    // Slides are not in the DOM at mount - the deck renders them async, which is
+    // why the step engine polls too. Build every camera world as soon as they
+    // exist, rather than on first visit: the step engine binds its clicks on
+    // slidechange, and a world built later than that binds nothing.
+    const boot = () => {
+      document.querySelectorAll('section[data-label]').forEach((section) => {
+        if (!CAM[section.getAttribute('data-label')]) return;
+        const host = section.querySelector('[data-world]');
+        if (!host || host.querySelector('.world')) return;
+        host.innerHTML = this._worldHTML();
+        host._m = measure(host.querySelector('.world'));
+      });
       const cur = document.querySelector('section[data-deck-active]');
-      if (cur) { clearInterval(poll); enter(cur, null); }
-    }, 200);
-    setTimeout(() => clearInterval(poll), 6000);
+      if (!cur) return;
+      // re-announce the current slide so the step engine binds against the
+      // worlds that now exist (covers opening straight onto a camera slide)
+      document.dispatchEvent(new CustomEvent('slidechange', { bubbles: true, detail: {
+        index: 0, previousIndex: -1, slide: cur, previousSlide: null, reason: 'worlds-ready' } }));
+    };
+    const poll = setInterval(() => {
+      if (document.querySelector('section[data-deck-active]')) { clearInterval(poll); boot(); }
+    }, 120);
+    setTimeout(() => clearInterval(poll), 8000);
   }
 
   _setupBuilds() {
     const STEPS = {
+      'Cloud Footprint': ['.s-f1', '.s-f2', '.s-f3', '.s-f4', '.s-f5'],
       'The Problem': ['.d2', '.d3', '.d4'],
       'The Cost': ['.d2', '.d3', '.d4', '.d5', '.d6,.d7'],
       'Replanning': ['.d2', '.d3', '.d4'],
       'Six Services': ['.d3', '.d4', '.d5', '.d6', '.d7'],
-      'The Network': ['.d3', '.d4', '.d5'],
       'Inside the Cluster': ['.s-c1', '.s-c2', '.s-c3', '.s-c4', '.s-c5'],
-      'The Optimizer': ['.s-opt-1', '.s-opt-2', '.s-opt-3', '.s-opt-4', '.s-opt-5'],
+      'The Optimizer': ['.s-o1', '.s-o2', '.s-o3', '.s-o4', '.s-o5'],
       'By the Numbers': ['.d2', '.d3', '.d4', '.d5', '.d6', '.d7'],
       'Commit to Cluster': ['.d2', '.d3', '.d4', '.d5', '.d6', '.d7'],
       'GitOps in Production': ['.d3'],
