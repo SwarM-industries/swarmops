@@ -859,3 +859,67 @@ purple networking, orange containers) because the point of the sheet is "this is
 deployment" and that palette is what makes a panel read the nesting before the labels. It is
 contained: every rule is scoped under `.fig-aws`, so nothing leaks to another figure. If a future
 edit wants the deck uniform again, that whole stylesheet block is the thing to delete.
+
+**Update 2026-08-09 (Tony) — cluster login creds seeded + bootstrap script added.** Local `aws`
+CLI's default profile is a different personal account (048319616750) than SwarmOps's real one
+(769638986113, profile `swarmops`) — kubeconfig was stale/pointing at a dead endpoint until
+`aws eks update-kubeconfig --name swarmops --region us-east-1 --profile swarmops` was re-run.
+Two separate credentials were missing, both flagged by lastday_addons.md /
+swarmops-deployments/STATUS.md / swarmops-auth-service/STATUS.md as deliberately-manual,
+out-of-band steps that nobody had actually run against the live cluster yet:
+
+- `gateway-basic-auth` k8s Secret (protects `/grafana/` and `/argocd/` — both were 401ing with
+  no htpasswd file at all). Created from the repo-root `auth` htpasswd file (untracked, stays
+  that way on purpose — it's a credential).
+- App login: `swarmops-auth-service`'s `/auth/register` had never been called against the live
+  DB, so the frontend's login page had no account to log in with. Seeded
+  `demo-admin@swarmops.internal` (role `admin`) — verified end-to-end with `/auth/login`
+  returning a JWT.
+
+Both steps get wiped on every cluster rebuild (`destroy.tf` / COST_NOTES.md discipline), so
+`swarmops-infrastructure/infra/cluster/scripts/bootstrap-post-rebuild-creds.sh` now automates
+re-running them post-rebuild — idempotent (skips if the Secret/user already exist), checks the
+AWS account + kubectl context match before doing anything, and doesn't move either credential
+into a repo Argo CD syncs from. Run it with `AWS_PROFILE=swarmops` after any `terraform apply`
+that recreates the cluster.
+
+**Update 2026-08-10 (Tony) — deck: Tony gets a real CI slide, Harel gets a real Argo slide.**
+Merged with work already on `origin/main` that had moved `GitOps in Production`, `Zero Downtime`,
+`Canary Rollouts` and `Rollout Timeline` into Harel's section and re-voiced their notes to הראל —
+that half was already done upstream, so it was kept as-is rather than redone. What was still
+missing at both ends of the handoff is what this adds:
+
+- **Tony, slide 18 `CI Pipeline`** (new) — a camera-zoom slide, like the footprint/cluster/optimizer
+  ones, into the *real* GitHub Actions pipeline read off the service repos' `ci.yml`: PR/main
+  triggers → `verify` job (lint/typecheck, docker build-validate, never pushes) → the
+  `ref == refs/heads/main` gate → `publish` job (semver+7-hash tag, OIDC to AWS with no static
+  keys, ECR push, `yq` bump committed as `swarmops-ci-bot`) → ECR + `swarmops-deployments`.
+  Ends on "CI's last act is a git commit — it never talks to the cluster," which is the handoff.
+- **Harel, slide 23 `Reconciliation`** — replaces the old flat `Commit to Cluster` chain
+  (Commit→Build→Registry→Argo→Cluster), which had been carried into Harel's section as-is. That
+  chain restated Tony's CI in boxes and drew Argo as one step in a line. It is now a closed
+  git → diff → sync → live-state loop with the drift/self-heal return path drawn, and it keeps
+  the "pull, not push" line the old slide ended on.
+
+Final order: … 17 By the Numbers · 18 CI Pipeline · 19 Cost Engineering · 20 §Harel ·
+21 Monitoring · 22 What We Measure · 23 Reconciliation · 24–27 the Argo/rollout block ·
+28 Security … 32 Thank You.
+
+Mechanics worth knowing before touching the deck again: `_worldHTML()` now takes a world name —
+`'main'` is the shared architecture world (footprint/cluster/optimizer), `'ci'` is a **separate**
+world for the CI slide, because GitHub is not a place inside the AWS account and sharing the
+coordinate space would imply it is. `CAM` entries carry `w:'ci'`; `enter()` only pans between
+slides in the *same* world and flies in from half-scale otherwise. Anything positioned inside a
+world region needs `z-index:3` or it renders under the `.wires` SVG (z-index 2) and simply never
+appears — cost an hour to find.
+
+Also fixed while in there: `Speaker Script.dc.html` had drifted two slides out of sync with the
+deck (an orphan card for the deleted "Constraints" slide, an orphan `הרשת` card, and no card at
+all for `The Optimizer`), so every number from 8 on was wrong. Cards are now renumbered 01–32
+against the deck 1:1, the missing Optimizer card was added from that slide's own speaker notes,
+and the two orphans are kept in place but marked `— · … · השקף הוסר מהמצגת` rather than deleted —
+if anyone wants that text back, it is right there.
+
+Not done / open: `Rollout Timeline` (27) largely repeats `Canary Rollouts` (26) and is the
+obvious cut if the run-through comes in over 15 minutes. Script cards 14–15 still describe an
+older version of the cloud/cluster slides — pre-existing drift, not touched here.
