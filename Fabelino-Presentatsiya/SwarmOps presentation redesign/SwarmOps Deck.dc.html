@@ -684,40 +684,40 @@ a:hover{color:#ff5f3c}
   <p class="fx d6" style="margin:0;font-size:28px;font-weight:400;color:#6e6e73"><span style="color:#ff5f3c;font-weight:700">NEXT&nbsp;&nbsp;</span>Closed military networks. The doctrine holds; only the perimeter moves.</p>
 </section>
 
-<section data-label="Request Path" data-speaker-notes="הראל: כך הדוקטרינה נראית עבור פקודה אחת, מקצה לקצה. ▸ פקודת המפעיל נוסעת מוצפנת, דרך DNS, אל ה־load balancer — הדלת הציבורית היחידה. ▸ ב־gateway, המחסום: בלי טוקן תקף, הבקשה נדחית לפני שנגעה בשירות כלשהו. ▸ עם טוקן תקף היא נכנסת לרשת הפרטית: השירות פועל בתוך תפקידו, מעביר עבודה לתור, planning מחליט, והפקודה מגיעה לרחפן. חמש בדיקות, אפס אמון עיוור." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:44px;padding:80px 130px">
+<section data-label="Request Path" data-speaker-notes="הראל: וכך הדוקטרינה הזאת נראית עבור פקודה אחת בודדת, מקצה לקצה. שלושה מחסומים. ▸ אחת: הפקודה יוצאת מוצפנת. שתיים: היא מגיעה ל־load balancer — הדלת הציבורית היחידה. שלוש: ב־gateway נבדק הטוקן. ▸ בלי טוקן תקף — נעצרת בדלת. 401. היא לא נגעה באף שירות. ▸ עם טוקן תקף — נכנסת פנימה לרשת הפרטית: planning פועל בתוך התפקיד המצומצם שלו בלבד, ומשם הפקודה מגיעה לרחפן. אפס אמון עיוור, בכל שלב." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:52px;padding:80px 130px">
   <div style="display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center">
     <p class="fx" style="margin:0;font-size:26px;font-weight:600;letter-spacing:.16em;color:#ff5f3c">SECURITY</p>
-    <h2 class="fx d1" style="margin:0;font-size:76px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">One command, five checks</h2>
+    <h2 class="fx d1" style="margin:0;font-size:76px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">One command, three checkpoints</h2>
   </div>
-  <div style="display:flex;flex-direction:column;gap:22px;width:100%;max-width:1640px">
-    <div class="fp d2" style="display:flex;align-items:center;gap:16px;justify-content:center">
-      <div style="background:#1d1d1f;color:#f5f5f7;border-radius:18px;padding:20px 32px;display:flex;flex-direction:column;gap:2px"><span style="font-size:27px;font-weight:700">Operator</span><span style="font-size:23px;color:#a1a1a6">sends a command</span></div>
-      <span style="font-size:24px;color:#248a3d;font-weight:600">&#8594;&nbsp;TLS</span>
-      <div style="background:#fff;border-radius:18px;padding:20px 32px;display:flex;flex-direction:column;gap:2px;box-shadow:0 2px 12px rgba(0,0,0,.05)"><span style="font-size:27px;font-weight:700">Route 53</span><span style="font-size:23px;color:#6e6e73">DNS</span></div>
-      <span style="font-size:24px;color:#b6b6bc">&#8594;</span>
-      <div style="background:#fff;border-radius:18px;padding:20px 32px;display:flex;flex-direction:column;gap:2px;box-shadow:0 2px 12px rgba(0,0,0,.05)"><span style="font-size:27px;font-weight:700">Load balancer</span><span style="font-size:23px;color:#6e6e73">the only public door</span></div>
-      <span style="font-size:24px;color:#b6b6bc">&#8594;</span>
-      <div style="background:#fff;border:2px solid #ff5f3c;border-radius:18px;padding:18px 32px;display:flex;flex-direction:column;gap:2px"><span style="font-size:27px;font-weight:700;color:#ff5f3c">gateway</span><span style="font-size:23px;color:#6e6e73">checkpoint · token check</span></div>
+
+  <div style="display:flex;flex-direction:column;gap:34px;width:100%;max-width:1580px;align-items:center">
+
+    <div class="fp d2" style="display:flex;align-items:center;gap:20px;justify-content:center">
+      <div style="background:#1d1d1f;color:#f5f5f7;border-radius:20px;padding:22px 34px;display:flex;flex-direction:column;gap:3px"><span style="font-size:28px;font-weight:700">Operator</span><span style="font-size:23px;color:#a1a1a6">sends a command</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:7px"><span style="width:36px;height:36px;border-radius:50%;background:#ff5f3c;color:#fff;font-size:21px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">1</span><span style="font-size:22px;font-weight:600;color:#248a3d">encrypted</span></div>
+      <span style="font-size:30px;color:#b6b6bc">&#8594;</span>
+      <div style="background:#fff;border-radius:20px;padding:20px 32px;display:flex;align-items:center;gap:18px;box-shadow:0 2px 12px rgba(0,0,0,.05)"><span style="width:36px;height:36px;border-radius:50%;background:#ff5f3c;color:#fff;font-size:21px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">2</span><span style="display:flex;flex-direction:column;gap:3px"><span style="font-size:28px;font-weight:700">Load balancer</span><span style="font-size:23px;color:#6e6e73">the only public door</span></span></div>
+      <span style="font-size:30px;color:#b6b6bc">&#8594;</span>
+      <div style="background:#fff;border:2px solid #ff5f3c;border-radius:20px;padding:18px 32px;display:flex;align-items:center;gap:18px"><span style="width:36px;height:36px;border-radius:50%;background:#ff5f3c;color:#fff;font-size:21px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">3</span><span style="display:flex;flex-direction:column;gap:3px"><span style="font-size:28px;font-weight:700;color:#ff5f3c">gateway</span><span style="font-size:23px;color:#6e6e73">checks the token</span></span></div>
     </div>
-    <div class="fp d3" style="display:flex;align-items:center;gap:16px;justify-content:center">
-      <span style="font-size:25px;font-weight:700;color:#c22c1e">&#10007;&nbsp;no valid token</span>
-      <span style="font-size:24px;color:#c22c1e">&#8594;</span>
-      <div style="background:#fdeceb;border:1px solid #c22c1e;border-radius:100px;padding:14px 34px"><span style="font-size:25px;font-weight:600;color:#c22c1e">Rejected at the door · 401 · never reaches a service</span></div>
+
+    <div class="fp d3" style="display:flex;align-items:center;gap:18px;justify-content:center">
+      <span style="font-size:26px;font-weight:700;color:#c22c1e;white-space:nowrap">&#10007;&nbsp; no valid token</span>
+      <span style="font-size:26px;color:#c22c1e">&#8594;</span>
+      <div style="background:#fdeceb;border:1px solid #c22c1e;border-radius:100px;padding:16px 38px"><span style="font-size:26px;font-weight:600;color:#c22c1e">Stopped at the door &middot; 401 &middot; never reaches a service</span></div>
     </div>
-    <div class="fp d4" style="display:flex;align-items:center;gap:16px;justify-content:center">
-      <span style="font-size:25px;font-weight:700;color:#248a3d">&#10003;&nbsp;valid token</span>
-      <span style="font-size:24px;color:#248a3d">&#8594;</span>
-      <div style="border:2px dashed #0e8a8c;border-radius:20px;padding:18px 24px;display:flex;align-items:center;gap:16px">
-        <span style="font-size:22px;font-weight:600;color:#0e8a8c;letter-spacing:.06em;writing-mode:vertical-rl;transform:rotate(180deg)">PRIVATE VPC</span>
-        <div style="background:#fff;border-radius:16px;padding:16px 26px;display:flex;flex-direction:column;gap:2px;box-shadow:0 2px 12px rgba(0,0,0,.05)"><span style="font-size:26px;font-weight:700">service</span><span style="font-size:22px;color:#6e6e73">least-privilege role</span></div>
-        <span style="font-size:24px;color:#b6b6bc">&#8594;</span>
-        <div style="background:#fff;border-radius:16px;padding:16px 26px;display:flex;flex-direction:column;gap:2px;box-shadow:0 2px 12px rgba(0,0,0,.05)"><span style="font-size:26px;font-weight:700">RabbitMQ</span><span style="font-size:22px;color:#6e6e73">queued, never direct</span></div>
-        <span style="font-size:24px;color:#b6b6bc">&#8594;</span>
-        <div style="background:#fff;border-radius:16px;padding:16px 26px;display:flex;flex-direction:column;gap:2px;box-shadow:0 2px 12px rgba(0,0,0,.05)"><span style="font-size:26px;font-weight:700">planning</span><span style="font-size:22px;color:#6e6e73">decides &amp; assigns</span></div>
-        <span style="font-size:24px;color:#b6b6bc">&#8594;</span>
-        <div style="background:#1d1d1f;color:#f5f5f7;border-radius:16px;padding:16px 26px;display:flex;flex-direction:column;gap:2px"><span style="font-size:26px;font-weight:700">drone</span><span style="font-size:22px;color:#a1a1a6">executes</span></div>
+
+    <div class="fp d4" style="display:flex;align-items:center;gap:18px;justify-content:center">
+      <span style="font-size:26px;font-weight:700;color:#248a3d;white-space:nowrap">&#10003;&nbsp; valid token</span>
+      <span style="font-size:26px;color:#248a3d">&#8594;</span>
+      <div style="border:2px dashed #0e8a8c;border-radius:22px;padding:20px 28px;display:flex;align-items:center;gap:18px">
+        <span style="font-size:21px;font-weight:600;color:#0e8a8c;letter-spacing:.08em;white-space:nowrap">PRIVATE NETWORK</span>
+        <div style="background:#fff;border-radius:16px;padding:16px 28px;display:flex;flex-direction:column;gap:3px;box-shadow:0 2px 12px rgba(0,0,0,.05)"><span style="font-size:27px;font-weight:700">planning</span><span style="font-size:22px;color:#6e6e73">its own limited role</span></div>
+        <span style="font-size:26px;color:#b6b6bc">&#8594;</span>
+        <div style="background:#1d1d1f;color:#f5f5f7;border-radius:16px;padding:16px 28px;display:flex;flex-direction:column;gap:3px"><span style="font-size:27px;font-weight:700">drone</span><span style="font-size:22px;color:#a1a1a6">executes</span></div>
       </div>
     </div>
+
   </div>
 </section>
 
