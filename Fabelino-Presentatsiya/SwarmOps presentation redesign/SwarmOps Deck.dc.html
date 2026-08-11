@@ -169,7 +169,7 @@ a:hover{color:#ff5f3c}
 </section>
 
 <section data-label="§ Guy" data-speaker-notes="גיא: מילה עליי קודם. הייתי חובש קרבי בחילוץ והצלה. מה שאני עומד לספר לכם הוא לא היפותטי. זה קרה." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;padding:90px 140px;text-align:center" data-om-slide-id="c01c2d98">
-  <img class="fp" src="assets/guy.jpg" alt="Guy" style="width:190px;height:190px;border-radius:50%;object-fit:cover;object-position:center 40%;filter:contrast(1.05);box-shadow:0 12px 40px rgba(0,0,0,.15)">
+  <img class="fp" src="assets/guy.jpg" alt="Guy" style="width:300px;height:300px;border-radius:50%;object-fit:cover;object-position:center 40%;filter:contrast(1.05);box-shadow:0 12px 40px rgba(0,0,0,.15)">
   <p class="fx d1" style="margin:0;font-size:28px;font-weight:600;letter-spacing:.2em;color:#6e6e73">GUY&nbsp;&nbsp;·&nbsp;&nbsp;COMBAT MEDIC, SEARCH &amp; RESCUE</p>
   <h2 class="grad fx d2" style="margin:0;font-size:160px;font-weight:700;letter-spacing:-0.03em;line-height:1">The Mission</h2>
   <p class="fx d3" style="margin:0;font-size:34px;font-weight:400;color:#6e6e73">The problem&nbsp;&nbsp;·&nbsp;&nbsp;The idea&nbsp;&nbsp;·&nbsp;&nbsp;Live demo</p>
@@ -306,7 +306,7 @@ a:hover{color:#ff5f3c}
     <h2 class="fx d1" style="margin:0;font-size:84px;font-weight:700;letter-spacing:-0.015em;line-height:1.05">A patrol that never blinks</h2>
     <p class="fx d2" style="margin:0;font-size:32px;font-weight:400;color:#6e6e73">Battery runs low. Another drone continues the patrol without missing a moment.</p>
   </div>
-  <video class="fz d3" data-video="assets/patrol-demo.mp4" autoPlay="{{ true }}" muted="{{ true }}" loop="{{ true }}" playsInline="{{ true }}" style="display:block;width:100%;max-width:1240px;aspect-ratio:16/9;object-fit:cover;border-radius:26px;box-shadow:0 26px 80px rgba(0,0,0,.2)"></video>
+  <video class="fz d3" data-video="assets/Patrol-Demo.mp4" autoPlay="{{ true }}" muted="{{ true }}" loop="{{ true }}" playsInline="{{ true }}" style="display:block;width:100%;max-width:1240px;aspect-ratio:16/9;object-fit:cover;border-radius:26px;box-shadow:0 26px 80px rgba(0,0,0,.2)"></video>
 </section>
 
 <section data-label="Live Demo" data-speaker-notes="גיא עובר למערכת החיה: זו הייתה הקלטה. עכשיו נעשה את זה בשידור חי. (דמו: המפה עם כל רחפן וסוללה ← יצירת משימה, תכנון ושיגור ← החלפת סוללה.) וזה הצד המשימתי. כל מה שראיתם רץ בענן אמיתי — וזה סיפור בפני עצמו. טוני." style="background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif;display:flex;align-items:center;justify-content:center;gap:100px;padding:90px 140px" data-om-slide-id="6a27a87d">
@@ -322,7 +322,7 @@ a:hover{color:#ff5f3c}
   <img class="fz" src="assets/drone4.jpeg" alt="Night launch from the field" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%" />
   <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.78))"></div>
   <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;padding:90px 140px;text-align:center">
-    <img class="fp" src="assets/tony.jpg" alt="Tony" style="width:190px;height:190px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.35);filter:contrast(1.05);box-shadow:0 12px 40px rgba(0,0,0,.15)">
+    <img class="fp" src="assets/tony.jpg" alt="Tony" style="width:300px;height:300px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.35);filter:contrast(1.05);box-shadow:0 12px 40px rgba(0,0,0,.15)">
     <p class="fx d1" style="margin:0;font-size:28px;font-weight:600;letter-spacing:.2em;color:rgba(245,245,247,.75)">TONY&nbsp;&nbsp;·&nbsp;&nbsp;SNIPER, DRONE OPERATOR</p>
     <h2 class="grad fx d2" style="margin:0;font-size:160px;font-weight:700;letter-spacing:-0.03em;line-height:1;text-shadow:none">The Cloud</h2>
     <p class="fx d3" style="margin:0;font-size:34px;font-weight:400;color:rgba(245,245,247,.75)">Architecture&nbsp;&nbsp;·&nbsp;&nbsp;Scale&nbsp;&nbsp;·&nbsp;&nbsp;Cost</p>
@@ -381,13 +381,13 @@ a:hover{color:#ff5f3c}
   </div>
 </section>
 
-<section class="camslide" data-label="Cloud Footprint" data-speaker-notes="טוני: הכול רץ על AWS, וכל מה שעל השקף הזה נקרא מה־Terraform שלנו. ▸ מתחילים מבחוץ: משתמש נכנס ב־HTTPS דרך ה־Internet Gateway — זו הדלת היחידה פנימה. ▸ בפנים, VPC פרטי מפוצל לשני אזורי זמינות. בכל אזור רשת ציבורית עם load balancer, ו־NAT יחיד ליציאה החוצה. ▸ מתחת להן הרשתות הפרטיות: שם יושבים חמשת השרתים שמריצים את כל הפודים, ואליהם ה־ALB מנתב. ▸ הדיסקים של MongoDB ו־RabbitMQ נוצרים דינמית, ומישור הבקרה של EKS — שמנוהל על ידי AWS ויושב מחוץ ל־VPC — מדבר עם שני קבוצות השרתים. ▸ ומי בנה את כל זה: Terraform מקים את התשתית, ו־GitHub Actions דוחף אימג׳ים ל־ECR דרך OIDC בלי מפתחות קבועים. שני אזורים אומר שאובדן דאטה־סנטר לא מפיל אותנו, והכול קוד: הורסים בלילה, בונים מחדש בדקות." style="background:#eef0f3;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif" data-om-slide-id="0794a74e">
+<section class="camslide" data-label="Cloud Footprint" data-speaker-notes="טוני: הכול רץ על AWS, וכל מה שעל השקף הזה נקרא מה־Terraform שלנו. ▸ מתחילים מבחוץ: משתמש נכנס ב־HTTPS דרך ה־Internet Gateway — זו הדלת היחידה פנימה. ▸ בפנים, VPC פרטי מפוצל לשני אזורי זמינות. בכל אזור רשת ציבורית עם load balancer — אבל NAT gateway אחד בלבד לכל ה־VPC, ושני האזורים יוצאים החוצה דרכו. זו החלטת עלות מודעת: NAT לכל אזור היה מוסיף עוד כשישים דולר בחודש. ▸ מתחת להן הרשתות הפרטיות: שם יושבים חמשת השרתים שמריצים את כל הפודים, ואליהם ה־ALB מנתב. ▸ הדיסקים של MongoDB ו־RabbitMQ נוצרים דינמית, ומישור הבקרה של EKS — שמנוהל על ידי AWS ויושב מחוץ ל־VPC — מדבר עם שני קבוצות השרתים. ▸ ומי בנה את כל זה: Terraform מקים את התשתית, ו־GitHub Actions דוחף אימג׳ים ל־ECR דרך OIDC בלי מפתחות קבועים. שני אזורים אומר שאובדן דאטה־סנטר לא מפיל אותנו, והכול קוד: הורסים בלילה, בונים מחדש בדקות." style="background:#eef0f3;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif" data-om-slide-id="0794a74e">
   <div class="wv" data-world data-dense="0"></div>
   <div class="crumb"><b>AWS ACCOUNT</b></div>
   <div class="tstrip"><b>THE CLOUD</b><span>Where it actually runs</span></div>
 </section>
 
-<section class="camslide" data-label="Inside the Cluster" data-speaker-notes="טוני: וזה מה שבאמת רץ בתוך הקלאסטר — כל הרכיבים, וגם מה מדבר עם מה. ▸ כל בקשה נכנסת דרך ה־Ingress אל ה־gateway, והוא גם זה שמגיש את הפרונטאנד. ▸ מה־gateway היא מנותבת לאחד מששת השירותים; אף אחד מהם לא חשוף החוצה. ▸ planning-service הוא היחיד שרץ כ־Rollout עם canary, ולידו הסימולטור שמזרים טלמטריה פנימה. ▸ המצב נשמר בשניים בלבד: MongoDB לנתונים, RabbitMQ לאירועים, ולכל שירות יש ServiceMonitor שחושף מדדים. ▸ ומסביב לאפליקציה — argocd שמדפלה את הכול, argo-rollouts ששולט בשלבי ה־canary, ומוניטורינג ולוגים שרואים הכול. חמישה namespaces, מערכת אחת." style="background:#eef0f3;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif" data-om-slide-id="4883b4ed">
+<section class="camslide" data-label="Inside the Cluster" data-speaker-notes="טוני: וזה מה שבאמת רץ בתוך הקלאסטר — כל הרכיבים, וגם מה מדבר עם מה. ▸ כל בקשה נכנסת דרך ה־Ingress אל ה־gateway, והוא גם זה שמגיש את הפרונטאנד. ▸ מה־gateway היא מנותבת לאחד מששת השירותים; אף אחד מהם לא חשוף החוצה. ▸ planning-service הוא היחיד שרץ כ־Rollout עם canary, ולידו הסימולטור. הסימולטור הוא לקוח לכל דבר: הוא מתחבר ל־auth עם חשבון שירות משלו, מושך את התוכניות מ־planning, ומזרים טלמטריה ל־telemetry — הכול ב־HTTP רגיל, ואף פעם לא ישירות מול התור. ▸ המצב נשמר בשניים בלבד: MongoDB לנתונים, ו־RabbitMQ לאירועים — והוא לא תחנה סופית אלא הצומת. telemetry מפרסם לתוכו כל אירוע, ו־fleet, planning ו־notification צורכים ממנו, כל אחד לתור משלו. planning גם מפרסם התראות בחזרה, ו־notification צורך גם אותן. שני ה־exchanges הם fanout, כי תור משותף היה מחלק את ההודעות בין הצרכנים במקום לתת לכל אחד עותק מלא — לכל צרכן יש תור משלו שקשור ל־exchange. ולכל שירות יש ServiceMonitor שחושף מדדים. ▸ ומסביב לאפליקציה — argocd שמדפלה את הכול, argo-rollouts ששולט בשלבי ה־canary, ומוניטורינג ולוגים שרואים הכול. חמישה namespaces, מערכת אחת." style="background:#eef0f3;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Segoe UI',Arial,sans-serif" data-om-slide-id="4883b4ed">
   <div class="wv" data-world data-dense="0"></div>
   <div class="crumb">VPC<span>›</span><b>EKS CLUSTER</b></div>
   <div class="tstrip"><b>KUBERNETES</b><span>Inside the cluster</span></div>
@@ -473,7 +473,7 @@ a:hover{color:#ff5f3c}
   <img class="fz" src="assets/drone2.jpeg" alt="Thermal feed on the controller at night" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 55%" />
   <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.78))"></div>
   <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;padding:90px 140px;text-align:center">
-    <img class="fp" src="assets/harel.jpg" alt="Harel" style="width:190px;height:190px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.35);filter:contrast(1.05);box-shadow:0 12px 40px rgba(0,0,0,.15)">
+    <img class="fp" src="assets/harel.jpg" alt="Harel" style="width:300px;height:300px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.35);filter:contrast(1.05);box-shadow:0 12px 40px rgba(0,0,0,.15)">
     <p class="fx d1" style="margin:0;font-size:28px;font-weight:600;letter-spacing:.2em;color:rgba(245,245,247,.75)">HAREL&nbsp;&nbsp;·&nbsp;&nbsp;TANK GUNNER</p>
     <h2 class="grad fx d2" style="margin:0;font-size:160px;font-weight:700;letter-spacing:-0.03em;line-height:1;text-shadow:none">Operations</h2>
     <p class="fx d3" style="margin:0;font-size:34px;font-weight:400;color:rgba(245,245,247,.75)">Deployment&nbsp;&nbsp;·&nbsp;&nbsp;Monitoring&nbsp;&nbsp;·&nbsp;&nbsp;Security</p>
@@ -804,9 +804,10 @@ class Component extends DCLogic {
           ${ke('M280,162 H330 V322 H700', 's-f1')}
           ${ke('M580,446 V396 H770 V348', 's-f2')}
           ${ke('M840,348 V396 H870 V446', 's-f2')}
-          ${ke('M1260,446 V380 H900 V348', 's-f2')}
           ${ke('M920,322 H1550 V446', 's-f2')}
           ${ke('M870,510 V576 H730 V646', 's-f3')}
+          ${ke('M520,646 V516', 's-f3')}
+          ${ke('M1200,646 V584 H640 V516', 's-f3')}
           ${ke('M1550,510 V576 H1410 V646', 's-f3')}
           ${ke('M730,736 V776', 's-f4')}
           ${ke('M1410,736 V776', 's-f4')}
@@ -817,7 +818,6 @@ class Component extends DCLogic {
           ${ke('M1400,184 H1264', 's-f5')}
           ${kl(600, 314, 'HTTPS', 's-f1')}
           ${kl(686, 390, 'egress only', 's-f2')}
-          ${kl(946, 372, 'egress only', 's-f2')}
           ${kl(736, 568, 'ingress &rarr; gateway', 's-f3')}
           ${kl(1416, 568, 'ingress &rarr; gateway', 's-f3')}
           ${kl(742, 766, 'dynamic PVC', 's-f4')}
@@ -840,9 +840,8 @@ class Component extends DCLogic {
 
         ${kb(30, 120, 250, 84, 'edge', 'Internet / Users', '', 's-f1')}
         ${kb(700, 296, 220, 52, 'gw', 'Internet Gateway', '', 's-f1')}
-        ${kb(455, 446, 250, 64, 'sys', 'NAT Gateway A', '', 's-f2')}
+        ${kb(455, 446, 250, 70, 'sys', 'NAT Gateway', 'shared by both AZs', 's-f2')}
         ${kb(735, 446, 270, 64, 'edge', 'ALB target group', '', 's-f2')}
-        ${kb(1135, 446, 250, 64, 'sys', 'NAT Gateway B', '', 's-f2')}
         ${kb(1415, 446, 270, 64, 'edge', 'ALB target group', '', 's-f2')}
         ${kb(455, 646, 550, 90, 'app', 'EKS Node Group A', '2 spot nodes &middot; all service pods', 's-f3')}
         ${kb(1135, 646, 550, 90, 'app', 'EKS Node Group B', '3 spot nodes &middot; all service pods', 's-f3')}
@@ -872,20 +871,27 @@ class Component extends DCLogic {
           ${ke('M485,234 V275 H1024 V320', 's-c2')}
           ${ke('M485,234 V275 H489 V522 H498', 's-c3')}
           ${ke('M975,470 V440 H810 V404', 's-c3')}
+          ${ke('M850,522 H798', 's-c3')}
           ${ke('M168,404 V630 H150 V660', 's-c4')}
           ${ke('M520,574 V624 H270 V660', 's-c4')}
           ${ke('M810,404 V600 H530 V660', 's-c4')}
+          ${ke('M640,574 V660', 's-c4')}
+          ${ke('M430,660 V404', 's-c4')}
+          ${ke('M560,660 V574', 's-c4')}
+          ${ke('M600,764 V806 H1115 V404', 's-c4')}
           ${ke('M1215,175 H1150', 's-c5')}
           ${ke('M1215,370 H1170 V630 H700 V574', 's-c5')}
-          ${ke('M1010,712 H1120 V555 H1215', 's-c5')}
+          ${ke('M1010,712 H1145 V555 H1215', 's-c5')}
           ${ke('M1500,415 V440 H1350 V520', 's-c5')}
           ${ke('M1305,620 V590', 's-c5')}
           ${ke('M1395,555 H1420', 's-c5')}
-          ${ke('M1360,520 V500 H1715 V520', 's-c5')}
+          ${ke('M1250,590 V606 H1715 V590', 's-c5')}
           ${ke('M1600,840 H1580', 's-c5')}
           ${ke('M1150,940 H1700 V880', 's-c5')}
           ${ke('M1500,800 V590', 's-c5')}
           ${kl(842, 432, 'ingest', 's-c3')}
+          ${kl(690, 592, 'publishes', 's-c4')}
+          ${kl(652, 622, 'publishes alerts', 's-c4')}
           ${kl(1000, 166, 'applies Helm chart', 's-c5')}
           ${kl(716, 654, 'controls canary steps', 's-c5')}
           ${kl(1024, 700, 'scrapes /metrics', 's-c5')}
@@ -895,7 +901,8 @@ class Component extends DCLogic {
         ${kf(30, 70, 1120, 790, 'NAMESPACE: SWARMOPS', '#6f42d8')}
         ${kf(1180, 70, 650, 180, 'NAMESPACE: ARGOCD', '#3f7fd8').replace('class="kfrm"', 'class="kfrm s-c5"')}
         ${kf(1180, 275, 650, 165, 'NAMESPACE: ARGO-ROLLOUTS', '#7b4fd8').replace('class="kfrm"', 'class="kfrm s-c5"')}
-        ${kf(1180, 465, 650, 250, 'NAMESPACE: MONITORING', '#8e8e93').replace('class="kfrm"', 'class="kfrm s-c5"')}
+        <div class="kfrm s-c5" style="left:1180px;top:465px;width:650px;height:250px;border-color:#8e8e93">
+          <b style="color:#8e8e93;left:auto;right:22px">NAMESPACE: MONITORING</b></div>
         ${kf(1180, 740, 650, 240, 'NAMESPACE: LOGGING', '#8e8e93').replace('class="kfrm"', 'class="kfrm s-c5"')}
 
         ${kb(70, 150, 200, 84, 'edge', 'Ingress', 'ALB target', 's-c1')}
@@ -909,7 +916,7 @@ class Component extends DCLogic {
         ${kb(926, 320, 196, 84, 'app', 'notification-service', '', 's-c2')}
 
         ${kb(498, 470, 300, 104, 'hero', 'planning-service', 'Rollout &middot; canary', 's-c3')}
-        ${kb(850, 470, 250, 104, 'sim', 'drone-simulator', 'Deployment, no Service', 's-c3')}
+        ${kb(850, 470, 250, 104, 'sim', 'drone-simulator', 'Deployment, no Service &middot; own service account', 's-c3')}
 
         ${kb(70, 660, 280, 104, 'data', 'MongoDB', 'StatefulSet + PVC', 's-c4')}
         ${kb(390, 660, 280, 104, 'mq', 'RabbitMQ', 'StatefulSet + PVC', 's-c4')}
@@ -971,36 +978,34 @@ class Component extends DCLogic {
               <path d="M0,0 L9,4.5 L0,9 z" fill="#9a9aa4"/>
             </marker>
           </defs>
-          ${ke('M460,170 H560', 's-ci1')}
-          ${ke('M460,350 H560', 's-ci2')}
-          ${ke('M1180,225 H1235 V170 H1290', 's-ci2')}
-          ${ke('M870,390 V460', 's-ci3')}
-          ${ke('M880,810 V850', 's-ci4')}
-          ${ke('M1510,810 V850', 's-ci5')}
-          ${cl(884, 432, 'only if ref == refs/heads/main', 's-ci3')}
+          ${ke('M460,230 H560', 's-ci1')}
+          ${ke('M1180,265 H1235 V225 H1290', 's-ci2')}
+          ${ke('M870,435 V500', 's-ci3')}
+          ${ke('M880,840 V875', 's-ci4')}
+          ${ke('M1510,840 V875', 's-ci5')}
+          ${cl(884, 478, 'only if ref == refs/heads/main', 's-ci3')}
         </svg>
 
-        ${cb(40, 120, 420, 100, 'edge', 'Pull request', 'opened against main', 's-ci1')}
-        ${cb(40, 300, 420, 100, 'gw', 'Push to main', 'the merge lands', 's-ci2')}
+        ${cb(40, 180, 420, 100, 'edge', 'Pull request', 'opened against main', 's-ci1')}
 
-        ${cf(560, 60, 620, 330, 'JOB: VERIFY', '#3f9e4d', 's-ci1')}
-        ${cb(595, 130, 550, 84, 'sys', 'install &middot; lint &middot; typecheck', 'planning: import sanity check', 's-ci1')}
-        ${cb(595, 235, 550, 84, 'sys', 'docker build', 'validated, never pushed', 's-ci1')}
+        ${cf(560, 115, 620, 320, 'JOB: VERIFY', '#3f9e4d', 's-ci1')}
+        ${cb(595, 180, 550, 84, 'sys', 'install &middot; lint &middot; typecheck', 'planning: import sanity check', 's-ci1')}
+        ${cb(595, 285, 550, 84, 'sys', 'docker build', 'validated, never pushed', 's-ci1')}
 
-        ${cb(1290, 120, 500, 100, 'sys', 'A PR stops here', 'no image, no cluster', 's-ci2')}
+        ${cb(1290, 175, 500, 100, 'sys', 'A PR stops here', 'no image, no cluster', 's-ci2')}
 
-        ${cf(560, 460, 1230, 350, 'JOB: PUBLISH', '#7b4fd8', 's-ci3')}
-        ${cb(595, 535, 570, 84, 'app', 'Tag &nbsp;0.1.0-a1b2c3d', 'semver + 7-char commit hash', 's-ci3')}
-        ${cb(595, 645, 570, 84, 'app', 'OIDC &rarr; AWS', 'short-lived role, no static keys', 's-ci3')}
-        ${cb(1195, 535, 560, 84, 'app', 'Build + push image', 'immutable tag, never latest', 's-ci4')}
-        ${cb(1195, 645, 560, 84, 'hero', 'yq bump &rarr; git commit', 'authored by swarmops-ci-bot', 's-ci5')}
+        ${cf(560, 500, 1230, 340, 'JOB: PUBLISH', '#7b4fd8', 's-ci3')}
+        ${cb(595, 570, 570, 84, 'app', 'Tag &nbsp;0.1.0-a1b2c3d', 'semver + 7-char commit hash', 's-ci3')}
+        ${cb(595, 675, 570, 84, 'app', 'OIDC &rarr; AWS', 'short-lived role, no static keys', 's-ci3')}
+        ${cb(1195, 570, 560, 84, 'app', 'Build + push image', 'immutable tag, never latest', 's-ci4')}
+        ${cb(1195, 675, 560, 84, 'hero', 'yq bump &rarr; git commit', 'authored by swarmops-ci-bot', 's-ci5')}
 
-        ${cb(560, 850, 560, 100, 'sim', 'ECR', '9 service images', 's-ci4')}
-        ${cb(1230, 850, 560, 100, 'data', 'swarmops-deployments', 'environments/production/images/', 's-ci5')}
+        ${cb(560, 875, 560, 100, 'sim', 'ECR', '9 service images', 's-ci4')}
+        ${cb(1230, 875, 560, 100, 'data', 'swarmops-deployments', 'environments/production/images/', 's-ci5')}
 
         <!-- z-index: anything in a world region must clear the .wires svg (z 2),
              or it renders underneath it and simply never appears -->
-        <div class="s-ci5" style="position:absolute;left:40px;top:520px;width:490px;text-align:left;z-index:3">
+        <div class="s-ci5" style="position:absolute;left:40px;top:560px;width:490px;text-align:left;z-index:3">
           <div style="font-size:36px;font-weight:700;color:#c2400f;line-height:1.25">CI&rsquo;s last act is a git commit.</div>
           <div style="margin-top:14px;font-size:28px;font-weight:400;color:#6e6e73;line-height:1.4">It never talks to the cluster. Not once.</div>
         </div>
