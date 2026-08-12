@@ -923,3 +923,15 @@ if anyone wants that text back, it is right there.
 Not done / open: `Rollout Timeline` (27) largely repeats `Canary Rollouts` (26) and is the
 obvious cut if the run-through comes in over 15 minutes. Script cards 14–15 still describe an
 older version of the cloud/cluster slides — pre-existing drift, not touched here.
+
+**Update 2026-08-12 (Tony) — business document for college leadership added (`business/`).** After
+the presentation, college management asked for a business document to support an incubation/funding
+decision. `business/SwarmOps_Business_Overview_{EN,HE}.md` are the source texts;
+`SwarmOps_Business_Overview_{EN,HE}.pdf` are the deliverables (rendered via headless Chrome from
+styled HTML, cover carries the logo-mark + "SwarM Industries" wordmark — deliberately *not* the
+full logo, whose "CONNECTED. CAPABLE. LETHAL." tagline is the wrong register for this audience).
+Content is deliberately claim-safe: every capability in §3 is something actually built/deployed;
+the simulated-fleet scope is stated openly (§3.5) and framed as Phase 1 of the roadmap; no invented
+market figures. Open before sending: surnames, team bios, pre-seed amount, contact details — all
+marked `[...]` in both languages. Regenerate PDFs by re-running the HTML→Chrome step if the MD
+changes (HTML templates were in the job tmp dir, not committed — trivially rebuildable from the MD).
