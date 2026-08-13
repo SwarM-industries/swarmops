@@ -987,3 +987,30 @@ placeholders in both languages. Also unresolved — the one-pagers name the thir
 Harel/הראל while `CLAUDE.md` says Valfish; one of the two is stale and nobody has said which.
 Third-party EN business overview was **not** touched this pass, so it still lags the HE version
 on the use-case section (the 2026-08-12 note's open item is still open).
+
+**Update 2026-08-13b (Tony) — one-pager V2 (HE) added; team claims verified.** New
+`business/SwarmOps_OnePager_HE_V2.pdf` (source: `business/_render/onepager_he_v2.html`), 1 page.
+This is a **content variant, not a replacement** — V1 and V2 both stand, pick per audience. V2
+takes an externally-drafted Hebrew text verbatim (numbered 8-section structure: exec summary,
+challenge, solution, use cases, roadmap, team, ask, contact) and applies our own design system to
+it, rather than the other way round. Differences from V1: numbered section badges with English
+sub-labels, no stats row, exec summary as a bordered lede block, use cases as a two-column table.
+**Edit V1 and V2 independently — they are not generated from a shared source and will drift.**
+
+Note V2 re-introduces "ארכיטקטורת Enterprise … תצפיתיות (Observability)" in §3, which the
+2026-08-13 pass had deliberately stripped from V1 as too-technical for this audience. That is
+intentional here — the instruction was to reproduce the supplied text one-to-one — but it means
+**V2 is slightly more technical than the audience rule in `business/_render/README.md` prescribes**.
+If V2 becomes the primary one-pager, revisit that line.
+
+**Both flagged claims are now confirmed true (Tony, 2026-08-13):** all three of us are combat
+veterans, and the Discharged Combat Veterans Program affiliation is accurate. Additionally — not
+yet reflected in any document — **Tony and Guy are drone operators**, which is a real credibility
+asset for a drone-fleet product and should be worked into the team bios when the `[...]` surname
+and bio placeholders get filled in.
+
+Also committed: `business/SwarmOps - Executive One-Pager.pdf`, the externally-generated (Gemini)
+draft that prompted both the de-teching pass and V2. Kept for provenance — it is **not** a
+deliverable (it carries a browser print header and a local `file:///Users/tonyverin/Desktop/...`
+path in its footer). The deliverables remain `SwarmOps_OnePager_{HE,EN}.pdf` and
+`SwarmOps_OnePager_HE_V2.pdf`.
