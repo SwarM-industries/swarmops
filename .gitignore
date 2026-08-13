@@ -17,3 +17,6 @@ OBSERVABILITY_ACCESS.md
 # tool scratch output, not project content
 .claude-design/
 .playwright-mcp/
+
+# local credentials — never commit
+auth

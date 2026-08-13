@@ -14,6 +14,7 @@ commit both. A PDF edited directly will be silently overwritten by the next rend
 | `_render/onepager_he.html` | `../SwarmOps_OnePager_HE.pdf` | Hand-authored HTML, 1 page, RTL |
 | `_render/onepager_en.html` | `../SwarmOps_OnePager_EN.pdf` | Hand-authored HTML, 1 page, LTR |
 | `_render/onepager_he_v2.html` | `../SwarmOps_OnePager_HE_V2.pdf` | Hand-authored HTML, 1 page, RTL |
+| `_render/onepager_en_v3.html` | `../SwarmOps_OnePager_EN_V3.pdf` | Hand-authored HTML, **3 pages**, LTR |
 | `../SwarmOps_Business_Overview_HE.md` | `../SwarmOps_Business_Overview_HE.pdf` | Markdown → `wrap_overview.py` |
 | `../SwarmOps_Business_Overview_EN.md` | `../SwarmOps_Business_Overview_EN.pdf` | Markdown → `wrap_overview.py` |
 | `../SwarmOps_UseCases.md` | *(none — markdown only)* | Companion doc, no PDF |
@@ -24,8 +25,31 @@ edit them; they are overwritten on every render. Only the `.md` is the source.
 ### Three one-pagers, not one
 
 - **V1** (`onepager_he.html` + `onepager_en.html`) — the stats-row layout. HE and EN are a pair.
-- **V2** (`onepager_he_v2.html`) — a different content variant with numbered sections and an
-  exec-summary lede. Hebrew only. Not a replacement for V1; both are live, pick per audience.
+- **V2** (`onepager_he_v2.html`) — numbered sections and an exec-summary lede. Hebrew only.
+- **V3** (`onepager_en_v3.html`) — the investor-facing English one-pager: V2's layout, rewritten
+  for investors (milestone-based ask, no incubation/mentorship requests, no "capstone" or "PoC"
+  language) plus a two-page market annex. **This is the current English document.**
+
+**EN V3 is deliberately three pages, and it is the only multi-page one-pager.** Page 1 is the
+one-pager proper. Pages 2–3 are a market annex: **page 2 is the numbers** (TAM/SAM/SOM, the
+Israel-first case, pricing comparables), **page 3 is the plan** (open questions, why the gap
+stays open, the expansion track, sources). Split by `.page2` / `.page3 { break-before: page }`.
+`render.sh` expects 3 pages for `en_v3` and 1 for every other one-pager.
+
+It got here by accretion, and the lesson is worth recording: the annex was one page, content kept
+being added, and each addition was absorbed by shrinking type — down to 5.4pt at the worst, which
+is unreadable and defeats the point. **When the annex overflows, cut content or add a page. Do not
+shrink type below ~6.5pt.** Page 1 is different: it must stay exactly one page, and a spill there
+is fixed by tightening page 1, never by relaxing the expected count.
+
+**HE V2 has not been updated to match EN V3.** As of the market-sizing revision, EN V3 and the EN
+overview carry the coordination-gap reframe (§2), the market figures, and the Israel-first case;
+the Hebrew documents do not. They are stale by that much until someone ports it.
+
+Backing research for every figure on EN V3 pages 2–3 and in EN overview §4:
+`../SwarmOps_Market_Sizing.md`. Do not change a number in either document without changing it
+there — that file carries the sources and the assumptions, and is what gets handed over if
+anyone asks how a figure was derived.
 
 **All three are independent files.** There is no shared template and no generation step between
 them. A copy change means editing every file it applies to, by hand, and re-rendering each. They
@@ -185,8 +209,18 @@ carries one. This tagging is the documents' entire credibility model; a reader w
 overstatement discounts everything else.
 
 - No **Future** item may be written in the present tense.
-- Video feed, GNSS-denied onboard autonomy, ML, and UTM are all **Future**, and the video feed
-  row says out loud that no camera or streaming exists in the system today. Don't soften that.
+- GNSS-denied onboard autonomy, ML/learning-from-history, and UTM are **Future**. Mark every
+  such statement with `<span class="fut">` (muted italic) in EN V2.
+- **Live video is Built, not Future — this was documented wrong for weeks.** The camera feed
+  ships: Unity `CameraFeedStreamer.cs` → `telemetry-service`'s WebSocket relay
+  (`src/websocket/cameraFeed.ts`, role-aware, backpressure-guarded) → the frontend's
+  `DroneCameraPanel.tsx` (docked, per-drone selection, 2s staleness detection, fullscreen).
+  Multi-drone concurrent streaming works; two live bugs were found and fixed getting there.
+  `milestones.md`'s 2026-08-13e note claiming "no camera, no video, no streaming anywhere"
+  was written from the PRD (which never mentioned video) and was already false when written —
+  `UseCases.md` 2.9 and the business docs all inherited it. Corrected 2026-08-13.
+  **The one caveat that must stay in the text:** the fleet is simulated, so feeds come from the
+  simulator, not physical cameras. Say that plainly; don't let "live video" imply real hardware.
 - Anything cross-unit / multi-org is **Phase 3**. A unified live map for a *single* fleet is
   Built.
 

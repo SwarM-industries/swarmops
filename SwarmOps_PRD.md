@@ -23,7 +23,14 @@ Coordinating a fleet of drones against a changing set of missions is a constrain
 - Visualize the entire fleet and mission state on a live map.
 - Demonstrate this as a small but realistic distributed system: multiple services, a real optimization core, event-driven telemetry, and production-style deployment infrastructure.
 
-### 1.3 Non-goals
+### 1.3 Non-goals *(historical — capstone scope only)*
+
+> **Superseded 2026-08-13.** This section recorded the boundaries of the **academic capstone**,
+> which is complete and presented. It is no longer a constraint on the company. Real hardware
+> integration, multi-tenancy and richer airspace deconfliction are all on the commercial roadmap
+> — see `business/SwarmOps_Business_Overview_EN.md` §7/§7.1 and `actual_prod.md`. Kept here as
+> the record of what the deliverable covered. The rest of this PRD (data models §6, API surface
+> §7) remains authoritative.
 
 - Real hardware integration (this project uses simulated drones and telemetry).
 - Full air-traffic-control-grade collision avoidance (a simplified no-fly-zone and route-conflict check is in scope; full 3D trajectory deconfliction is not).

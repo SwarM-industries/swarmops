@@ -23,7 +23,9 @@ care what produces it. As long as Unity emits that same schema, swapping produce
 producer-level change only. Confirmed via grep: PRD/plan.md have zero mentions of
 camera/video anywhere, so the camera piece is pure addition, not a schema change.
 
-**Non-goal check:** PRD §1.3 excludes real hardware integration. This track stays simulated data
+**Scope note (updated 2026-08-13):** PRD §1.3's exclusion of real hardware was capstone scope and
+no longer binds — real integration now has its own plan in `actual_prod.md`, and it reuses this
+track's producer contract directly. This track itself stays simulated data
 end to end (Unity is a fake fleet, same spirit as the existing Node simulator) — it does not
 cross into real-drone territory. Keep it that way.
 
@@ -91,4 +93,6 @@ cross into real-drone territory. Keep it that way.
 - [x] Track promoted to main (`plan.md` Track B, `milestones.md` M9.5, 2026-07-26) — normal PR
       rules apply per repo (`swarmops-drone-simulator`'s own `main`, `swarmops-frontend`'s own
       `main` for Stage 2), no separate "side branch" carve-out anymore.
-- [ ] Re-check PRD §1.3 non-goals if scope ever drifts toward real hardware — it shouldn't.
+- [x] Real hardware is no longer out of scope for the project — see `actual_prod.md`. This track
+      stays simulated; the Stage 0 ingest route and camera relay it built are what a real-aircraft
+      adapter plugs into.

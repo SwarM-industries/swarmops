@@ -14,7 +14,7 @@ LOGO="../../presentation-assets/logo-mark.png"
 [ -x "$CHROME" ] || { echo "Chrome not found at $CHROME"; exit 1; }
 
 # doc key -> source html | output pdf | expected pages (0 = don't care)
-onepagers="he en he_v2 en_v2"
+onepagers="he en he_v2 en_v3"
 overviews="overview_he overview_en"
 
 pagecount() {
@@ -36,8 +36,11 @@ topdf() { # src.html  out.pdf  expected_pages
 
 render_onepager() { # key
   local k=$1
+  # en_v3 is deliberately 3 pages: page 1 is the one-pager, pages 2-3 are the market annex
+  # (2 = the numbers, 3 = the plan). Everything else is a true single page.
+  local want=1; [ "$k" = en_v3 ] && want=3
   echo "one-pager: $k"
-  topdf "onepager_$k.html" "../SwarmOps_OnePager_$(echo "$k" | tr '[:lower:]' '[:upper:]').pdf" 1
+  topdf "onepager_$k.html" "../SwarmOps_OnePager_$(echo "$k" | tr '[:lower:]' '[:upper:]').pdf" "$want"
 }
 
 render_overview() { # overview_he | overview_en

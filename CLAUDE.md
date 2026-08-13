@@ -169,9 +169,14 @@ integration breaks.
 - **Don't build ahead of your phase in `plan.md`** unless you've cleared it with the team —
   phases are sequenced because later phases assume earlier contracts are stable (e.g. don't
   build the what-if simulator UI before `/planning/simulate`'s response shape is locked).
-- **Non-goals stay non-goals** (PRD §1.3): no real hardware integration, no full ATC-grade
-  collision avoidance (simplified no-fly-zone/route-conflict checks only), no multi-tenancy.
-  If a task starts trending toward one of these, stop and check the PRD.
+- **The PRD's non-goals are historical, not binding** (2026-08-13). PRD §1.3 excluded real
+  hardware integration, multi-tenancy and ATC-grade collision avoidance. Those were *the
+  capstone's* scope boundaries, the capstone is complete and presented, and the project is now
+  being built as a company — every one of those three is on the commercial roadmap
+  (`business/SwarmOps_Business_Overview_EN.md` §7 and §7.1). **Don't stop work because the PRD
+  says a thing is out of scope.** Treat the PRD as the record of what the academic deliverable
+  covered and as the authority on data models and API shapes (§6/§7), not as a gate on what the
+  company builds. Real-hardware integration specifically has its own plan: `actual_prod.md`.
 - **Commit messages**: describe why, not what (the diff already shows what). No
   `Co-Authored-By` trailers.
 - **Tests**: each service owns its own test suite; don't mock another team member's service in

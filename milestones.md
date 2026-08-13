@@ -1068,8 +1068,9 @@ as prose ("Beyond the 12-month roadmap"), not table rows — a status column rea
 
 **Everything new is tagged, and two items are tagged Future for reasons worth remembering:**
 
-- **2.9 video feed has no built foundation.** There is no camera, no video, no streaming anywhere
-  in the system — telemetry is position/battery/status (PRD §6) and the map is an abstract SVG
+- **2.9 video feed — THIS NOTE WAS WRONG, see the 2026-08-13f correction below.** Written as:
+  "no built foundation. There is no camera, no video, no streaming anywhere
+  in the system" — telemetry is position/battery/status (PRD §6) and the map is an abstract SVG
   grid. Every other Future item extends something that exists; this one does not, and the row says
   so in as many words. Framed as feed *aggregation over drones SwarmOps already coordinates*, so
   it reads as a layer on the product rather than a second product. If anyone proposes promoting it
@@ -1170,3 +1171,99 @@ where dispatch *collapses*, not where the market *begins* - don't let the two ge
 in either direction. Still open (see 2026-08-13e): no TAM/SAM/SOM sizing exists in any document;
 §4 of both overviews carries an explicit placeholder promising third-party-sourced figures. If
 that gets written, the SAM filter is "operators with 2+ aircraft", not "5+".
+
+---
+
+### Update 2026-08-13f (Tony) — video feed is BUILT; several documents said otherwise for weeks
+
+**Correction, caught by Tony reading the one-pager.** The 2026-08-13e note above (and
+`SwarmOps_UseCases.md` 2.9, and every business document that inherited from them) stated that
+"there is no camera, no video, no streaming anywhere in the system." **That was already false when
+it was written.** It was reasoned from the PRD — which genuinely never mentions video, since
+`Telemetry event` is position/battery/status — and from the map being an abstract SVG grid. Both
+true, and both irrelevant: the camera feed shipped on the Unity track weeks earlier, through a
+separate WebSocket path that deliberately never touches RabbitMQ or the telemetry schema. Grepping
+the PRD was exactly the wrong way to establish what is built.
+
+**What actually exists** (M9.5 Stage 2, DONE 2026-07-27/28, hardened 08-04, re-homed 08-07):
+
+- `swarmops-unity-simulator/Assets/Scripts/CameraFeedStreamer.cs` — `Camera` → `RenderTexture` →
+  JPEG frames, one atomic self-tagged binary message per frame, one producer connection per drone.
+- `swarmops-telemetry-service/src/websocket/cameraFeed.ts` — protocol-agnostic broadcast relay,
+  role-aware (`?role=producer`, so producers don't receive each other's frames — that bug stalled
+  connections), backpressure ceiling on `client.send()` (this was the service's real OOM cause).
+- `swarmops-frontend/src/components/dashboard/DroneCameraPanel.tsx` — docked left-column panel,
+  `framesByDrone` map, per-drone selection over the same socket, 2s staleness detection,
+  fullscreen.
+
+Multi-drone concurrent streaming works; two real bugs were found live and fixed getting there.
+
+**Caveats that belong in any external claim:** the fleet is simulated, so feeds originate from the
+simulator, not physical cameras — Phase 1's vendor adapters are what make them real. The commander
+selects one feed at a time (all drones stream concurrently; one renders). Cross-organization feed
+aggregation is the same Phase 3 multi-tenancy work as everything else. Stage 4 (two-machine public
+demo over the ALB) is still open, so the feed has not been proven over the public AWS path.
+
+**Corrected in this pass:** `SwarmOps_UseCases.md` 2.9 (Future → Built, with the source caveat),
+`business/_render/README.md` editing rules, `business/SwarmOps_Market_Sizing.md` §3.3 and §5.2,
+`business/SwarmOps_Business_Overview_EN.md` §3.3 and §4.4, `business/_render/onepager_en_v2.html`
+§03 and the page-2 vision block. **The Hebrew documents still carry the wrong claim** — port
+before either is sent.
+
+**Lesson worth keeping:** capability claims must be checked against the repos, not against the
+PRD or a sibling document. Three documents agreed with each other and all three were wrong,
+because they shared one ancestor and none of them looked at the code.
+
+---
+
+### Update 2026-08-13g (Tony) — business docs retargeted at investors; market sizing researched from scratch
+
+**Audience changed.** The college turned out to be a small institution running 4-month courses —
+no entrepreneurship program, no industry network, no capital. It can give a letter of support,
+space, and introductions to its own contacts, and that is all. The business documents were written
+as if pitching a university with resources, so the English set was retargeted at investors and
+design partners. The college is now provenance ("developed under the Discharged Combat Veterans
+Program"), not an ask.
+
+**New documents:**
+- `business/SwarmOps_Market_Sizing.md` — TAM/SAM/SOM built bottom-up, every figure tagged
+  `[SOURCED]` / `[MODELLED]` / `[ASSUMPTION]`, with the corrections and their causes recorded.
+- `actual_prod.md` — how real-aircraft integration actually works (Remote ID / controller app /
+  PSDK), per-vendor, with a build order. Key finding: the Unity track's `POST /telemetry/events`
+  and camera relay *are* the real-hardware ingest surface, so a real drone is a new producer, not
+  a rebuild.
+- `budget.md` — Phase 1 costs from Israeli sources. **~$10.5K**, not the $35–45K first estimated.
+
+**`SwarmOps_OnePager_EN_V2` → `_V3`** (file renamed, `render.sh` target renamed, 3 pages: page 1
+the one-pager, pages 2–3 a market annex). Rewritten for investors: milestone-based ask
+($12K min non-dilutive → $250K pre-seed → one design partner), "PoC" removed, traction leading.
+
+**Claims corrected — all three were wrong in ways a reader would catch:**
+1. **DroneDeploy pricing was ~12× wrong** ($329–499/seat/*month* → $329–599/user/*year*). The
+   source was a review published by Skyebrowse, a *competitor* of DroneDeploy. Never let a
+   competitor's marketing be load-bearing for a factual claim.
+2. **MAVLink was named as the integration path.** True generally, wrong for this market — the IDF
+   flies DJI and Autel, both closed, both needing their own SDKs.
+3. **Internal inconsistency in the sizing:** the Europe+US SAM breached, by ~1.7×, the
+   coordination-share ceiling stated elsewhere in the same document. Fixed by tightening the
+   input, not the ceiling.
+
+**Team:** four co-founders now — Tony Verin, Guy Peres, Harel Valfish, **Amir Shacham** (DevOps
+engineer + business/economics, Reichman). All four are combat veterans; three of four were IDF
+drone operators. Surnames filled in everywhere. **No titles in the business docs** — deliberate;
+C-suite titles on a pre-revenue four-person team read as inexperienced. Keep them for
+incorporation and bank paperwork only.
+
+**PRD §1.3 non-goals are no longer a gate.** They were the first build's scope, that build is
+finished, and real hardware / multi-tenancy / airspace deconfliction are all on the commercial
+roadmap. `CLAUDE.md` updated to say so explicitly; PRD §1.3 marked historical rather than deleted.
+PRD §6/§7 (data models, API surface) remain authoritative.
+
+**Still open:** four team bio lines (the only thing blocking the EN overview) · `onepager_en.html`
+(V1 EN) is stale and still carries the old college ask and `[email]`/`[phone]` · **all Hebrew
+documents are far behind** — no coordination reframe, no market figures, no Israel-first case,
+still claim video does not exist, no Amir, still say "team lead".
+
+**Security note:** an untracked `auth` file at repo root contains an htpasswd credential
+(`admin:$apr1$...`). It was **not** committed and is now in `.gitignore`. If that hash is live
+anywhere, rotate it.
