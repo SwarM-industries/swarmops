@@ -24,6 +24,17 @@ non-technical stakeholders. It is not the application. Its `LiveMap` component i
 visual/code reference for the real frontend's live map (Phase 3), but don't confuse the two —
 changes to the actual product do not belong in `site/`, and vice versa.
 
+There is also a **`business/`** directory: the external-facing documents — business overviews and
+one-pagers (HE + EN), a use-case companion doc, and the PDFs generated from them. Also not the
+application, and a separate track from both the product and `site/`.
+
+**If you are asked to change any of those documents, read `business/_render/README.md` first.**
+It is the complete process: which file is the source for which PDF, the exact render commands,
+how to verify a render, and the editing rules that keep the documents' claims aligned with what
+is actually built. Two things that catch people out: every `.pdf` in `business/` is generated
+output (edit the source and re-render — never the PDF), and the three one-pagers are independent
+hand-authored files with no shared template, so a copy change means editing each one by hand.
+
 ## System shape (memorize this, it doesn't change)
 
 ```
