@@ -1118,3 +1118,28 @@ Also note §3 now names Docker, Kubernetes and CI/CD explicitly, which the one-p
 in `_render/README.md` says to keep out of this document. V2 had already drifted more technical
 than V1 by design; this widens that gap. Deliberate or not, V1 and V2 are now aimed at
 noticeably different readers.
+
+**Update 2026-08-13g (Tony) — EN V2 one-pager added; em dashes removed everywhere; render script.**
+`business/_render/onepager_en_v2.html` → `SwarmOps_OnePager_EN_V2.pdf`, an English mirror of V2.
+There are now **four one-pagers** (HE/EN × V1/V2), all independent hand-authored files with no
+shared template. A copy change means editing up to four files by hand.
+
+One EN-specific difference worth knowing: V2's section headings carry a small English gloss to the
+side (`<span class="en">`). In Hebrew that gloss adds something; in English it just repeated the
+heading ("Executive Summary / EXECUTIVE SUMMARY"), so it is kept only where it says something new
+- §03 "Vendor-Neutral Layer" and §04 "Dual-Use". Don't "restore" the others.
+
+**All em dashes (—) removed from every business source** - 237 of them across the four one-pagers
+and the three markdown docs - replaced with a spaced hyphen. En dashes in numeric ranges (`0–3`,
+`3–5`) are deliberately untouched; they are a different character and still correct. If you add
+copy, match the hyphen convention.
+
+**New: `business/_render/render.sh`.** One command renders any or all documents and asserts the
+page count (`./render.sh`, `./render.sh he_v2 en_v2`). Exits non-zero if a one-pager spills past
+one page. This replaces hand-running the Chrome invocation per file, which is what the process was
+until now and is easy to get wrong while iterating.
+
+Also fixed in passing: a broken `<b>` tag in the HE V2 team line that would have rendered
+"מפעילי רחפנים" with no subject, and a dangling slash left in "(AWS / וכדומה)" after Nimbus was
+removed. Tony's real contact details are now in both V2 files (name, gmail, phone) - deliberate,
+these are pitch documents, but note they are now in git history.

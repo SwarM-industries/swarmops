@@ -89,7 +89,7 @@ table.market td { padding: 3px 5px; border: 1px solid var(--hair); vertical-alig
     <div class="meta">SWARM INDUSTRIES<br>One page &middot; August 2026<br><span class="prog">Discharged Combat Veterans Program</span></div>
   </div>
 
-  <p class="lede"><b>SwarmOps automates the hardest part of operating a drone fleet:</b> deciding, in real time, which drone flies which mission, in what order and along which route — while guaranteeing no drone runs out of battery mid-flight. A working distributed system, deployed on AWS and demonstrable live today.</p>
+  <p class="lede"><b>SwarmOps automates the hardest part of operating a drone fleet:</b> deciding, in real time, which drone flies which mission, in what order and along which route - while guaranteeing no drone runs out of battery mid-flight. A working distributed system, deployed on AWS and demonstrable live today.</p>
 
   <div class="stats">
     <div class="stat"><div class="k">Optimization (VRPTW)</div><div class="v">Optimal assignment and routing, proven battery feasibility on every route</div></div>
@@ -102,24 +102,24 @@ table.market td { padding: 3px 5px; border: 1px solid var(--hair); vertical-alig
     <div>
       <div class="section">
         <h2>The Problem</h2>
-        <p class="tight">Beyond a handful of drones, fleet coordination is no longer solvable by a human dispatcher: battery limits that depend on both distance and payload weight, priorities and deadlines, no-fly zones, charging logistics and mid-mission disruptions — all interacting at once. The result: wasted flight time, duplicate coverage, missed deadlines, stranded aircraft and an inaccurate operational picture. Manufacturer software flies one aircraft well; nobody answers the fleet-level question — who should do what, and can they actually complete it?</p>
+        <p class="tight">Beyond a handful of drones, fleet coordination is no longer solvable by a human dispatcher: battery limits that depend on both distance and payload weight, priorities and deadlines, no-fly zones, charging logistics and mid-mission disruptions - all interacting at once. The result: wasted flight time, duplicate coverage, missed deadlines, stranded aircraft and an inaccurate operational picture. Manufacturer software flies one aircraft well; nobody answers the fleet-level question - who should do what, and can they actually complete it?</p>
       </div>
       <div class="origin">
         <div class="lbl">Why we built this</div>
-        <b>This is not a theoretical scenario for us.</b> On 7 October 2023, during the fighting in the kibbutzim, two teams from the same company launched drones at the same time. With no coordination between them, both swept the same sector — one team identified hostiles, the other reported a friendly force in the same place. The contradiction in the situational picture delayed a critical operational decision. That is the problem SwarmOps was built to solve.
+        <b>This is not a theoretical scenario for us.</b> On 7 October 2023, during the fighting in the kibbutzim, two teams from the same company launched drones at the same time. With no coordination between them, both swept the same sector - one team identified hostiles, the other reported a friendly force in the same place. The contradiction in the situational picture delayed a critical operational decision. That is the problem SwarmOps was built to solve.
       </div>
       <div class="section">
-        <h2>The Product — Built, Not Planned</h2>
+        <h2>The Product - Built, Not Planned</h2>
         <ul class="tight">
-          <li><b>Optimal assignment and routing</b> — measured against a greedy baseline; proven battery feasibility on every route, with charging stops inserted automatically.</li>
-          <li><b>Real-time re-planning</b> — live telemetry streams through a message bus; a disruption re-solves the affected schedule within seconds.</li>
-          <li><b>Live control room</b> — real-time map, mission board, fleet inventory, operational dashboards.</li>
-          <li><b>Enterprise-grade infrastructure</b> — secure, distributed and scalable cloud, with automated and controlled deployments; the maturity startups build in year two, already in place.</li>
+          <li><b>Optimal assignment and routing</b> - measured against a greedy baseline; proven battery feasibility on every route, with charging stops inserted automatically.</li>
+          <li><b>Real-time re-planning</b> - live telemetry streams through a message bus; a disruption re-solves the affected schedule within seconds.</li>
+          <li><b>Live control room</b> - real-time map, mission board, fleet inventory, operational dashboards.</li>
+          <li><b>Enterprise-grade infrastructure</b> - secure, distributed and scalable cloud, with automated and controlled deployments; the maturity startups build in year two, already in place.</li>
         </ul>
-        <p class="tight"><b>Current scope, stated plainly:</b> the fleet is simulated — a deliberate scope decision. Connecting real aircraft (MAVLink protocol) is Phase 1 engineering, not research risk.</p>
+        <p class="tight"><b>Current scope, stated plainly:</b> the fleet is simulated - a deliberate scope decision. Connecting real aircraft (MAVLink protocol) is Phase 1 engineering, not research risk.</p>
       </div>
       <div class="section">
-        <h2>Roadmap — 12 Months</h2>
+        <h2>Roadmap - 12 Months</h2>
         <div class="roadmap">
           <div class="rm"><b>Months 0–3</b>Real aircraft: incorporate, MAVLink, full loop on hardware, CAAI groundwork.</div>
           <div class="rm"><b>Months 3–6</b>First pilot: design partner, success criteria agreed up front.</div>
@@ -133,34 +133,34 @@ table.market td { padding: 3px 5px; border: 1px solid var(--hair); vertical-alig
         <table class="market">
           <tr><th>Segment</th><th>Use case</th></tr>
           <tr><td>Defense &amp; security</td><td>Resupply tasking, patrol/surveillance coverage, inspection rounds</td></tr>
-          <tr><td>Infrastructure &amp; energy</td><td>Power lines, pipelines, solar fields — recurring missions</td></tr>
+          <tr><td>Infrastructure &amp; energy</td><td>Power lines, pipelines, solar fields - recurring missions</td></tr>
           <tr><td>Agriculture</td><td>Survey and spraying coordination at scale</td></tr>
           <tr><td>Delivery</td><td>Last-mile / site-to-site (regulation-dependent)</td></tr>
         </table>
         <div class="defcaps">
           <div class="lbl">Additional defense capabilities in development (Phase 2–3)</div>
           <ul class="tight">
-            <li><b>Fleet monitoring and predictive maintenance</b> — maintenance status already exists as a core field; predictive scoring will pull a drone from the available pool before it fails.</li>
-            <li><b>Single command picture across units</b> — a unified map for a single fleet already exists; multi-unit hierarchy (unit → base → command) is in development.</li>
-            <li><b>Eliminating manual dispatch inefficiency</b> — optimized assignment and routing, proven against a manual/greedy baseline, are built and measured.</li>
+            <li><b>Fleet monitoring and predictive maintenance</b> - maintenance status already exists as a core field; predictive scoring will pull a drone from the available pool before it fails.</li>
+            <li><b>Single command picture across units</b> - a unified map for a single fleet already exists; multi-unit hierarchy (unit → base → command) is in development.</li>
+            <li><b>Eliminating manual dispatch inefficiency</b> - optimized assignment and routing, proven against a manual/greedy baseline, are built and measured.</li>
           </ul>
         </div>
         <p class="tight"><b>Positioning:</b> a vendor-neutral coordination layer above whatever aircraft an organization already owns. Fleets are scaling, BVLOS regulation is opening, and the Israeli ecosystem is a natural first market.</p>
       </div>
       <div class="section team">
         <h2>Team</h2>
-        <p>Tony [surname] (technical lead) &middot; Guy [surname] &middot; Harel [surname] — three engineers who designed, built and operate the entire system: algorithms, services, frontend, cloud infrastructure and delivery pipeline.</p>
-        <p class="bg">Field and combat unit veterans; two of us are drone operators — operational understanding from the field, combined with advanced software engineering.</p>
+        <p>Tony [surname] (technical lead) &middot; Guy [surname] &middot; Harel [surname] - three engineers who designed, built and operate the entire system: algorithms, services, frontend, cloud infrastructure and delivery pipeline.</p>
+        <p class="bg">Field and combat unit veterans; two of us are drone operators - operational understanding from the field, combined with advanced software engineering.</p>
       </div>
     </div>
   </div>
 
   <div class="ask">
     <div class="lbl">The Ask</div>
-    Incubation / accelerator — workspace and program affiliation &middot; Mentorship (business development, defense/aerospace) &middot; Introductions (operators, integrators, infrastructure companies) &middot; Pre-Seed support ([amount]: development drones, cloud, legal/regulatory). Live demonstration available on request.
+    Incubation / accelerator - workspace and program affiliation &middot; Mentorship (business development, defense/aerospace) &middot; Introductions (operators, integrators, infrastructure companies) &middot; Pre-Seed support ([amount]: development drones, cloud, legal/regulatory). Live demonstration available on request.
   </div>
   <div class="contact">
-    <span>SwarM Industries — SwarmOps</span>
+    <span>SwarM Industries - SwarmOps</span>
     <span>Contact: Tony [surname] &middot; [email] &middot; [phone]</span>
   </div>
 </div>
