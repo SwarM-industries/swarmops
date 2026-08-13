@@ -1090,3 +1090,31 @@ because the page has no room and Future items belong in the longer docs. HE over
 pages; the §5.1 table splits across pages 4–5 with its header row correctly repeated. EN overview
 untouched here — it still has no §5 use-case section at all, which remains the open sync item from
 2026-08-12.
+
+**Update 2026-08-13f (Tony) — V2 one-pager §3 replaced; §2 and market table rewritten.** §3 is now
+"הפתרון והמוצר / The Solution & Product": five bullets (VRPTW assignment+routing, dynamic
+re-planning, unified control room, hardware agnosticism, flexible deployment architecture) under a
+"Vendor-Neutral Coordination Layer" subhead. §2 and the §4 market table were edited directly in
+VSCode in the same pass — §2 reframed around OEM disconnection and a "Scale Problem", §4 gained a
+ConTech row and ML/battery-health detail.
+
+Combined, this pushed V2 to 2 pages. Brought back to 1 by tightening only — base font 8.6→7.9pt,
+line-height 1.42→1.32, tighter section/list/table spacing, market table 7.9→7pt. No content cut.
+V2 is now visibly denser than V1; it is at about the limit of what fits, so **the next content
+addition to V2 will require cutting something, not just shrinking type.**
+
+**Three claims in the new §3 are ahead of what is built — flagged to Tony, not yet resolved:**
+1. **"שידור פיד תצפית חי למפקדים"** — `SwarmOps_UseCases.md` row 2.9 tags the video feed
+   **Future** and states there is no camera, video or streaming in the system at all. §3 now states
+   it in the present tense in a section headed "The Solution & Product". This directly contradicts
+   the rule written into `business/_render/README.md` in the same day's work.
+2. **"עצמאות יצרן / חיבור חלק לציים מעורבים… (כגון MAVLink)"** — the fleet is simulated; MAVLink
+   integration is Phase 1 (months 0–3) on our own roadmap in §5 of the same page. V2 also has no
+   "current scope, stated plainly" disclaimer — V1 does.
+3. **"On-Premise / Edge / נימבוס"** — deployment is AWS-only today. Containers and CI/CD are real;
+   on-prem, edge and Nimbus are untested claims.
+
+Also note §3 now names Docker, Kubernetes and CI/CD explicitly, which the one-pager audience rule
+in `_render/README.md` says to keep out of this document. V2 had already drifted more technical
+than V1 by design; this widens that gap. Deliberate or not, V1 and V2 are now aimed at
+noticeably different readers.
