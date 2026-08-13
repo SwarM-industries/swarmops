@@ -1055,3 +1055,38 @@ content — all nine sections verified present via `pdftotext`. HE overview unch
 
 Note `pdftoppm`/`pdftotext` (poppler) *are* installed on Tony's machine — an earlier note implied
 otherwise. Use them for page-level verification instead of `sips`, which only ever converts page 1.
+
+**Update 2026-08-13e (Tony) — defense capability map expanded (`SwarmOps_UseCases.md` + HE
+overview §5.1).** Four problem areas Tony raised — C2/common operational picture, fleet health,
+dead-zone coverage and GNSS-denied operation, and an AI/UTM future — folded into the existing
+status-tagged tables rather than added as a parallel structure. Most of it was a **merge**, not
+new content: fleet health went into row 2.1 (now a "fleet health index", tracking battery wear
+rather than just charge), cross-team deduplication into 2.2, dead-zone coverage into 2.5. Two
+genuinely new rows: **2.9 commander video feed** and **2.10 GPS/comms-denied**. ML and UTM went in
+as prose ("Beyond the 12-month roadmap"), not table rows — a status column reading nothing but
+"Future" is padding.
+
+**Everything new is tagged, and two items are tagged Future for reasons worth remembering:**
+
+- **2.9 video feed has no built foundation.** There is no camera, no video, no streaming anywhere
+  in the system — telemetry is position/battery/status (PRD §6) and the map is an abstract SVG
+  grid. Every other Future item extends something that exists; this one does not, and the row says
+  so in as many words. Framed as feed *aggregation over drones SwarmOps already coordinates*, so
+  it reads as a layer on the product rather than a second product. If anyone proposes promoting it
+  to the roadmap, that is a real engineering estimate, not a config change.
+- **2.10 GNSS-denied is split three ways on purpose.** Jammed areas as no-fly zones (a) and
+  stale-telemetry detection (b) are Phase 2 extensions of built mechanisms; onboard autonomy under
+  GPS loss (c) is the **autopilot's** job, not a coordination layer's, and is tagged Future gated
+  on whichever autopilot Phase 1 integrates. This split exists because a defense-side technical
+  reader will otherwise read the row as a claim of onboard autonomy and ask which autopilot we
+  have. Do not collapse it back into one line.
+
+UTM stays explicitly outside the funded roadmap and the prose says out loud that ATC-grade 3D
+deconfliction is a stated non-goal of the current system (PRD §1.3) — the ambition is real, the
+disclaimer keeps it from reading as a capability.
+
+One-pagers were **not** touched by this pass: their `defcaps` block stays at three Phase 2–3 items
+because the page has no room and Future items belong in the longer docs. HE overview grew 6 → 7
+pages; the §5.1 table splits across pages 4–5 with its header row correctly repeated. EN overview
+untouched here — it still has no §5 use-case section at all, which remains the open sync item from
+2026-08-12.
