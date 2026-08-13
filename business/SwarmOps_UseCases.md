@@ -51,6 +51,10 @@ and doctrine-agnostic, not unit-specific or classified detail. Positioning is un
 Business Overview: SwarmOps is a vendor-neutral coordination layer above whatever aircraft a
 unit already owns, not a weapons system and not a manufacturer.
 
+The founding motivation for this section is first-hand — see the 7 October account in Business
+Overview §2. Note that the specific failure it describes (two teams, no shared picture) maps to
+row 2.2 below, whose cross-unit half is **Phase 3**, not built today.
+
 | # | Problem | Current state (pain) | SwarmOps solution | Status |
 |---|---|---|---|---|
 | 2.1 | **Fleet maintenance is tracked manually per unit.** Flight hours, battery cycle count, and wear are logged by hand or not at all; a drone's degraded battery or airframe issue is discovered mid-mission, not before it's tasked. | Maintenance logs live outside the tasking system, so a scheduler can assign a mission to a drone that shouldn't fly. | `fleet-service` already carries `status: maintenance` per drone. Extend with **predictive health scoring** (flight-hour and battery-cycle thresholds) that automatically excludes a drone from the assignable pool before it fails, and surfaces a maintenance queue to the tasking officer. | Core status field: **Built**. Predictive scoring + auto-exclusion: **Phase 2** |

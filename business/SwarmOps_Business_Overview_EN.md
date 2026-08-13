@@ -32,7 +32,10 @@ The operational consequences are consistent across sectors:
 - **Wasted flight time and low utilization** of expensive aircraft, because assignments are made by intuition rather than optimization.
 - **Missed deadlines on high-priority missions**, because a human cannot re-plan the whole fleet every time conditions change.
 - **Stranded aircraft**, because battery feasibility is estimated rather than computed.
+- **Duplicate coverage and an inaccurate operational picture**, because without central coordination two teams can sweep the same ground and report it differently.
 - **No single operational picture**, because fleet state lives across separate tools, spreadsheets, and radio calls.
+
+> **Why we built this — this is not a theoretical scenario for us.** On 7 October 2023, during the fighting in the kibbutzim, two teams from the same company launched drones at the same time. With no coordination between them, both swept the same sector — one team identified hostiles, the other reported a friendly force in the same place. The contradiction in the situational picture delayed a critical operational decision. That is the problem SwarmOps was built to solve.
 
 Existing tooling is largely built by drone *manufacturers* and is drone-centric and vendor-locked: it flies one aircraft well, but it does not answer the fleet-level question — *who should do what, and can they actually complete it?* That coordination layer is the gap SwarmOps fills.
 

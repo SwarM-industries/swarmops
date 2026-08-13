@@ -64,8 +64,10 @@ p.tight { margin: 0 0 5px 0; }
 table.market { width: 100%; border-collapse: collapse; font-size: 7.1pt; margin-bottom: 5px; }
 table.market th { background: var(--accent-soft); text-align: left; padding: 3px 5px; font-weight: 700; border: 1px solid var(--hair); }
 table.market td { padding: 3px 5px; border: 1px solid var(--hair); vertical-align: top; }
-.defcaps { border: 1px solid var(--hair); background: #fff; border-radius: 3px; padding: 5px 7px; font-size: 7pt; margin-bottom: 8px; }
-.defcaps .lbl { font-weight: 700; color: var(--accent); margin-bottom: 2px; }
+.defcaps, .origin { border: 1px solid var(--hair); background: #fff; border-radius: 3px; padding: 5px 7px; font-size: 7pt; margin-bottom: 8px; }
+.defcaps .lbl, .origin .lbl { font-weight: 700; color: var(--accent); margin-bottom: 2px; }
+.origin { border-inline-start: 3px solid var(--accent); }
+.origin .lbl { text-transform: uppercase; letter-spacing: .03em; font-size: 6.7pt; }
 .roadmap { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
 .rm { border-top: 3px solid var(--accent); padding-top: 3px; font-size: 6.9pt; }
 .rm b { display:block; font-size: 7.5pt; }
@@ -100,7 +102,11 @@ table.market td { padding: 3px 5px; border: 1px solid var(--hair); vertical-alig
     <div>
       <div class="section">
         <h2>The Problem</h2>
-        <p class="tight">Beyond a handful of drones, fleet coordination is no longer solvable by a human dispatcher: battery limits that depend on both distance and payload weight, priorities and deadlines, no-fly zones, charging logistics and mid-mission disruptions — all interacting at once. The result: wasted flight time, missed deadlines, stranded aircraft and no single operational picture. Manufacturer software flies one aircraft well; nobody answers the fleet-level question — who should do what, and can they actually complete it?</p>
+        <p class="tight">Beyond a handful of drones, fleet coordination is no longer solvable by a human dispatcher: battery limits that depend on both distance and payload weight, priorities and deadlines, no-fly zones, charging logistics and mid-mission disruptions — all interacting at once. The result: wasted flight time, duplicate coverage, missed deadlines, stranded aircraft and an inaccurate operational picture. Manufacturer software flies one aircraft well; nobody answers the fleet-level question — who should do what, and can they actually complete it?</p>
+      </div>
+      <div class="origin">
+        <div class="lbl">Why we built this</div>
+        <b>This is not a theoretical scenario for us.</b> On 7 October 2023, during the fighting in the kibbutzim, two teams from the same company launched drones at the same time. With no coordination between them, both swept the same sector — one team identified hostiles, the other reported a friendly force in the same place. The contradiction in the situational picture delayed a critical operational decision. That is the problem SwarmOps was built to solve.
       </div>
       <div class="section">
         <h2>The Product — Built, Not Planned</h2>

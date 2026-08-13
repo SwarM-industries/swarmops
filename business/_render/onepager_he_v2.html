@@ -101,6 +101,18 @@ table.market td.seg { font-weight: 700; width: 33%; }
 
 .team p { font-size: 8.1pt; margin: 0; }
 
+.origin {
+  border: 1px solid var(--hair);
+  border-inline-start: 3px solid var(--accent);
+  background: #fff;
+  border-radius: 3px;
+  padding: 7px 10px;
+  margin-top: 4px;
+  font-size: 8.3pt;
+}
+.origin .lbl { font-weight: 900; color: var(--accent); font-size: 8.6pt; margin-bottom: 2px; display: flex; align-items: baseline; gap: 6px; }
+.origin .lbl .en { margin-inline-start: auto; font-size: 6.8pt; font-weight: 500; color: var(--muted); letter-spacing: .03em; text-transform: uppercase; }
+.origin b { font-weight: 700; }
 .ask { background: var(--ink); color: #fff; border-radius: 3px; padding: 8px 11px; margin-top: 8px; }
 .ask h2 { color: #fff; border-bottom: 1px solid #3a3937; margin-bottom: 5px; }
 .ask h2 .en { color: #9b9995; }
@@ -147,7 +159,7 @@ table.market td.seg { font-weight: 700; width: 33%; }
         <ul class="tight">
           <li><b class="term">מורכבות תפעולית:</b> מעבר לכלי טיס בודד, תיאום צי בלתי אפשרי לניהול אנושי בשל ניהול זמני, מגבלות סוללה, משקל מטען ואזורי איסור טיסה.</li>
           <li><b class="term">היעדר תמונה כוללת:</b> תוכנות היצרן (OEM) מטיסות כלי יחיד, אך אין מענה לרמת הצי — מי מבצע מה והאם יעמוד במשימה.</li>
-          <li><b class="term">התוצאה:</b> בזבוז זמן טיסה, סיכון לאובדן כלים, חוסר יעילות ואיחור בלוחות זמנים.</li>
+          <li><b class="term">התוצאה:</b> בזבוז זמן טיסה, כפילות סריקה, סיכון לאובדן כלים ואי-דיוק קריטי בתמונת המצב.</li>
         </ul>
       </div>
 
@@ -187,6 +199,11 @@ table.market td.seg { font-weight: 700; width: 33%; }
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="origin">
+    <div class="lbl">למה בנינו את זה<span class="en">Why We Built This</span></div>
+    <b>זה לא תרחיש תיאורטי עבורנו.</b> ב-7 באוקטובר, במהלך הלחימה בקיבוצים, שני צוותים מאותה פלוגה העלו רחפנים במקביל. בהיעדר תיאום, שניהם סרקו את אותו תא שטח — צוות א' זיהה מחבלים, בעוד צוות ב' דיווח על כוח ידידותי באותו מקום. הסתירה בתמונת המצב עיכבה קבלת החלטה מבצעית קריטית. <b>זו הבעיה ש-SwarmOps נבנתה כדי לפתור.</b>
   </div>
 
   <div class="ask">

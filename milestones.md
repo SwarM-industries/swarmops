@@ -1025,3 +1025,33 @@ first-hand rather than inferred. Do not drop this line when trimming for space.
 
 Note this is the one place V2 now deviates from the supplied verbatim text — deliberately, on
 request.
+
+**Update 2026-08-13d (Tony) — the 7 October origin story added to all five business docs.**
+Both one-pager languages + V2, and §2 of both business overviews, now carry a first-hand account:
+on 7 October two teams from the same company launched drones with no coordination, both swept the
+same sector, and reported contradictory ground truth (one hostiles, one a friendly force); the
+contradiction delayed a critical operational decision. This is the strongest paragraph the project
+has and it was previously in none of the documents.
+
+**The framing is deliberate and must not be "improved".** The account ends on intent — "זו הבעיה
+ש-SwarmOps נבנתה כדי לפתור" — never on capability. The failure it describes is the *cross-unit*
+operational picture, which `SwarmOps_UseCases.md` row 2.2 tags **Phase 3, not built**; what exists
+today is a unified live map for a single fleet. Rewriting it as "SwarmOps prevents this" would put
+an unsupportable claim in the most emotionally weighted paragraph in the document. The rule is now
+written into `business/_render/README.md` so it survives the next editing pass.
+
+Other decisions worth not re-litigating: attribution is **unattributed first person plural** — no
+founder named, and the incident is phrased "שני צוותים מאותה פלוגה" rather than "הפלוגה שלנו", so
+the text never asserts all three of us served together (**confirm and switch if we did**). No unit,
+no kibbutz, no individuals — capability level only, same rule §5.1 already applies to itself. No
+emoji; the source draft's 📌 is wrong for both this content and the design system.
+
+**`wrap_overview.py` now renders both languages** (optional 7th arg: `he` default, or `en`). The
+directional rules moved to CSS logical properties, so RTL and LTR share one stylesheet rather than
+forking it. This closes the last "PDF with no committed source" gap — the EN overview's template
+was never checked in. Consequence to know about: re-rendering the EN overview through this path
+restyled the whole document and it is now **6 pages, was 7**. That is tighter styling, not dropped
+content — all nine sections verified present via `pdftotext`. HE overview unchanged at 6 pages.
+
+Note `pdftoppm`/`pdftotext` (poppler) *are* installed on Tony's machine — an earlier note implied
+otherwise. Use them for page-level verification instead of `sips`, which only ever converts page 1.

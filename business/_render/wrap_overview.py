@@ -1,6 +1,13 @@
 import sys, base64
 
 body_path, logo_path, out_path, doc_kind, doc_date = sys.argv[1:6]
+# Optional 7th arg: document language. Only lang/dir and the font stack differ — every
+# directional rule below uses CSS logical properties, so RTL and LTR share one stylesheet.
+lang = sys.argv[6] if len(sys.argv) > 6 else "he"
+if lang not in ("he", "en"):
+    sys.exit(f"unsupported lang {lang!r} (expected 'he' or 'en')")
+direction = "rtl" if lang == "he" else "ltr"
+font_family = "Heebo" if lang == "he" else "Inter"
 
 with open(body_path, encoding="utf-8") as f:
     body = f.read()
@@ -31,8 +38,8 @@ html, body {
   -webkit-print-color-adjust: exact;
 }
 body {
-  direction: rtl;
-  font-family: 'Heebo', sans-serif;
+  direction: DIRECTION;
+  font-family: 'FONTFAMILY', sans-serif;
   font-weight: 400;
   font-size: 10.6pt;
   line-height: 1.55;
@@ -54,7 +61,7 @@ body {
   letter-spacing: -0.01em;
 }
 .coverbar .meta {
-  text-align: left;
+  text-align: end;
   font-size: 8pt;
   color: var(--muted);
   font-weight: 700;
@@ -100,21 +107,22 @@ th {
   color: var(--ink);
   font-weight: 700;
   padding: 5px 6px;
-  text-align: right;
+  text-align: start;
 }
 td {
   padding: 5px 6px;
   vertical-align: top;
-  text-align: right;
+  text-align: start;
 }
 tr { page-break-inside: avoid; }
 blockquote {
   margin: 8px 0;
   padding: 8px 12px;
-  border-right: 3px solid var(--accent);
+  border-inline-start: 3px solid var(--accent);
   background: var(--accent-soft);
   color: var(--muted);
   font-size: 9.3pt;
+  page-break-inside: avoid;
 }
 .pagefooter {
   position: fixed;
@@ -127,12 +135,14 @@ blockquote {
 }
 """
 
-fonts = """<link rel="preconnect" href="https://fonts.googleapis.com">
+css = css.replace("DIRECTION", direction).replace("FONTFAMILY", font_family)
+
+fonts = f"""<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">"""
+<link href="https://fonts.googleapis.com/css2?family={font_family}:wght@300;400;500;700;900&display=swap" rel="stylesheet">"""
 
 html = f"""<!doctype html>
-<html lang="he" dir="rtl">
+<html lang="{lang}" dir="{direction}">
 <head>
 <meta charset="utf-8">
 <title>{doc_kind}</title>
