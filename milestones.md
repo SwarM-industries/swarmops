@@ -935,3 +935,55 @@ the simulated-fleet scope is stated openly (§3.5) and framed as Phase 1 of the 
 market figures. Open before sending: surnames, team bios, pre-seed amount, contact details — all
 marked `[...]` in both languages. Regenerate PDFs by re-running the HTML→Chrome step if the MD
 changes (HTML templates were in the job tmp dir, not committed — trivially rebuildable from the MD).
+
+**Update 2026-08-12 (Tony) — use-case content added (`business/SwarmOps_UseCases.md` +
+HE overview/one-pager integration).** New standalone doc `SwarmOps_UseCases.md`: sector-by-sector
+problem→solution→status tables covering defense (IDF-oriented, capability-level, no unit-specific
+or classified detail) and civilian sectors, each row tagged Built/Phase N/Future so nothing
+overstates current capability. Integrated a condensed version into
+`SwarmOps_Business_Overview_HE.md` as new §5 (existing §5–9 renumbered to §6–10) and into
+`SwarmOps_OnePager_HE.pdf` as an expanded market table + a new "יכולות ביטחוניות נוספות בפיתוח"
+block (predictive maintenance, cross-unit unified command picture, optimized-vs-manual
+assignment — the three items Tony flagged as the IDF-specific asks). **EN docs and
+`vision.md` were not touched** — this pass was HE-only, scope as requested; EN business overview
+and one-pager are now content-behind their HE counterparts on this section and should get the
+same treatment before both languages go out together.
+
+Also fixed a process gap the previous note left open: the HTML→PDF render templates are now
+committed at `business/_render/` (`overview_he.html`, `onepager_he.html`, `wrap_overview.py`,
+plus a README with the exact regen commands), instead of living only in a job tmp dir. Anyone's
+Claude session can now regenerate the HE PDFs after an MD edit without reconstructing the
+template from scratch. The one-pager (`onepager_he.html`) is hand-authored HTML, not
+markdown-derived — a one-pager's dense grid layout doesn't map cleanly from flowing markdown, so
+edit it directly and re-render; verify it stays at exactly 1 page (command in the README) before
+committing the PDF.
+
+**Update 2026-08-13 (Tony) — one-pagers de-teched for a business audience; EN one-pager
+rebuilt from the HE source.** Both `SwarmOps_OnePager_HE.pdf` and `SwarmOps_OnePager_EN.pdf`
+regenerated (1 page each, verified). Driver: external review flagged that the one-pager was
+reading as a tech preview rather than a business document. Architecture detail is now out of
+both — no Terraform / Argo CD / EKS / GitOps / canary / microservice counts / Hungarian /
+OR-Tools; replaced with outcome language ("secure, distributed and scalable cloud
+infrastructure", "optimized assignment and routing", "working PoC, live demo on request").
+Terms that stay, deliberately in English rather than transliterated: AWS, MAVLink, VRPTW, PoC,
+Pre-Seed, Seed, Multi-Tenant, BVLOS, Accelerator, Enterprise — they read as domain fluency to
+investors. This audience rule is now written down in `business/_render/README.md` so the next
+pass doesn't re-add the detail. **The fuller business overview docs still carry architecture
+detail on purpose — the split is intentional, don't "harmonize" it.**
+
+Also new in both one-pagers: sharper tagline ("real-time control and optimization for unmanned
+drone fleets"), a program-affiliation line in the header ("Discharged Combat Veterans Program" /
+"פותח במסגרת התוכנית ללוחמים משוחררים"), Tony retitled team lead → technical lead, and a team
+military-background line. **Two factual claims need confirming before this goes to anyone
+external: the program affiliation, and "field and combat unit veterans" for all three of us.**
+Both came from an external draft, neither is verified in-repo — if either is wrong, it's the
+kind of error that costs credibility with exactly the audience this document targets.
+
+`business/_render/onepager_en.html` is committed and is now the EN source of truth (the previous
+EN PDF had no committed source — that gap from the 2026-08-12 note is closed). HE and EN are
+**separate hand-authored files, not a template + translation**: edit both when content changes.
+Still open, unchanged from before: surnames, pre-seed amount, contact details are `[...]`
+placeholders in both languages. Also unresolved — the one-pagers name the third team member as
+Harel/הראל while `CLAUDE.md` says Valfish; one of the two is stale and nobody has said which.
+Third-party EN business overview was **not** touched this pass, so it still lags the HE version
+on the use-case section (the 2026-08-12 note's open item is still open).
