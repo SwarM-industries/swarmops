@@ -149,7 +149,7 @@ table.market td.seg { font-weight: 700; width: 30%; background: var(--accent-sof
 
   <div class="lede">
     <div class="lbl"><span class="num">01</span>Executive Summary</div>
-    <b>SwarmOps solves the most critical bottleneck in drone fleet operations:</b> real-time operational decision-making - which drone flies which mission, in what order and along which route, while dynamically managing battery limits, range and priorities. The technology is built on advanced optimization algorithms (VRPTW) and a distributed system that re-plans within seconds when conditions change in the field. The prototype is working, deployed on AWS and available for a live demonstration.
+    <b>SwarmOps solves the critical bottleneck in drone fleet operations:</b> deciding, in real time, which drone flies which mission, in what order and along which route - while managing battery, range and priority constraints as they shift. It pairs a VRPTW optimization engine with a distributed architecture that re-plans the fleet within seconds of a disruption in the field. The prototype works today: deployed on AWS, ready for live demonstration.
   </div>
 
   <div class="cols">
@@ -157,9 +157,9 @@ table.market td.seg { font-weight: 700; width: 30%; background: var(--accent-sof
       <div class="section">
         <h2><span class="num">02</span>The Challenge</h2>
         <ul class="tight">
-          <li><b class="term">Operational complexity and disconnected tools:</b> manufacturer (OEM) software flies a single aircraft superbly, but the tools do not talk to each other. Nothing provides synchronization and one unified operational picture at fleet level - who is doing what, what the battery state is, and whether the aircraft can complete the mission safely.</li>
-          <li><b class="term">The scale problem:</b> managing one drone is simple, but past a fleet of dozens the coordination problem becomes computationally intractable for a human operator. Analyzing battery, weight, time-window and airspace constraints in real time demands autonomous algorithms - without them the manual process collapses.</li>
-          <li><b class="term">The cost in the field:</b> critical flight time wasted, duplicate coverage, airframe wear, and worst of all - inaccuracy and confusion in the real-time operational picture.</li>
+          <li><b class="term">Operational complexity, disconnected tools:</b> manufacturer (OEM) software flies a single aircraft superbly - and stops there. The tools don't talk to each other, and nothing assembles a fleet-level picture: who is flying what, where every battery stands, and whether each aircraft can actually complete its mission safely.</li>
+          <li><b class="term">The scale problem:</b> one drone is easy to manage; a fleet of dozens is not. Battery, payload weight, time windows and airspace constraints all interact in real time, and the coordination problem becomes computationally intractable for a human operator - without autonomous algorithms, manual dispatch collapses.</li>
+          <li><b class="term">The cost in the field:</b> wasted flight time, duplicate coverage, needless airframe wear - and worst of all, an operational picture nobody can fully trust.</li>
         </ul>
       </div>
 
@@ -167,17 +167,17 @@ table.market td.seg { font-weight: 700; width: 30%; background: var(--accent-sof
         <h2><span class="num">03</span>The Solution &amp; Product<span class="en">Vendor-Neutral Layer</span></h2>
         <p class="subhead">A vendor-neutral coordination and optimization layer</p>
         <ul class="tight">
-          <li><b class="term">Assignment and routing algorithms (VRPTW):</b> optimal route computation, automatic mission allocation and real-time integration of charging / battery-swap stops - for maximum air time and minimum risk.</li>
-          <li><b class="term">Dynamic real-time re-planning:</b> continuous processing of telemetry and field events updates the mission board within seconds - on a technical fault, a battery draining faster than planned, loss of signal, or an urgent change in operational priorities.</li>
-          <li><b class="term">Unified control room and a coherent operational picture:</b> centralized fleet control, live observation feed to commanders and managers, and dynamic dashboards showing mission status, aircraft readiness and remaining air time in real time.</li>
-          <li><b class="term">Hardware agnostic:</b> seamless connection to mixed fleets from any manufacturer or protocol (such as MAVLink) - full use of the aircraft an organization already owns.</li>
-          <li><b class="term">Flexible, deployment-ready architecture:</b> a distributed system supporting rapid deployment in the cloud (AWS and equivalents), on local servers in closed networks (on-premise), or at edge points in the field - container-based (Docker &amp; Kubernetes) with automated deployment pipelines (CI/CD) and full observability.</li>
+          <li><b class="term">Assignment &amp; routing engine (VRPTW):</b> computes optimal routes, allocates missions automatically, and folds charging or battery-swap stops into the plan in real time - maximum air time, minimum risk.</li>
+          <li><b class="term">Dynamic re-planning:</b> live telemetry and field events update the mission board within seconds of a technical fault, an abnormal battery drain, loss of signal, or an urgent shift in operational priorities.</li>
+          <li><b class="term">Unified control room:</b> centralized fleet control, a live observation feed for commanders and managers, and dashboards tracking mission status, aircraft readiness and remaining air time - one coherent operational picture.</li>
+          <li><b class="term">Hardware agnostic:</b> connects seamlessly to mixed fleets from any manufacturer or protocol (e.g. MAVLink), so an organization gets full use of the aircraft it already owns.</li>
+          <li><b class="term">Deploys where the customer operates:</b> in the cloud (AWS and equivalents), on local servers in closed networks (on-premise), or on edge nodes in the field - containerized (Docker &amp; Kubernetes), with automated CI/CD pipelines and full observability.</li>
         </ul>
       </div>
 
       <div class="section team">
         <h2><span class="num">06</span>Team</h2>
-        <p>Tony Verin (team lead) | Guy | Harel - three engineers, veterans of field and combat units, <b class="term">two of them drone operators</b>, who designed, built and operate the entire system end to end: algorithms, cloud architecture, user interfaces and infrastructure.</p>
+        <p>Tony Verin (team lead) | Guy | Harel - three engineers and combat veterans, <b class="term">two of them drone operators</b>, who designed, built and operate the entire system end to end: algorithms, cloud architecture, user interfaces and infrastructure.</p>
       </div>
     </div>
 
@@ -185,20 +185,20 @@ table.market td.seg { font-weight: 700; width: 30%; background: var(--accent-sof
       <div class="section">
         <h2><span class="num">04</span>Applications &amp; Market Potential<span class="en">Dual-Use</span></h2>
         <table class="market">
-          <tr><td class="seg">Defense, emergency &amp; C4I</td><td>Unified operational picture, coordinated sweeps and rapid response, alongside intelligent fleet logistics (battery and airframe health), and an ML component for lessons learned, pattern recognition and sector-specific optimization.</td></tr>
-          <tr><td class="seg">Construction &amp; infrastructure (ConTech)</td><td>Autonomous periodic mapping against project milestones - earthwork volume calculations, progress verification for releasing funds from banks and financiers, comparison of as-built conditions against engineering plans (BIM), and legal documentation to prevent overruns.</td></tr>
-          <tr><td class="seg">Infrastructure &amp; energy</td><td>Periodic monitoring, defect scanning and preventive maintenance of power lines, oil and gas pipelines, national assets and solar installations.</td></tr>
-          <tr><td class="seg">Precision agriculture</td><td>Coordination of multispectral aerial surveys for pest detection, and scheduled autonomous spraying at scale.</td></tr>
-          <tr><td class="seg">Logistics &amp; delivery</td><td>Autonomous site-to-site transport management and last-mile optimization across the supply chain.</td></tr>
+          <tr><td class="seg">Defense, emergency &amp; C4I</td><td>One unified operational picture, coordinated sweeps and rapid response; intelligent fleet logistics (battery and airframe health); an ML layer for after-action review, pattern recognition and sector-specific optimization.</td></tr>
+          <tr><td class="seg">Construction &amp; infrastructure (ConTech)</td><td>Autonomous mapping keyed to project milestones: earthwork volume calculation, progress verification for releasing lender funds, as-built comparison against engineering plans (BIM), and defensible documentation for disputes.</td></tr>
+          <tr><td class="seg">Infrastructure &amp; energy</td><td>Recurring monitoring, defect detection and preventive maintenance across power lines, oil &amp; gas pipelines, national assets and solar farms.</td></tr>
+          <tr><td class="seg">Precision agriculture</td><td>Coordinated multispectral surveys for pest detection, and scheduled autonomous spraying at scale.</td></tr>
+          <tr><td class="seg">Logistics &amp; delivery</td><td>Autonomous site-to-site transport and last-mile optimization across the supply chain.</td></tr>
         </table>
       </div>
 
       <div class="section">
         <h2><span class="num">05</span>Roadmap - 12 Months</h2>
         <div class="roadmap">
-          <div class="rm"><b>Months 0–3</b>Connecting real aircraft (MAVLink), initial field trials and engagement with the Civil Aviation Authority.</div>
-          <div class="rm"><b>Months 3–6</b>First pilot with a strategic partner / design customer to prove success metrics.</div>
-          <div class="rm"><b>Months 6–12</b>Transition to a Multi-Tenant product, commercial pricing and a Pre-Seed / Seed round.</div>
+          <div class="rm"><b>Months 0–3</b>Connect real aircraft (MAVLink), run first field trials, begin engagement with the Civil Aviation Authority.</div>
+          <div class="rm"><b>Months 3–6</b>First pilot with a strategic partner or design customer, proving out agreed success metrics.</div>
+          <div class="rm"><b>Months 6–12</b>Multi-Tenant product, commercial pricing, and a Pre-Seed / Seed round.</div>
         </div>
       </div>
     </div>
@@ -206,22 +206,22 @@ table.market td.seg { font-weight: 700; width: 30%; background: var(--accent-sof
 
   <div class="origin">
     <div class="lbl">Why We Built This</div>
-    <b>This is not a theoretical scenario for us.</b> On 7 October 2023, during the fighting in the kibbutzim, two teams from the same company launched drones at the same time. With no coordination between them, both swept the same sector - one team identified hostiles, the other reported a friendly force in the same place. The contradiction in the situational picture delayed a critical operational decision. <b>That is the problem SwarmOps was built to solve.</b>
+    <b>This is not a theoretical scenario for us.</b> On 7 October 2023, during the fighting in the kibbutzim, two teams from the same army company launched drones at the same time. With no coordination between them, both swept the same sector - one team identified hostiles, the other reported a friendly force in the same place. The contradiction in the situational picture delayed a critical operational decision. <b>That is the problem SwarmOps was built to solve.</b>
   </div>
 
   <div class="ask">
     <h2><span class="num">07</span>The Ask</h2>
-    <p class="tight">As we move from prototype (PoC) to an operational/commercial product, we are looking for:</p>
+    <p class="tight">To take SwarmOps from working prototype (PoC) to an operational, commercial product, we are looking for:</p>
     <ul class="tight">
-      <li>A place in a <b>technology incubator / accelerator</b>, with business mentorship.</li>
-      <li><b>Strategic introductions:</b> institutional operators, integrators and infrastructure companies.</li>
-      <li><b>Pre-Seed support:</b> to acquire a drone fleet for live testing, cloud resources and regulatory/legal counsel.</li>
+      <li>A place in a <b>technology incubator / accelerator</b>, with hands-on business mentorship.</li>
+      <li><b>Strategic introductions:</b> institutional operators, systems integrators and infrastructure companies.</li>
+      <li><b>Pre-Seed support:</b> a drone fleet for live testing, cloud resources, and regulatory and legal counsel.</li>
     </ul>
   </div>
 
   <div class="footer">
     <span class="contact"><b>Contact:</b> Tony Verin | Email: toniv7891@gmail.com | Phone: +972-52-4328627</span>
-    <span class="note">* A live demo of the system is available on request</span>
+    <span class="note">* Live demo available on request</span>
   </div>
 
 </div>

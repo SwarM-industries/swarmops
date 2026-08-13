@@ -1143,3 +1143,15 @@ Also fixed in passing: a broken `<b>` tag in the HE V2 team line that would have
 "מפעילי רחפנים" with no subject, and a dangling slash left in "(AWS / וכדומה)" after Nimbus was
 removed. Tony's real contact details are now in both V2 files (name, gmail, phone) - deliberate,
 these are pitch documents, but note they are now in git history.
+
+**Update 2026-08-13h (Tony) - EN V2 one-pager: English polish pass (wording only, no new claims).**
+Every section of `onepager_en_v2.html` reworded from translated-Hebrew register to native business
+English: verb-led roadmap entries, tightened bullets ("maximum air time, minimum risk"), §3's last
+bullet retitled "Deploys where the customer operates" (was "Flexible, deployment-ready
+architecture"), team line deduplicated ("three engineers and combat veterans" - "field and combat
+units" read oddly in English), 7-October account now says "the same army company" so English
+readers don't parse "company" as a business, ConTech row now says "defensible documentation for
+disputes" instead of "legal documentation to prevent overruns". Content, claims and status
+framing unchanged - present-tense video-feed/hardware-agnostic/on-prem claims are still there,
+still tracked as an open flag from update 2026-08-13f. HE V2 untouched; its copy differences from
+EN V2 are now register-driven, not just language-driven.
