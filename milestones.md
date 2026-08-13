@@ -1155,3 +1155,18 @@ disputes" instead of "legal documentation to prevent overruns". Content, claims 
 framing unchanged - present-tense video-feed/hardware-agnostic/on-prem claims are still there,
 still tracked as an open flag from update 2026-08-13f. HE V2 untouched; its copy differences from
 EN V2 are now register-driven, not just language-driven.
+
+**Update 2026-08-13i (Tony) - market thesis corrected: coordination problem starts at TWO drones,
+not dozens.** V2 §2 previously read "one drone is easy to manage; a fleet of dozens is not" /
+"מעבר לצי של עשרות כלים". That set the entry bar for our own market at dozens of aircraft, which
+(a) shrinks SAM enormously and (b) directly contradicted the 7 October account two blocks below on
+the same page - a failure between **two** teams. Both languages now state the ladder correctly:
+one drone is a task; two or more is a coordination problem (who covers what, who already swept it,
+whose report is current); past a handful, manual dispatch collapses outright.
+
+**This is the market definition to hold to going forward:** our market is any operator with more
+than one drone. The "3-5 drones in a human's head" line in `SwarmOps_UseCases.md` §1 describes
+where dispatch *collapses*, not where the market *begins* - don't let the two get conflated again,
+in either direction. Still open (see 2026-08-13e): no TAM/SAM/SOM sizing exists in any document;
+§4 of both overviews carries an explicit placeholder promising third-party-sourced figures. If
+that gets written, the SAM filter is "operators with 2+ aircraft", not "5+".

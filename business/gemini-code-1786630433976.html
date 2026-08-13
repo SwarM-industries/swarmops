@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>SwarmOps - Executive One Pager</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Heebo', 'Segoe UI', Arial, sans-serif;
+        }
+        body {
+            width: 210mm;
+            height: 297mm;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            padding: 15mm 15mm 12mm 15mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Header Section */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 2px solid #000000;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+        .logo-area h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: #0d1b2a;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+        .logo-area p {
+            font-size: 13px;
+            color: #4a5568;
+            font-weight: 500;
+            margin-top: 3px;
+        }
+        .badge {
+            font-size: 11px;
+            color: #4a5568;
+            text-align: left;
+            line-height: 1.3;
+        }
+
+        /* Grid Layout */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .section {
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 10px 12px;
+            background: #fafafa;
+        }
+        .full-width {
+            grid-column: span 2;
+        }
+
+        /* Titles & Typography */
+        h2 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0d1b2a;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 3px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        h2 span.num {
+            color: #64748b;
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        p, li {
+            font-size: 11px;
+            line-height: 1.4;
+            color: #334155;
+        }
+        ul {
+            list-style: none;
+            padding-right: 0;
+        }
+        li {
+            margin-bottom: 5px;
+            position: relative;
+            padding-right: 12px;
+        }
+        li::before {
+            content: "■";
+            color: #2563eb;
+            font-size: 8px;
+            position: absolute;
+            right: 0;
+            top: 2px;
+        }
+        strong {
+            color: #0f172a;
+        }
+
+        /* Highlight Box - Why We Built This */
+        .story-box {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-right: 4px solid #2563eb;
+            border-radius: 4px;
+            padding: 8px 12px;
+        }
+        .story-box h3 {
+            color: #1e3a8a;
+            font-size: 11.5px;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+        .story-box p {
+            color: #334155;
+            font-style: italic;
+            font-size: 10.5px;
+            line-height: 1.35;
+        }
+
+        /* Footer / Contact */
+        footer {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10.5px;
+            color: #64748b;
+        }
+        .contact-info strong {
+            color: #0d1b2a;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="logo-area">
+            <h1>SwarmOps | Swarm Industries</h1>
+            <p>פלטפורמת שליטה ואופטימיזציה בזמן אמת לצי רחפנים אוטונומי</p>
+        </div>
+        <div class="badge">
+            עמוד אחד | אוגוסט 2026<br>
+            התוכנית ללוחמים משוחררים
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <div class="grid-container">
+
+        <!-- 01 Executive Summary -->
+        <div class="section full-width">
+            <h2><span>01 תקציר מנהלים</span> <span class="num">EXECUTIVE SUMMARY</span></h2>
+            <p>SwarmOps פותרת את צוואר הבקבוק הקריטי ביותר בתפעול צי רחפנים: קבלת החלטות מבצעיות בזמן אמת - איזה רחפן מבצע איזה משימה, באיזה סדר ובאיזה מסלול, תוך ניהול דינמי של מגבלות סוללה, טווח ועדיפויות[cite: 1]. הטכנולוגיה מבוססת אלגוריתמיקת אופטימיזציה מתקדמת (VRPTW) ומערכת מבוזרת המאפשרת תכנון מחדש בשניות במקרה של שיבושים בשטח[cite: 1]. אב-הטיפוס מוכן, פרוס בענן (AWS) וזמין להדגמה חיה[cite: 1].</p>
+        </div>
+
+        <!-- 02 Challenge -->
+        <div class="section">
+            <h2><span>02 האתגר בשטח</span> <span class="num">THE CHALLENGE</span></h2>
+            <ul>
+                <li><strong>מורכבות תפעולית ונתק:</strong> תוכנות היצרן (OEM) מטיסות כלי יחיד מעולה, אך אינן מסתנכרנות[cite: 1]. אין כלי המעניק תמונה מבצעית אחודה לרמת הצי[cite: 1].</li>
+                <li><strong>אי-יכולת גדילה (Scale Limit):</strong> ניהול רחפן בודד פשוט, אך מעבר לעשרות כלים מייצר מורכבות חישובית שגורמת לתפעול הידני לקרוס[cite: 1].</li>
+                <li><strong>המחיר בשטח:</strong> בזבוז זמן טיסה, כפילויות סריקה, שחיקת כלים ובלבול בתמונת המצב[cite: 1].</li>
+            </ul>
+        </div>
+
+        <!-- 03 Solution & Product -->
+        <div class="section">
+            <h2><span>03 הפתרון והמוצר</span> <span class="num">THE SOLUTION & PRODUCT</span></h2>
+            <ul>
+                <li><strong>אלגוריתמיקת שיבוץ (VRPTW):</strong> מסלולים אופטימליים, הקצאה אוטומטית ועצירות טעינה בזמן אמת[cite: 1].</li>
+                <li><strong>תכנון-מחדש דינמי:</strong> עדכון לוח המשימות בשניות במקרה של תקלה, סוללה חלשה, אובדן כלי (Loss of Signal) או שינוי עדיפות[cite: 1].</li>
+                <li><strong>חמ"ל אחוד:</strong> פיד תצפית חי למפקדים ומסכי מעקב דינמיים (Dashboards)[cite: 1].</li>
+                <li><strong>עצמאות יצרן וארכיטקטורה:</strong> MAVLink/Hardware Agnostic, פריסה ב-Cloud, On-Premise או Edge עם קונטיינרים (Docker & Kubernetes) ו-CI/CD[cite: 1].</li>
+            </ul>
+        </div>
+
+        <!-- Story Highlight Box -->
+        <div class="section full-width story-box">
+            <h3>📌 למה בנינו את זה? (תרחיש מבצעי מ-7 באוקטובר)</h3>
+            <p>"במהלך הלחימה בקיבוצים, שני צוותים מהפלוגה העלו רחפנים במקביל[cite: 1]. בהיעדר תיאום, שניהם סרקו את אותו תא שטח — צוות א' זיהה מחבלים, בעוד צוות ב' דיווח על כוח ידידותי[cite: 1]. הסתירה בתמונת המצב עיכבה קבלת החלטה מבצעית קריטית[cite: 1]. זו הבעיה ש-SwarmOps נבנתה כדי לפתור[cite: 1]."</p>
+        </div>
+
+        <!-- 04 Applications / Dual Use -->
+        <div class="section">
+            <h2><span>04 יישומים ופוטנציאל שוק</span> <span class="num">DUAL-USE</span></h2>
+            <ul>
+                <li><strong>ביטחון וחירום:</strong> תמונה אחודה, ניהול סוללות ורכיב ML להפקת לקחים[cite: 1].</li>
+                <li><strong>בנייה ותשתיות (ConTech):</strong> מיפוי תקופתי לפי Milestones, חישובי עפר, אימות לשחרור כספים מבנקים והשוואת BIM[cite: 1].</li>
+                <li><strong>תשתיות, אנרגיה וחקלאות:</strong> ניטור קווי מתח, צנרות, וריסוס מדויק בקנה מידה גדול[cite: 1].</li>
+            </ul>
+        </div>
+
+        <!-- 05 & 06 Roadmap & Team -->
+        <div class="section">
+            <h2><span>05 & 06 צוות ומפת דרכים</span> <span class="num">TEAM & ROADMAP</span></h2>
+            <p style="margin-bottom: 5px;"><strong>הצוות:</strong> טוני (ראש צוות) | גיא | הראל — 3 מהנדסים, יוצאי יחידות שטח ומפעילי רחפנים[cite: 1].</p>
+            <ul>
+                <li><strong>0–3 חודשים:</strong> חיבור MAVLink, ניסויי שטח ועבודה מול רת"א[cite: 1].</li>
+                <li><strong>3–6 חודשים:</strong> פיילוט ראשון מול שותף אסטרטגי / לקוח בדיקה[cite: 1].</li>
+                <li><strong>6–12 חודשים:</strong> מוצר Multi-Tenant, תמחור וגיוס Pre-Seed/Seed[cite: 1].</li>
+            </ul>
+        </div>
+
+        <!-- 07 Ask -->
+        <div class="section full-width">
+            <h2><span>07 הבקשה שלנו</span> <span class="num">THE ASK</span></h2>
+            <p>השתלבות בחממה טכנולוגית/אקסלרטור • חיבורים אסטרטגיים למפעילים מוסדיים ואינטגרטורים • תמיכת Pre-Seed לרכישת צי לבדיקות חמות, משאבי ענן וייעוץ רגולטורי[cite: 1].</p>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="contact-info">
+            איש קשר: <strong>טוני ורין</strong> | דוא"ל: <strong>toniv7891@gmail.com</strong> | טלפון: <strong>052-4328627</strong>[cite: 1]
+        </div>
+        <div>* הדגמה חיה (Live Demo) של המערכת זמינה לפי דרישה[cite: 1]</div>
+    </footer>
+
+</body>
+</html>
