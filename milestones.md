@@ -1014,3 +1014,14 @@ draft that prompted both the de-teching pass and V2. Kept for provenance — it 
 deliverable (it carries a browser print header and a local `file:///Users/tonyverin/Desktop/...`
 path in its footer). The deliverables remain `SwarmOps_OnePager_{HE,EN}.pdf` and
 `SwarmOps_OnePager_HE_V2.pdf`.
+
+**Update 2026-08-13c (Tony) — drone-operator credential added to all three one-pagers.** The team
+line in `onepager_he.html`, `onepager_en.html` and `onepager_he_v2.html` now states that two of the
+three of us are drone operators, not just combat veterans. All three PDFs re-rendered, 1 page each.
+Rationale worth preserving for whoever edits these next: for a drone-fleet product, "we operated
+the thing we're building software for" is a stronger credibility signal to defense and
+infrastructure buyers than any engineering claim on the page — it says the workflow was known
+first-hand rather than inferred. Do not drop this line when trimming for space.
+
+Note this is the one place V2 now deviates from the supplied verbatim text — deliberately, on
+request.
