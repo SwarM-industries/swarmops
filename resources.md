@@ -4,6 +4,16 @@ Snapshot as of 2026-08-07, taken live via `kubectl`/`aws`/`gh` against the runni
 `swarmops` EKS cluster and `swarmops-deployments`. Not auto-updated — re-run the
 checks below if this drifts.
 
+> **Cost note added 2026-08-14.** `budget.md` prices twelve months of this cluster at
+> **$1,000–2,500**, not the $6–8K an earlier draft assumed: the EKS control plane is ~$73/month,
+> two small nodes plus an ALB put continuous operation at $150–250/month, and the environment is
+> already torn down between sessions. **It may be $0** — AWS Activate grants startups $1K–100K in
+> credits and this project qualifies. Worth applying before the next billing cycle.
+>
+> If real drone hardware is connected (`actual_prod.md`), one thing here changes: the Stage 0
+> ingest route `POST /telemetry/events` becomes internet-facing for a non-simulated producer, and
+> it **still has no auth** — flagged in `UNITY_SIMULATOR_PLAN.md` Stage 4 and still open.
+
 ## Cluster
 
 - **Name**: `swarmops` (EKS 1.34, `eks.30`, status `ACTIVE`)
