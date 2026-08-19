@@ -18,7 +18,7 @@ no network. It works offline, which is deliberate — the same constraint the pr
 | `d` | toggle dark mode — use it in a dark room, the palette is validated for both |
 | **Tables** button | opens every chart's underlying numbers as plain tables, in a new tab |
 
-18 slides, ~17 minutes at a normal pace.
+19 slides, ~18 minutes at a normal pace.
 
 ## Where the numbers come from
 
@@ -32,11 +32,12 @@ Every figure traces to the research documents. Change a number **there first**, 
 | 7 — observed growth | derived from slides 5 and 6 plus `SwarmOps_Competitive_Battlecard.md` §1 |
 | 8 — growth gaps | `business/SwarmOps_Market_Sizing.md` §2.1, §2.3, §9 |
 | 9 — fleet size bands | `business/SwarmOps_Drone_Fact_Pack.md` §1.3 |
-| 10, 11, 15 — competitors | `business/SwarmOps_Competitive_Battlecard.md` §1, `SwarmOps_Competitor_eyesAtop.md` |
+| 10, 11, 16 — competitors | `business/SwarmOps_Competitive_Battlecard.md` §1, `SwarmOps_Competitor_eyesAtop.md` |
 | 12 — TAM | `business/SwarmOps_Market_Sizing.md` §2.1, §9.1 |
-| 13, 14 — layers, fleet shapes | `business/SwarmOps_Positioning_and_Pitch.md` §3, `Battlecard` §3.6 |
-| 16 — the four observers | `business/SwarmOps_Competitor_eyesAtop.md` §5 |
-| 17, 18 — insights and next steps | `business/SwarmOps_Positioning_and_Pitch.md` §9 |
+| 13 — exit comparables | `business/SwarmOps_Exits_and_Funders.md` §1 |
+| 14, 15 — layers, fleet shapes | `business/SwarmOps_Positioning_and_Pitch.md` §3, `Battlecard` §3.6 |
+| 17 — the four observers | `business/SwarmOps_Competitor_eyesAtop.md` §5 |
+| 18, 19 — insights and next steps | `business/SwarmOps_Positioning_and_Pitch.md` §9 |
 
 **All chart data lives in one `DATA` object** at the top of the `<script>` block. Edit there and
 every chart follows — do not hand-edit numbers into the SVG code.
@@ -60,6 +61,12 @@ These come from `business/_render/README.md` and the source discipline in the re
    Never "the IDF has no coordination system."
 6. **Nothing classified.** If it is not in an open source it does not go in this deck.
 7. **The fleet is simulated** wherever our own capability is shown.
+8. **Colour on slide 13 carries the argument, not decoration.** Orange is the coordination layer,
+   blue is hardware-anchored — that split *is* the slide. Keep the caveat with it: Aerodome was a
+   US public-safety position with the same investor on both sides, so it is a comparable for which
+   layer gets paid, never a prediction of our outcome.
+9. **Never state FlytBase's revenue as a fact.** The databases disagree by 2.7× on revenue and
+   100× on funding. State the headcount trajectory (98 → 48), which is consistently reported.
 
 ## Design
 
