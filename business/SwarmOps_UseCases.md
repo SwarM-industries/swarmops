@@ -76,8 +76,8 @@ in missed taskings and stranded aircraft, not just idle flight hours.
 
 ### Beyond the 12-month roadmap - where this goes
 
-Two directions worth stating because they shape the architecture, both **Future** by the legend
-above: past the 12-month roadmap, directionally correct, not yet scoped. Neither is offered as
+Three directions worth stating because they shape the architecture, all **Future** by the legend
+above: past the 12-month roadmap, directionally correct, not yet scoped. None is offered as
 something the system does.
 
 **Learning from flight history.** Every plan the optimizer issues and every telemetry event the
@@ -95,6 +95,28 @@ and route-conflict checking only. But a coordination layer that already holds ev
 position, plan and intent is the natural place for that capability to eventually live, and it is
 the direction the regulatory environment is moving as BVLOS opens up. Long-horizon, and
 deliberately outside the funded roadmap.
+
+**Cross-organization task assignment (multi-tenancy).** *(Added 2026-08-19.)* Two things are being
+distinguished here and they are often conflated. A **cross-unit operational picture inside one
+organization** - several units of one force, or several districts of one police force, sharing one
+live map and one plan - is **Phase 3**, and it is what the 7 October account in the business
+overviews describes. **Cross-*organization* assignment is a different and larger problem**: police,
+fire and MDA over one incident, or several military units under separate command, each owning its
+own aircraft and each unwilling to hand another organization control of them. That needs tenancy,
+permission boundaries, and a trust model for what one organization is allowed to see of another's
+fleet and be told about its own - not merely a shared map.
+
+Why it is worth recording rather than leaving implicit: **nobody sells it and nobody is licensed to
+sell it.** The Israeli UTM providers coordinate *airspace* between organizations under a CAAI
+licence - separation and authorization. Nobody assigns *tasks* between organizations, and that
+function sits outside the licensed UTM scope entirely. It is the largest genuinely empty space in
+the competitive map (`SwarmOps_Competitive_Battlecard.md` §3.3), and the multi-agency incident
+scene is a textbook case for it.
+
+**Future, and honestly so.** It is real engineering, not a configuration flag, and it should follow
+the single-organization work rather than run beside it. Recorded here so the architecture is not
+quietly built in a way that forecloses it - anything that assumes one tenant, one identity domain
+or one operator population makes this expensive later.
 
 ---
 
