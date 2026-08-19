@@ -45,3 +45,15 @@ Terraform. VPC, EKS cluster, ECR repos (one per service that ships an image), IA
 
 ### `swarmops-contracts`
 Shared data model / event shapes (Drone, Mission, Plan, Telemetry event — PRD §6) as an actual importable package (npm for the Node services, a small Python package for planning-service), so services can't silently drift on field names or types. Not required by the deployment brief — added so "contracts before code" is enforced by the compiler, not just convention.
+
+### `swarmops-business`
+Documents, not code — the odd one out in this list. Business overviews and one-pagers (HE + EN),
+the use-case companion, the market/competitive research behind them, and the `_render/` PDF
+pipeline. Split out of `swarmops` on 2026-08-19 with its full history so the business material
+versions on its own instead of riding along with the docs repo. **Nothing here is deployed, and it
+is deliberately absent from `SERVICE_REPOS` in the Makefile** — no CI, no Dockerfile, no image. It
+is in `REPOS`, so `make clone-missing` / `fetch-all` / `pull-all` / `status` all cover it.
+
+**Read `_render/README.md` in that repo before changing any document there** — every `.pdf` is
+generated output, and the three one-pagers are independent hand-authored files with no shared
+template.
