@@ -62,8 +62,14 @@ distinct:
    Pix4D.) This is where most of the category's revenue actually sits today.
 3. **Single-aircraft flight control & autonomy** — manufacturer software. (DJI, Skydio, Auterion,
    Autel.)
-4. **Fleet coordination** — who flies what, in what order, can they finish it. **Us.** Almost
-   nobody's primary product.
+4. **Fleet coordination** — who flies what, in what order, can they finish it. **Us.**
+   ~~Almost nobody's primary product.~~ **REVISED 2026-08-19 — that is no longer true.** It is the
+   primary product of at least six funded companies: **eyesAtop/Aitan** (fielded across IDF
+   reconnaissance units, 500,000+ combat flight hours, holder of the MoD *Digital Bat* national
+   contract since 14 Jul 2026), **FlytBase**, **Airwayz**, **SkyfireAI**, **Auterion Nemyx**, and
+   **XTEND XOS**. See §9.1 and `SwarmOps_Competitive_Battlecard.md`. The *category* claim below
+   still stands — it barely exists as a purchased line item in analyst terms — but "almost nobody
+   builds it" was wrong and must not be said in a room.
 
 Categories 1–3 are mature and crowded. Category 4 barely exists as a purchased line item, because
 until fleets crossed the coordination threshold there was nothing to buy. **That is
@@ -730,6 +736,161 @@ its success criteria alongside the operational metrics already planned.
    ecosystem are the nearest neighbours, most of them hardware-anchored). The working hypothesis
    is "almost nobody sells the coordination layer neutrally," and it needs to be tested rather
    than assumed, because it is the load-bearing claim of the whole positioning.
+
+---
+
+## 9. Review against the 2026-08-19 competitive and field findings
+
+**Audit of every figure in this document against what was learned on 2026-08-18/19** — the
+competitive census (`SwarmOps_Competitive_Battlecard.md`), the eyesAtop profile
+(`SwarmOps_Competitor_eyesAtop.md`), the counts (`SwarmOps_Drone_Fact_Pack.md`), and four
+first-hand observers inside a line infantry unit.
+
+**Headline: the numbers largely survive. The *interpretation* of the TAM does not, and one
+assumption got much stronger.** Nothing below is edited into the sections above unilaterally —
+each item says what should change and who has to decide.
+
+### 9.1 TAM — the size stands, the story around it must change
+
+**Unchanged:** the $2.5–3.9B fleet-management-software figure and the four-category breakdown
+in §2.2 are still correctly sourced.
+
+**Two findings pull in opposite directions and both belong in the deck.**
+
+**(a) The bear case, and an investor will run this arithmetic unprompted.** The best independent
+pure-play in this category — **FlytBase — is at ~$10.8M ARR on a ~$32.3M valuation after roughly a
+decade, with ~98 people** [SOURCED]. **If the coordination category were really $2.5–3.9B, its
+leading independent vendor would not be at $10.8M.** The honest reading: the analyst figure
+bundles categories 1–3 of §2.2 — compliance, media processing, and manufacturer flight software —
+and **the genuine coordination slice is far smaller than the headline.** §2.2 already suspected
+this; it now has evidence. **Put this in the deck ourselves.** A team that surfaces the
+uncomfortable number is trusted on the rest.
+
+**(b) The bull case, and it is new, specific, and points at defense.** **eyesAtop reportedly does
+"tens of millions of dollars" in annual sales with ~50 people, selling coordination software into
+Israeli defense** [SOURCED — Calcalist/Ynet; ⚠️ sits oddly against a ~$15M raise, caveat in the
+profile §7]. Set beside (a): **global civil coordination pure-play ≈ $10.8M; Israeli defense
+coordination, one vendor ≈ tens of millions.**
+
+**This is the strongest quantitative support the defense-first decision has ever had**, and it
+lands directly on §3.3's defense row: the modelled **$100–300K per site/formation and $1–5M at
+force level** is not aspirational — a company with fifty people is realizing revenue of that order
+right now, in this country, in this category. **Recommend: keep the defense ACV band and cite
+eyesAtop as the comparable.**
+
+### 9.2 Pricing anchors — add the most relevant comparable that exists
+
+§3.2's anchors are civil (DroneDeploy $329–599/seat/yr; Skydio ~$6,000 + ~$3,000/yr). **Missing,
+and it is the single closest comparable in the world to what we sell:**
+
+> **XTEND's $20M exclusive multi-year Israeli MoD contract for a multi-drone operating system**
+> [SOURCED].
+
+An Israeli MoD contract, for this exact product category, at $20M. **It makes §3.3's $1–5M
+force-level figure look conservative rather than optimistic.** Recommend adding to §3.2 as the
+defense anchor. Secondary: MAFAT reports **NIS 1.08B in government orders to Israeli defense-tech
+startups during 2025** — the size of the pool our defense SAM is drawn from.
+
+### 9.3 SAM Filter B — upgrade from [ASSUMPTION] toward evidence
+
+§3.1's Filter B rests on two claims. **Both got stronger:**
+
+1. *"No incumbent covers this."* **Now supported rather than reasoned.** Every competitor is
+   Filter-A-shaped: eyesAtop's proposition is explicitly *three or four soldiers become one* —
+   it shrinks a heavy crew flying several aircraft. **Shrinking a crew does not coordinate a
+   hundred soldiers flying one Mavic each.** Different problem, and nobody is solving the second.
+2. *"This is very likely the larger half of the Israeli market."* **Four first-hand observers** —
+   a drone operator, a serving pilot, an officer, and one of the IDF's leading drone specialists —
+   describe exactly the Filter B shape at line-unit level, **with no coordination system, as of
+   August 2026** (`SwarmOps_Positioning_and_Pitch.md` §0).
+
+**Recommend: re-tag Filter B's core premise from [ASSUMPTION] to [MODELLED, with primary
+corroboration], and keep the population estimate itself as [ASSUMPTION].** The *shape* is
+evidenced; the *count* is not.
+
+### 9.4 SAM Filter A, Israel — 300–800 organizations is at the top of what the fleet supports
+
+§3.3 models **300–800 Israeli organizations past the ≥3-aircraft threshold**. Cross-checked
+against the new count work (`SwarmOps_Drone_Fact_Pack.md` §1.3): the Israeli civilian fleet is
+**~25,000 registered-equivalent, 40,000–80,000 total airframes [MODELLED]**, overwhelmingly
+one-per-operator, and **CAAI has never published the fleet-size distribution** — which §8.2
+already identifies as the number that moves Filter A SAM linearly.
+
+The two are **compatible but tight**: 300–800 organizations holding ≥3 aircraft implies at least
+~900–2,400 airframes in ≥3-aircraft hands, which the fleet comfortably supports — but only if the
+commercial operator population is in the several-thousands. **Recommend: keep 300–800, and flag it
+in the text as the upper end of what the airframe estimate supports.** Do not widen it. **The CAAI
+request (§8.2) is now the highest-value open item in this document** — it resolves both §9.4 and
+§3.1's percentage assumption in one conversation.
+
+### 9.5 §5.8 national coordination layer — still overstated, still not fixed
+
+Flagged on 2026-08-18 (`SwarmOps_Israel_Drone_Landscape.md` §5) and **still open**. It is now
+**doubly** occupied: **High Lander** holds the CAAI U-space licence covering all of Israel, and
+**Airwayz was selected by Israel** for the national multi-fleet airspace programme and has flown
+Israel Police drone operations under its UTM.
+
+**Recommend: revise §5.8 before the next investor meeting**, reframing SwarmOps as the mission-
+coordination layer *above* UTM rather than the national traffic layer. **It should not survive
+another revision cycle unfixed** — it is a claim an informed investor can falsify in one search.
+
+### 9.6 US and Europe SAM — the count holds, our route into it does not
+
+§3.1's 424,516 US commercial registrations, 493,396 certified pilots and 1.6M EU operators are
+unchanged. **What changed is the path:** DJI went onto the **FCC Covered List on 21 December 2025**,
+so new DJI equipment is effectively blocked from US import and sale, with software-update waivers
+only through ~1 Jan 2027.
+
+Two effects, opposite in sign:
+- **For us, positive:** US fleets are migrating onto mixed Blue UAS vendors — **maximum
+  heterogeneity right now**, which is the condition our product needs.
+- **For us, negative:** a **DJI-integrated** product has no US future, and the DFR segment is
+  consolidating around full-stack vendors (Flock, Skydio, BRINC), which re-homogenizes fleets.
+
+**Recommend: keep the US/EU SAM figures, and state explicitly that Europe precedes the US** — which
+§4 already assumes for Part 108 reasons and which this strengthens independently.
+
+### 9.7 SOM — one gate may be softer than stated
+
+The table stands. **One line deserves re-examination:** months 0–6 is gated on *"hardware
+integration must land first — nothing is sellable against a simulated fleet."*
+
+**An IDF drone R&D unit has asked to test SwarmOps as it is** (`SwarmOps_Positioning_and_Pitch.md`
+§9). **Evaluating immature technology against a simulated fleet is what an R&D unit does** — that
+gate may apply to a *paying* customer and not to a *design partner*.
+
+**Do not revise the row yet.** Ask the unit what the test requires (§9.2 item 2 of the positioning
+doc). If a simulated fleet is acceptable, the months 0–6 row gains a real design partner without
+hardware, which pulls the whole schedule left.
+
+### 9.8 §6 sensitivity — risk 6 has partly materialised
+
+§6.6 lists manufacturer encroachment as a risk and says *"current evidence is against it."*
+**That is now out of date.** **Auterion Nemyx** coordinates drones from multiple manufacturers —
+provided they run AuterionOS — and shipped in Sept 2025. **Recommend: rewrite §6.6 as a risk that
+has partly materialised**, with the surviving distinction stated precisely (vendor-neutral at the
+*OS* layer versus at the *aircraft* layer, which is where we sit).
+
+### 9.9 §8 open questions — status
+
+| Item | Status |
+|---|---|
+| §8.10 competitive census of coordination specifically | **DONE** — `SwarmOps_Competitive_Battlecard.md`. Result: the hypothesis failed; the category is contested |
+| §8.2 CAAI registration + fleet-size distribution | **Still open. Now the highest-value item in this document** (§9.4) |
+| §8.7 Israel Innovation Authority eligibility | Still open — and **MAFAT Green Lane/Innofense is now the more urgent channel**, with an interested unit attached |
+| §8.4 enumerate the Israeli operator subset | Still open |
+| §8.9 military drone market scope discrepancy | Still open |
+
+### 9.10 What this does to the headline numbers
+
+**Nothing in this review changes a TAM, SAM or SOM figure.** It changes four things around them:
+
+1. **The TAM story** — the category is contested, not empty, and the leading pure-play's $10.8M is
+   the honest counterweight to a $2.5–3.9B headline. Say both.
+2. **The defense case** — materially stronger. A fifty-person Israeli company is realizing
+   "tens of millions" in this exact category, and a $20M MoD contract exists as a price anchor.
+3. **Filter B** — evidenced rather than argued.
+4. **§5.8 and §6.6** — overstated, flagged twice, and now overdue for revision.
 
 ---
 

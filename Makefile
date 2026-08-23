@@ -19,19 +19,23 @@ WORKSPACE ?= $(if $(wildcard $(MAKEFILE_DIR)/swarmops-frontend),$(MAKEFILE_DIR),
 # subdirectory literally named `swarmops` to find.
 SWARMOPS_DIR := $(if $(wildcard $(MAKEFILE_DIR)/swarmops-frontend),$(WORKSPACE),$(WORKSPACE)/swarmops)
 
-# The 15 app repos. `swarmops` (this repo — docs/plan/pitch site) is added separately in ALL.
+# The 16 sibling repos. `swarmops` (this repo — docs/plan/pitch site) is added separately in ALL.
+# swarmops-business (2026-08-19) is the odd one out: documents, not an app — split out of this
+# repo with its history so the business/market/competitive material versions on its own. It has no
+# CI, no Dockerfile and no deployable unit, so it belongs in REPOS (clone/fetch/pull/status all
+# apply) but never in SERVICE_REPOS.
 REPOS := swarmops-frontend swarmops-gateway swarmops-auth-service swarmops-fleet-service \
          swarmops-mission-service swarmops-planning-service swarmops-telemetry-service \
          swarmops-notification-service swarmops-drone-simulator swarmops-unity-simulator \
          swarmops-local swarmops-deployments swarmops-infrastructure swarmops-contracts \
-         swarmops-diag-test
+         swarmops-diag-test swarmops-business
 
-# All 16 repos in the org, as directory names under $(WORKSPACE).
+# All 17 repos in the org, as directory names under $(WORKSPACE).
 ALL := swarmops $(REPOS)
 
 # The 9 repos with a `publish` job (build -> push ECR -> bump swarmops-deployments).
-# Excludes swarmops-local/-deployments/-infrastructure/-contracts/-unity-simulator/-diag-test
-# and this docs repo, none of which have that CI job.
+# Excludes swarmops-local/-deployments/-infrastructure/-contracts/-unity-simulator/-diag-test,
+# swarmops-business, and this docs repo — none of which have that CI job.
 SERVICE_REPOS := swarmops-auth-service swarmops-fleet-service swarmops-mission-service \
                  swarmops-planning-service swarmops-telemetry-service swarmops-notification-service \
                  swarmops-frontend swarmops-gateway swarmops-drone-simulator
@@ -39,7 +43,7 @@ SERVICE_REPOS := swarmops-auth-service swarmops-fleet-service swarmops-mission-s
 .PHONY: help repos clone-missing status fetch-all pull-all push-all sync branch foreach trigger-publish check-publish
 
 help:
-	@echo "SwarmOps multi-repo automation (16 repos: swarmops + 15 app repos)"
+	@echo "SwarmOps multi-repo automation (17 repos: swarmops + 15 app repos + swarmops-business)"
 	@echo "workspace: $(WORKSPACE)"
 	@echo ""
 	@echo "  make repos                 list every repo this Makefile manages"
