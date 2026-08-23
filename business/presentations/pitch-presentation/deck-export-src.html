@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<template id="__bundler_thumbnail" data-bg-color="#f5f5f7">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="tg" x1="0" y1="1" x2="1" y2="0">
+        <stop offset="0" stop-color="#ffb340"/>
+        <stop offset="0.55" stop-color="#ff5f3c"/>
+        <stop offset="1" stop-color="#ff375f"/>
+      </linearGradient>
+    </defs>
+    <rect width="1200" height="800" fill="#f5f5f7"/>
+    <circle cx="600" cy="330" r="54" fill="url(#tg)"/>
+    <circle cx="404" cy="222" r="26" fill="#1d1d1f"/>
+    <circle cx="796" cy="222" r="26" fill="#1d1d1f"/>
+    <circle cx="404" cy="438" r="26" fill="#1d1d1f"/>
+    <circle cx="796" cy="438" r="26" fill="#1d1d1f"/>
+    <g stroke="#1d1d1f" stroke-width="7" opacity="0.55">
+      <line x1="600" y1="330" x2="404" y2="222"/>
+      <line x1="600" y1="330" x2="796" y2="222"/>
+      <line x1="600" y1="330" x2="404" y2="438"/>
+      <line x1="600" y1="330" x2="796" y2="438"/>
+    </g>
+    <rect x="404" y="560" width="392" height="26" rx="13" fill="#1d1d1f"/>
+    <rect x="484" y="620" width="232" height="18" rx="9" fill="#c9c9d0"/>
+  </svg>
+</template>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>SwarmOps · סבב Pre-Seed 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#f5f5f7}
+a{color:#1d1d1f;text-decoration:none}
+a:hover{color:#ff5f3c}
+:root{
+  --type-hero:150px; --type-title:84px; --type-h2:72px; --type-kicker:26px;
+  --type-sub:34px; --type-body:30px; --type-small:26px; --type-num:120px;
+  --pad-x:140px; --pad-y:90px; --gap-title:52px;
+}
+.grad{background:linear-gradient(95deg,#ffb340,#ff5f3c 55%,#ff375f);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#ff5f3c}
+@keyframes sIn{from{opacity:0;transform:scale(.982)}to{opacity:1;transform:scale(1)}}
+@keyframes dIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes dZoom{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:scale(1)}}
+@keyframes dPop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+@keyframes dBar{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes dBarY{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@media (prefers-reduced-motion:no-preference){
+[data-deck-active]{animation:sIn .7s cubic-bezier(.16,1,.3,1) both}
+[data-deck-active] .fx{animation:dIn .9s cubic-bezier(.16,1,.3,1) both}
+[data-deck-active] .fz{animation:dZoom 1.6s cubic-bezier(.16,1,.3,1) both}
+[data-deck-active] .fp{animation:dPop .7s cubic-bezier(.16,1,.3,1) both}
+[data-deck-active] .bar{animation:dBar 1.2s cubic-bezier(.16,1,.3,1) both;transform-origin:right center}
+[data-deck-active] .barY{animation:dBarY 1.1s cubic-bezier(.16,1,.3,1) both;transform-origin:bottom center}
+[data-deck-active] .d1{animation-delay:.12s}
+[data-deck-active] .d2{animation-delay:.24s}
+[data-deck-active] .d3{animation-delay:.36s}
+[data-deck-active] .d4{animation-delay:.48s}
+[data-deck-active] .d5{animation-delay:.6s}
+[data-deck-active] .d6{animation-delay:.72s}
+[data-deck-active] .d7{animation-delay:.86s}
+[data-deck-active] .d8{animation-delay:1s}
+}
+@media print{.fx,.fz,.fp,.bar,.barY{animation:none !important}}
+</style>
+</helmet>
+<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%" data-uneditable="">
+
+<section data-label="פתיחה" data-screen-label="01" data-speaker-notes="בוקר טוב. SwarmOps: שכבת תיאום לצי רחפנים אוטונומי. אנחנו מגייסים סבב Pre-Seed. חמש דקות: מי אנחנו, מה שבור, מה השוק, ומה אנחנו מבקשים." dir="rtl" style="background:#f5f5f7;color:#1d1d1f;font-family:'Heebo',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;padding:var(--pad-y) var(--pad-x);text-align:center">
+  <img class="fx" src="assets/logo-mark.png" alt="SwarmOps" style="width:160px;height:auto">
+  <h1 class="fx d1" style="margin:0;font-size:var(--type-hero);font-weight:800;letter-spacing:-0.03em;line-height:1;direction:ltr">SwarmOps</h1>
+  <p class="fx d2" style="margin:0;font-size:40px;font-weight:400;color:#6e6e73;max-width:1300px;line-height:1.35">שכבת תיאום ואופטימיזציה למרחב אווירי אחוד ובטוח יותר</p>
+  <p class="fx d3" style="margin:22px 0 0;font-size:28px;font-weight:500;color:#6e6e73;letter-spacing:.04em">טוני&nbsp;&nbsp;·&nbsp;&nbsp;גיא&nbsp;&nbsp;·&nbsp;&nbsp;הראל&nbsp;&nbsp;·&nbsp;&nbsp;אמיר&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;סבב Pre-Seed 2026</p>
+  <div class="conf" style="position:absolute;bottom:44px;left:var(--pad-x);font-size:19px;font-weight:400;color:#b6b6bc;letter-spacing:.05em">SwarmOps · Swarm Industries 2026 · חסוי</div>
+</section>
+
+<section data-label="הצוות" data-screen-label="02" data-speaker-notes="ארבעה מייסדים, כולם מהנדסים ולוחמים. טוני מפעיל רחפנים, גיא חובש קרבי בחילוץ והצלה, הראל תותחן טנק, אמיר צנחן עם רקע VC. שלושתנו בונים ומפעילים את המערכת מקצה לקצה; אמיר מחזיק את הצד המסחרי. לא המצאנו את הבעיה. חיינו אותה." dir="rtl" style="background:#f5f5f7;color:#1d1d1f;font-family:'Heebo',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:46px;padding:64px var(--pad-x) 74px;text-align:right">
+  <div style="display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center">
+    <p class="fx" style="margin:0;font-size:var(--type-kicker);font-weight:700;letter-spacing:.16em;color:#ff5f3c">הצוות</p>
+    <h2 class="fx d1" style="margin:0;font-size:64px;font-weight:800;letter-spacing:-0.015em;line-height:1.06">ארבעה מייסדים, ארבעה לוחמים</h2>
+    <p class="fx d2" style="margin:0;font-size:28px;font-weight:400;color:#6e6e73">אנחנו המשתמשים שהמוצר נבנה בשבילם.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,340px);gap:40px;justify-content:center;align-items:start">
+    <figure class="fp d3" style="margin:0;display:flex;flex-direction:column;gap:14px">
+      <img src="assets/tony.jpg" alt="טוני ורין" style="width:340px;height:300px;object-fit:cover;object-position:center 30%;border-radius:24px;filter:contrast(1.05);box-shadow:0 14px 44px rgba(0,0,0,.13)">
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <span style="font-size:34px;font-weight:800;line-height:1.15">טוני ורין</span>
+        <span style="font-size:24px;font-weight:700;color:#ff5f3c;letter-spacing:.06em;direction:ltr;text-align:right">CEO</span>
+      </div>
+      <p style="margin:4px 0 0;font-size:20px;font-weight:400;color:#6e6e73;line-height:1.5;text-wrap:pretty">מפעיל רחפנים מבצעי עם ניסיון פריסה בשטח, ורקע כצלף. Certified AWS Solutions Architect ומהנדס DevOps. בנה את SwarmOps כדי לפתור את פערי המרחב האווירי שחווה בשטח, ומפעיל את הפלטפורמה מקצה לקצה.</p>
+    </figure>
+    <figure class="fp d4" style="margin:0;display:flex;flex-direction:column;gap:14px">
+      <img src="assets/guy.jpg" alt="גיא פרס" style="width:340px;height:300px;object-fit:cover;object-position:center 22%;border-radius:24px;filter:contrast(1.05);box-shadow:0 14px 44px rgba(0,0,0,.13)">
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <span style="font-size:34px;font-weight:800;line-height:1.15">גיא פרס</span>
+        <span style="font-size:24px;font-weight:700;color:#ff5f3c;letter-spacing:.06em;direction:ltr;text-align:right">COO</span>
+      </div>
+      <p style="margin:4px 0 0;font-size:20px;font-weight:400;color:#6e6e73;line-height:1.5;text-wrap:pretty">חובש קרבי בחילוץ והצלה, צה״ל. AWS Certified Solutions Architect ו-DevOps Developer Expert (IITC). קריירה בתשתיות ענן ובהובלת שיווק דיגיטלי. אחראי על התפעול היומיומי, הרודמאפ והאספקה.</p>
+    </figure>
+    <figure class="fp d5" style="margin:0;display:flex;flex-direction:column;gap:14px">
+      <img src="assets/harel.jpg" alt="הראל ולפיש" style="width:340px;height:300px;object-fit:cover;object-position:center 28%;border-radius:24px;filter:contrast(1.05);box-shadow:0 14px 44px rgba(0,0,0,.13)">
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <span style="font-size:34px;font-weight:800;line-height:1.15">הראל ולפיש</span>
+        <span style="font-size:24px;font-weight:700;color:#ff5f3c;letter-spacing:.06em;direction:ltr;text-align:right">CRO, CIO</span>
+      </div>
+      <p style="margin:4px 0 0;font-size:20px;font-weight:400;color:#6e6e73;line-height:1.5;text-wrap:pretty">תותחן טנק לשעבר בצה״ל, מוסמך DevOps (IITC). מתכנן, בונה ומפעיל את המערכת מקצה לקצה, אחראי על האלגוריתמים, ארכיטקטורת הענן והתשתית שמאחורי מנוע הניתוב VRPTW וחדר הבקרה, מתוך היכרות ישירה עם פערי התיאום שהמערכת נבנתה לסגור.</p>
+    </figure>
+    <figure class="fp d6" style="margin:0;display:flex;flex-direction:column;gap:14px">
+      <div style="width:340px;height:300px;border-radius:24px;border:2px dashed #c9c9d0;background:repeating-linear-gradient(135deg,#f0f0f3 0 10px,#e8e8ec 10px 20px);display:flex;align-items:center;justify-content:center">
+        <span style="font-family:ui-monospace,'SFMono-Regular',Menlo,monospace;font-size:19px;color:#86868b;letter-spacing:.04em">תמונה · אמיר שחם</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <span style="font-size:34px;font-weight:800;line-height:1.15">אמיר שחם</span>
+        <span style="font-size:24px;font-weight:700;color:#ff5f3c;letter-spacing:.06em;direction:ltr;text-align:right">CDO</span>
+      </div>
+      <p style="margin:4px 0 0;font-size:20px;font-weight:400;color:#6e6e73;line-height:1.5;text-wrap:pretty">לוחם צנחנים בעל תואר במנהל עסקים, AWS Solutions Architect ומוסמך DevOps (IITC). רקע בהון סיכון ובסטארטאפים. אחראי אסטרטגיה מסחרית, ניתוח מתחרים, תמחור, קשרי משקיעים וגיוס.</p>
+    </figure>
+  </div>
+  <div class="conf" style="position:absolute;bottom:34px;left:var(--pad-x);font-size:19px;font-weight:400;color:#b6b6bc;letter-spacing:.05em">SwarmOps · Swarm Industries 2026 · חסוי</div>
+</section>
+
+<section data-label="הרקע" data-screen-label="03" data-speaker-notes="הנחת היסוד שלנו: חומרה הופכת לסחורה מהר, אבל אף אחד לא רואה את כל המרחב האווירי. כל רחפן טס על השלט שלו, בלי תמונה ברמת הצי: מי מכסה מה, מי כבר סרק, ומי הדוח העדכני. זו בעיית תיאום, לא בעיית גודל צי. ובהערכה שלנו כ-15 אחוז מזמן הטיסה מתבזבז בגלל זה." dir="rtl" style="background:#000;color:#f5f5f7;font-family:'Heebo',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">
+  <img class="fz" src="assets/drone1.jpeg" alt="רחפן בשטח" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+  <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.28) 30%,rgba(0,0,0,.88))"></div>
+  <div style="position:absolute;right:var(--pad-x);left:var(--pad-x);bottom:96px;display:flex;flex-direction:column;gap:38px;text-align:right">
+    <p class="fx d1" style="margin:0;font-size:var(--type-kicker);font-weight:700;letter-spacing:.16em;color:#ff8a63">הרקע</p>
+    <h2 class="fx d2" style="margin:0;font-size:76px;font-weight:800;letter-spacing:-0.015em;line-height:1.08;max-width:1400px">אף אחד לא רואה את כל המרחב האווירי</h2>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:44px;border-top:1px solid rgba(245,245,247,.28);padding-top:32px">
+      <div class="fx d3" style="display:flex;flex-direction:column;gap:10px">
+        <span style="font-size: 30px; font-weight: 700; line-height: 1.2">רחפן אחד מוגבל לשלט אחד</span>
+        <span style="font-size:23px;font-weight:400;color:rgba(245,245,247,.72);line-height:1.45">אין תמונה משותפת של מי מטיס מה, מי כבר סרק, ומה המידע העדכני.</span>
+      </div>
+      <div class="fx d4" style="display:flex;flex-direction:column;gap:10px">
+        <span style="font-size: 30px; font-weight: 700; line-height: 1.2">בעיית תיאום, לא בעיית צי</span>
+        <span style="font-size:23px;font-weight:400;color:rgba(245,245,247,.72);line-height:1.45">מפעילים עצמאיים בגזרה אחת הם נחיל בלי מוח.</span>
+      </div>
+      <div class="fx d5" style="display:flex;flex-direction:column;gap:10px">
+        <span style="font-size: 30px; font-weight: 700; line-height: 1.2">השכבה שמעל לא נמכרת</span>
+        <span style="font-size:23px;font-weight:400;color:rgba(245,245,247,.72);line-height:1.45">כל כלי מכוסה למפעיל בודד, לא למי שאחראי על המרחב.</span>
+      </div>
+      <div class="fp d6" style="display:flex;flex-direction:column;gap:6px">
+        <span class="grad" style="font-size:100px;font-weight:800;letter-spacing:-0.03em;line-height:1;direction:ltr;text-align:right">15%</span>
+        <span style="font-size:23px;font-weight:400;color:rgba(245,245,247,.72);line-height:1.45">מזמן הטיסה מתבזבז על תיאום לא אופטימלי (הערכה).</span>
+      </div>
+    </div>
+  </div>
+  <div class="conf" style="position:absolute;bottom:36px;left:var(--pad-x);font-size:19px;font-weight:400;color:rgba(245,245,247,.4);letter-spacing:.05em">SwarmOps · Swarm Industries 2026 · חסוי</div>
+</section>
+
+<section data-label="הפתרון" data-screen-label="04" data-speaker-notes="SwarmOps מחליטה בזמן אמת איזה רחפן טס לאיזו משימה, מנהלת סוללה, טווח ועדיפות תוך כדי, ומתכננת מחדש תוך שניות כשהתמונה משתנה. וכל מה שאתם רואים כאן כבר בנוי, פרוס ורץ על AWS." dir="rtl" style="background:#f5f5f7;color:#1d1d1f;font-family:'Heebo',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;display:flex;align-items:center;justify-content:center;gap:90px;padding:var(--pad-y) var(--pad-x);text-align:right">
+  <div style="display:flex;flex-direction:column;gap:34px;flex:1;max-width:820px">
+    <p class="fx" style="margin:0;font-size:var(--type-kicker);font-weight:700;letter-spacing:.16em;color:#ff5f3c">הפתרון</p>
+    <h2 class="fx d1" style="margin:0;font-size:68px;font-weight:800;letter-spacing:-0.02em;line-height:1.1">תמונה חיה אחת,<br><span class="grad">מתואמת בזמן אמת</span></h2>
+    <div style="display:flex;flex-direction:column;gap:0">
+      <div class="fx d2" style="display:flex;flex-direction:column;gap:6px;padding:22px 0;border-top:1px solid #d7d7de">
+        <span style="font-size:31px;font-weight:700;line-height:1.2">מנוע ניתוב VRPTW</span>
+        <span style="font-size:24px;font-weight:400;color:#6e6e73;line-height:1.4">מסלולים אופטימליים, תכנון משימה וסוללה אוטומטי.</span>
+      </div>
+      <div class="fx d3" style="display:flex;flex-direction:column;gap:6px;padding:22px 0;border-top:1px solid #d7d7de">
+        <span style="font-size:31px;font-weight:700;line-height:1.2">תכנון מחדש דינמי</span>
+        <span style="font-size:24px;font-weight:400;color:#6e6e73;line-height:1.4">לוח המשימות מתעדכן תוך שניות מתקלה או משינוי עדיפות.</span>
+      </div>
+      <div class="fx d4" style="display:flex;flex-direction:column;gap:6px;padding:22px 0;border-top:1px solid #d7d7de">
+        <span style="font-size:31px;font-weight:700;line-height:1.2">חדר בקרה מאוחד</span>
+        <span style="font-size:24px;font-weight:400;color:#6e6e73;line-height:1.4">מפה חיה אחת, כל כלי טיס, כל פיד מצלמה לפי דרישה.</span>
+      </div>
+      <div class="fx d5" style="display:flex;flex-direction:column;gap:6px;padding:22px 0;border-top:1px solid #d7d7de;border-bottom:1px solid #d7d7de">
+        <span style="font-size:31px;font-weight:700;line-height:1.2">אגנוסטי לחומרה</span>
+        <span style="font-size:24px;font-weight:400;color:#6e6e73;line-height:1.4">MAVLink, DJI ו-Autel בקונסולה אחת.</span>
+      </div>
+    </div>
+    <p class="fx d6" style="margin:0;font-size:25px;font-weight:500;color:#1d1d1f">המערכת בנויה, פרוסה ורצה על AWS.</p>
+  </div>
+  <img class="fz d2" src="assets/map.png" alt="חדר הבקרה של SwarmOps" style="width:720px;aspect-ratio:720/718;object-fit:cover;border-radius:28px;box-shadow:0 24px 80px rgba(0,0,0,.22)">
+  <div class="conf" style="position:absolute;bottom:44px;left:var(--pad-x);font-size:19px;font-weight:400;color:#b6b6bc;letter-spacing:.05em">SwarmOps · Swarm Industries 2026 · חסוי</div>
+</section>
+
+<section data-label="השוק" data-screen-label="05" data-speaker-notes="השוק הגלובלי לתוכנת ניהול צי רחפנים הוא 2.5 עד 3.9 מיליארד דולר ב-2026: 2.5 לפי Fact MR, 3.92 לפי Market Growth Reports, שניהם עם צמיחה של כ-18 אחוז בשנה. שכבת התיאום היא 10 עד 20 אחוז ממנו, כלומר 320 עד 640 מיליון דולר היום, וקרוב למיליארד ב-2029. בישראל לבד: 6 עד 20 מיליון דולר הכנסה חוזרת. היעד שלנו ב-2029 הוא 0.6 עד 1.5 מיליון ARR, מוגבל בכוח אדם, לא בשוק." dir="rtl" style="background:#f5f5f7;color:#1d1d1f;font-family:'Heebo',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:46px;padding:70px var(--pad-x);text-align:right">
+  <div style="display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center">
+    <p class="fx" style="margin:0;font-size:var(--type-kicker);font-weight:700;letter-spacing:.16em;color:#ff5f3c">השוק</p>
+    <h2 class="fx d1" style="margin:0;font-size:64px;font-weight:800;letter-spacing:-0.015em;line-height:1.05">שכבת התיאום, 2026 עד 2029</h2>
+  </div>
+  <div style="display:flex;align-items:flex-start;gap:80px;width:100%;max-width:1640px">
+
+    <div style="display:flex;flex-direction:column;gap:22px;flex:1">
+      <div style="display:flex;align-items:flex-end;gap:44px;height:428px">
+        <div class="fx d2" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:14px">
+          <span style="font-size:27px;font-weight:700;color:#6e6e73;direction:ltr">$0.32–0.64B</span>
+          <div style="position:relative;width:100%;height:217px;border-radius:14px 14px 0 0;background:linear-gradient(180deg,rgba(255,55,95,.16),rgba(255,179,64,.10))">
+            <div class="barY" style="position:absolute;left:0;right:0;bottom:0;height:109px;border-radius:14px 14px 0 0;background:linear-gradient(180deg,#ff375f,#ff5f3c 55%,#ffb340)"></div>
+          </div>
+          <span style="font-size:28px;font-weight:700;direction:ltr">2026</span>
+        </div>
+        <div class="fx d3" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:14px">
+          <span style="font-size:27px;font-weight:700;color:#6e6e73;direction:ltr">$0.38–0.76B</span>
+          <div style="position:relative;width:100%;height:258px;border-radius:14px 14px 0 0;background:linear-gradient(180deg,rgba(255,55,95,.16),rgba(255,179,64,.10))">
+            <div class="barY" style="position:absolute;left:0;right:0;bottom:0;height:129px;border-radius:14px 14px 0 0;background:linear-gradient(180deg,#ff375f,#ff5f3c 55%,#ffb340)"></div>
+          </div>
+          <span style="font-size:28px;font-weight:700;direction:ltr">2027</span>
+        </div>
+        <div class="fx d4" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:14px">
+          <span style="font-size:27px;font-weight:700;color:#6e6e73;direction:ltr">$0.45–0.90B</span>
+          <div style="position:relative;width:100%;height:306px;border-radius:14px 14px 0 0;background:linear-gradient(180deg,rgba(255,55,95,.16),rgba(255,179,64,.10))">
+            <div class="barY" style="position:absolute;left:0;right:0;bottom:0;height:153px;border-radius:14px 14px 0 0;background:linear-gradient(180deg,#ff375f,#ff5f3c 55%,#ffb340)"></div>
+          </div>
+          <span style="font-size:28px;font-weight:700;direction:ltr">2028</span>
+        </div>
+        <div class="fx d5" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:14px">
+          <span style="font-size:27px;font-weight:700;color:#1d1d1f;direction:ltr">$0.53–1.06B</span>
+          <div style="position:relative;width:100%;height:360px;border-radius:14px 14px 0 0;background:linear-gradient(180deg,rgba(255,55,95,.16),rgba(255,179,64,.10))">
+            <div class="barY" style="position:absolute;left:0;right:0;bottom:0;height:180px;border-radius:14px 14px 0 0;background:linear-gradient(180deg,#ff375f,#ff5f3c 55%,#ffb340)"></div>
+          </div>
+          <span style="font-size:28px;font-weight:700;direction:ltr">2029</span>
+        </div>
+      </div>
+      <div class="fx d6" style="display:flex;align-items:center;gap:32px;border-top:1px solid #d7d7de;padding-top:20px">
+        <span style="display:flex;align-items:center;gap:10px;font-size:26px;font-weight:600;color:#6e6e73"><span style="width:22px;height:22px;border-radius:6px;background:linear-gradient(180deg,#ff375f,#ffb340)"></span>10% מה-TAM</span>
+        <span style="display:flex;align-items:center;gap:10px;font-size:26px;font-weight:600;color:#6e6e73"><span style="width:22px;height:22px;border-radius:6px;background:rgba(255,55,95,.16)"></span>20% מה-TAM</span>
+        <span style="font-size:25px;font-weight:400;color:#86868b">בסיס: 3.2 מיליארד $ ב-2026, צמיחה 18% בשנה.</span>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:0;flex:0 0 560px">
+      <div class="fp d3" style="display:flex;flex-direction:column;gap:4px;padding:18px 0;border-top:1px solid #d7d7de">
+        <span style="font-size:24px;font-weight:700;letter-spacing:.14em;color:#a1a1a6;direction:ltr;text-align:right">TAM</span>
+        <span class="grad" style="font-size:48px;font-weight:800;letter-spacing:-0.03em;line-height:1.1;direction:ltr;text-align:right">$2.5–3.9B</span>
+        <span style="font-size:25px;font-weight:400;color:#6e6e73;line-height:1.4">תוכנת ניהול צי רחפנים גלובלית, 2026. שכבת התיאום היא 10-20% ממנה.</span>
+      </div>
+      <div class="fp d4" style="display:flex;flex-direction:column;gap:4px;padding:18px 0;border-top:1px solid #d7d7de">
+        <span style="font-size:24px;font-weight:700;letter-spacing:.14em;color:#a1a1a6;direction:ltr;text-align:right">SAM</span>
+        <span class="grad" style="font-size:48px;font-weight:800;letter-spacing:-0.03em;line-height:1.1;direction:ltr;text-align:right">$6–20M</span>
+        <span style="font-size:25px;font-weight:400;color:#6e6e73;line-height:1.4">הכנסה חוזרת בישראל; 300-800 ארגונים שמתאמים 3+ כלי טיס, ב-20-25 אלף דולר לשנה (הערכה).</span>
+      </div>
+      <div class="fp d5" style="display:flex;flex-direction:column;gap:4px;padding:18px 0;border-top:1px solid #d7d7de;border-bottom:1px solid #d7d7de">
+        <span style="font-size:24px;font-weight:700;letter-spacing:.14em;color:#a1a1a6;direction:ltr;text-align:right">SOM</span>
+        <span class="grad" style="font-size:48px;font-weight:800;letter-spacing:-0.03em;line-height:1.1;direction:ltr;text-align:right">$0.6–1.5M</span>
+        <span style="font-size:25px;font-weight:400;color:#6e6e73;line-height:1.4">ARR עד 2029, בין 20 ל-40 לקוחות משלמים. המגבלה היא כוח אדם, לא השוק.</span>
+      </div>
+      <span class="fx d7" style="font-size:24px;font-weight:400;color:#a1a1a6;line-height:1.45;padding-top:16px">מקורות: Fact MR (2.5 מיליארד $ ב-2026, CAGR 17.7%) · Market Growth Reports (3.92 מיליארד $ ב-2026, CAGR 18.3%).</span>
+    </div>
+
+  </div>
+  <div class="conf" style="position:absolute;bottom:44px;left:var(--pad-x);font-size:19px;font-weight:400;color:#b6b6bc;letter-spacing:.05em">SwarmOps · Swarm Industries 2026 · חסוי</div>
+</section>
+
+<section data-label="אינטגרציה" data-screen-label="06" data-speaker-notes="אנחנו לא מוכרים חומרה ולא נלחמים על תקן. כל כלי טיס עם SDK פתוח נכנס לקונסולה שלנו: DJI, Autel, וכל מסגרת אווירית על MAVLink. מה שאנחנו צריכים מכל SDK זה ארבעה דברים: טלמטריה, דחיפת מסלול, פיד וידאו ומצב סוללה. חיבור כלי טיס אמיתיים הוא חודשים 0 עד 3 במפת הדרכים." dir="rtl" style="background:#f5f5f7;color:#1d1d1f;font-family:'Heebo',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;display:flex;align-items:center;justify-content:center;gap:80px;padding:var(--pad-y) var(--pad-x);text-align:right">
+  <div style="display:flex;flex-direction:column;gap:30px;flex:1;max-width:900px">
+    <p class="fx" style="margin:0;font-size:var(--type-kicker);font-weight:700;letter-spacing:.16em;color:#ff5f3c">אינטגרציה</p>
+    <h2 class="fx d1" style="margin:0;font-size:68px;font-weight:800;letter-spacing:-0.02em;line-height:1.1">כל כלי טיס עם SDK פתוח</h2>
+    <div style="display:flex;flex-direction:column;gap:0">
+      <div class="fx d2" style="display:flex;align-items:baseline;gap:26px;padding:20px 0;border-top:1px solid #d7d7de">
+        <span style="font-size:30px;font-weight:800;flex:0 0 250px;direction:ltr;text-align:right">DJI</span>
+        <span style="font-size:24px;font-weight:400;color:#6e6e73;line-height:1.4">Payload SDK · Mobile SDK · Cloud API. סדרות Matrice ו-Mavic Enterprise, כולל תחנות עגינה.</span>
+      </div>
+      <div class="fx d3" style="display:flex;align-items:baseline;gap:26px;padding:20px 0;border-top:1px solid #d7d7de">
+        <span style="font-size:30px;font-weight:800;flex:0 0 250px;direction:ltr;text-align:right">Autel Robotics</span>
+        <span style="font-size:24px;font-weight:400;color:#6e6e73;line-height:1.4">EVO Max ו-Alpha, עם SDK פתוח למפתחים.</span>
+      </div>
+      <div class="fx d4" style="display:flex;align-items:baseline;gap:26px;padding:20px 0;border-top:1px solid #d7d7de">
+        <span style="font-size:30px;font-weight:800;flex:0 0 250px;direction:ltr;text-align:right">MAVLink</span>
+        <span style="font-size:24px;font-weight:400;color:#6e6e73;line-height:1.4">כל מסגרת אווירית עם טייס אוטומטי פתוח: PX4 או ArduPilot, כולל בנייה עצמית.</span>
+      </div>
+      <div class="fx d5" style="display:flex;align-items:baseline;gap:26px;padding:20px 0;border-top:1px solid #d7d7de;border-bottom:1px solid #d7d7de">
+        <span style="font-size:30px;font-weight:800;flex:0 0 250px;direction:ltr;text-align:right">Parrot ANAFI</span>
+        <span style="font-size:24px;font-weight:400;color:#6e6e73;line-height:1.4">Air SDK ו-Olympe, תואמי MAVLink.</span>
+      </div>
+    </div>
+    <div class="fp d6" style="display:flex;flex-wrap:wrap;gap:10px">
+      <span style="background:#fff;border-radius:100px;padding:12px 24px;font-size:23px;font-weight:600;box-shadow:0 2px 12px rgba(0,0,0,.05)">טלמטריה</span>
+      <span style="background:#fff;border-radius:100px;padding:12px 24px;font-size:23px;font-weight:600;box-shadow:0 2px 12px rgba(0,0,0,.05)">דחיפת מסלול</span>
+      <span style="background:#fff;border-radius:100px;padding:12px 24px;font-size:23px;font-weight:600;box-shadow:0 2px 12px rgba(0,0,0,.05)">פיד וידאו</span>
+      <span style="background:#fff;border-radius:100px;padding:12px 24px;font-size:23px;font-weight:600;box-shadow:0 2px 12px rgba(0,0,0,.05)">מצב סוללה</span>
+      <span style="border:2px solid #ff5f3c;color:#ff5f3c;border-radius:100px;padding:10px 24px;font-size:23px;font-weight:600">חיבור כלי טיס אמיתיים: חודשים 0-3</span>
+    </div>
+  </div>
+  <figure class="fz d3" style="margin:0;display:flex;flex-direction:column;gap:16px;flex:0 0 620px">
+    <img src="assets/drone2.jpeg" alt="מסך שלט בשטח" style="width:620px;aspect-ratio:4/3;object-fit:cover;border-radius:26px;box-shadow:0 22px 70px rgba(0,0,0,.2)">
+    <figcaption style="font-size:23px;font-weight:400;color:#86868b">היום: מסך אחד, כלי טיס אחד, מפעיל אחד.</figcaption>
+  </figure>
+  <div class="conf" style="position:absolute;bottom:44px;left:var(--pad-x);font-size:19px;font-weight:400;color:#b6b6bc;letter-spacing:.05em">SwarmOps · Swarm Industries 2026 · חסוי</div>
+</section>
+
+<section data-label="מודל ההכנסות" data-screen-label="07" data-speaker-notes="המודל הוא מנוי לכלי טיס. טווח השוק הוא 50 עד 500 דולר לכלי טיס בחודש; נקודת העבודה שלנו היא 150. עשרה כלי טיס זה כ-20 אלף דולר לשנה, ואתר הגנתי בפריסה מקומית הוא 100 עד 300 אלף לשנה. מכאן התחזית: 2027 עם לקוח מעצב ראשון ושניים נוספים, 60 עד 90 אלף ARR. 2028 עם עשרה לקוחות, 200 עד 300 אלף. 2029, שנה שלישית, 20 עד 40 לקוחות ו-0.6 עד 1.5 מיליון ARR. זה ה-SOM, לא תקרת השוק." dir="rtl" style="background:#f5f5f7;color:#1d1d1f;font-family:'Heebo',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:52px;padding:70px var(--pad-x);text-align:right">
+  <div style="display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center">
+    <p class="fx" style="margin:0;font-size:var(--type-kicker);font-weight:700;letter-spacing:.16em;color:#ff5f3c">מודל ההכנסות</p>
+    <h2 class="fx d1" style="margin:0;font-size:64px;font-weight:800;letter-spacing:-0.015em;line-height:1.05">מנוי לכלי טיס, ותחזית ARR לשלוש שנים</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:70px;width:100%;max-width:1560px">
+    <div class="fp d2" style="display:flex;flex-direction:column;gap:6px">
+      <span class="grad" style="font-size:66px;font-weight:800;letter-spacing:-0.03em;line-height:1.1;direction:ltr;text-align:right">$150</span>
+      <span style="font-size:26px;font-weight:700;line-height:1.3">לכלי טיס בחודש</span>
+      <span style="font-size:25px;font-weight:400;color:#6e6e73;line-height:1.4">נקודת העבודה שלנו (הערכה). טווח השוק: 50-500 דולר.</span>
+    </div>
+    <div class="fp d3" style="display:flex;flex-direction:column;gap:6px">
+      <span class="grad" style="font-size:66px;font-weight:800;letter-spacing:-0.03em;line-height:1.1;direction:ltr;text-align:right">$20K</span>
+      <span style="font-size:26px;font-weight:700;line-height:1.3">לשנה, בעשרה כלי טיס</span>
+      <span style="font-size:25px;font-weight:400;color:#6e6e73;line-height:1.4">הלקוח הטיפוסי בשוק היעד הישראלי.</span>
+    </div>
+    <div class="fp d4" style="display:flex;flex-direction:column;gap:6px">
+      <span class="grad" style="font-size:66px;font-weight:800;letter-spacing:-0.03em;line-height:1.1;direction:ltr;text-align:right">$100–300K</span>
+      <span style="font-size:26px;font-weight:700;line-height:1.3">לשנה, אתר הגנתי</span>
+      <span style="font-size:25px;font-weight:400;color:#6e6e73;line-height:1.4">פריסה מקומית (on-premise), סביבות מנותקות.</span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:16px;width:100%;max-width:1560px">
+    <div class="fx d5" style="display:flex;align-items:center;gap:28px">
+      <span style="font-size:26px;font-weight:800;flex:0 0 190px;direction:ltr;text-align:right">2027 · שנה 1</span>
+      <div style="position:relative;flex:1;height:46px;border-radius:23px;background:#ebebef;overflow:hidden">
+        <div style="position:absolute;inset-inline-start:0;top:0;bottom:0;width:6%;border-radius:23px;background:rgba(255,55,95,.18)"></div>
+        <div class="bar" style="position:absolute;inset-inline-start:0;top:0;bottom:0;width:4%;border-radius:23px;background:linear-gradient(270deg,#ffb340,#ff5f3c 55%,#ff375f)"></div>
+      </div>
+      <span style="font-size:25px;font-weight:600;color:#1d1d1f;flex:0 0 360px">60-90 אלף $ · 3 לקוחות</span>
+    </div>
+    <div class="fx d6" style="display:flex;align-items:center;gap:28px">
+      <span style="font-size:26px;font-weight:800;flex:0 0 190px;direction:ltr;text-align:right">2028 · שנה 2</span>
+      <div style="position:relative;flex:1;height:46px;border-radius:23px;background:#ebebef;overflow:hidden">
+        <div style="position:absolute;inset-inline-start:0;top:0;bottom:0;width:20%;border-radius:23px;background:rgba(255,55,95,.18)"></div>
+        <div class="bar" style="position:absolute;inset-inline-start:0;top:0;bottom:0;width:13.3%;border-radius:23px;background:linear-gradient(270deg,#ffb340,#ff5f3c 55%,#ff375f)"></div>
+      </div>
+      <span style="font-size:25px;font-weight:600;color:#1d1d1f;flex:0 0 360px">200-300 אלף $ · 10 לקוחות</span>
+    </div>
+    <div class="fx d7" style="display:flex;align-items:center;gap:28px">
+      <span style="font-size:26px;font-weight:800;flex:0 0 190px;direction:ltr;text-align:right">2029 · שנה 3</span>
+      <div style="position:relative;flex:1;height:46px;border-radius:23px;background:#ebebef;overflow:hidden">
+        <div style="position:absolute;inset-inline-start:0;top:0;bottom:0;width:100%;border-radius:23px;background:rgba(255,55,95,.18)"></div>
+        <div class="bar" style="position:absolute;inset-inline-start:0;top:0;bottom:0;width:40%;border-radius:23px;background:linear-gradient(270deg,#ffb340,#ff5f3c 55%,#ff375f)"></div>
+      </div>
+      <span style="font-size:25px;font-weight:600;color:#1d1d1f;flex:0 0 360px">0.6-1.5 מיליון $ · 20-40 לקוחות</span>
+    </div>
+    <span class="fx d8" style="font-size:24px;font-weight:400;color:#a1a1a6;line-height:1.45">מלא: תרחיש שמרני · בהיר: תרחיש עליון. מבוסס על 20-25 אלף דולר ללקוח בשנה, בתוספת אתרי on-premise. הציר עד 1.5 מיליון $.</span>
+  </div>
+  <div class="conf" style="position:absolute;bottom:44px;left:var(--pad-x);font-size:19px;font-weight:400;color:#b6b6bc;letter-spacing:.05em">SwarmOps · Swarm Industries 2026 · חסוי</div>
+</section>
+
+<section data-label="מפת דרכים" data-screen-label="08" data-speaker-notes="שנה אחת קדימה. חודשים 0 עד 3: חיבור כלי טיס אמיתיים, ניסויי שדה ראשונים, ופנייה לרשות התעופה האזרחית. חודשים 3 עד 6: פיילוט ראשון עם שותף אסטרטגי או לקוח מעצב. חודשים 6 עד 12: מוצר מרובה־דיירים, תמחור מסחרי, והסבב הבא." dir="rtl" style="background:#f5f5f7;color:#1d1d1f;font-family:'Heebo',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:70px;padding:var(--pad-y) var(--pad-x);text-align:right">
+  <div style="display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center">
+    <p class="fx" style="margin:0;font-size:var(--type-kicker);font-weight:700;letter-spacing:.16em;color:#ff5f3c">מפת דרכים</p>
+    <h2 class="fx d1" style="margin:0;font-size:var(--type-title);font-weight:800;letter-spacing:-0.015em;line-height:1.05">שנים־עשר החודשים הבאים</h2>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:0;width:100%;max-width:1560px">
+    <div class="bar d2" style="height:6px;border-radius:3px;background:linear-gradient(270deg,#ffb340,#ff5f3c 55%,#ff375f)"></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:70px;padding-top:0">
+      <div class="fx d3" style="display:flex;flex-direction:column;gap:14px">
+        <span style="width:22px;height:22px;border-radius:50%;background:#ff5f3c;margin-top:-14px;box-shadow:0 0 0 6px #f5f5f7"></span>
+        <span style="font-size:34px;font-weight:800;line-height:1.2;margin-top:16px">חודשים 0-3</span>
+        <span style="font-size:26px;font-weight:400;color:#6e6e73;line-height:1.5">חיבור כלי טיס אמיתיים, ניסויי שדה ראשונים, ופנייה לרשות התעופה האזרחית.</span>
+      </div>
+      <div class="fx d5" style="display:flex;flex-direction:column;gap:14px">
+        <span style="width:22px;height:22px;border-radius:50%;background:#ff5f3c;margin-top:-14px;box-shadow:0 0 0 6px #f5f5f7"></span>
+        <span style="font-size:34px;font-weight:800;line-height:1.2;margin-top:16px">חודשים 3-6</span>
+        <span style="font-size:26px;font-weight:400;color:#6e6e73;line-height:1.5">פיילוט ראשון עם שותף אסטרטגי או לקוח מעצב.</span>
+      </div>
+      <div class="fx d7" style="display:flex;flex-direction:column;gap:14px">
+        <span style="width:22px;height:22px;border-radius:50%;background:#ff5f3c;margin-top:-14px;box-shadow:0 0 0 6px #f5f5f7"></span>
+        <span style="font-size:34px;font-weight:800;line-height:1.2;margin-top:16px">חודשים 6-12</span>
+        <span style="font-size:26px;font-weight:400;color:#6e6e73;line-height:1.5">מוצר מרובה־דיירים, תמחור מסחרי, הסבב הבא.</span>
+      </div>
+    </div>
+  </div>
+  <div class="conf" style="position:absolute;bottom:44px;left:var(--pad-x);font-size:19px;font-weight:400;color:#b6b6bc;letter-spacing:.05em">SwarmOps · Swarm Industries 2026 · חסוי</div>
+</section>
+
+<section data-label="הבקשה" data-screen-label="09" data-speaker-notes="הבקשה: 250 אלף דולר ב-SAFE, שלב Pre-Seed. זה 12 חודשי מסלול עם ארבעה מייסדים במשרה מלאה. הכספים הולכים לשכר ולהבאת לקוח מעצב ראשון. אנחנו בישראל, מוכנים לייצוא." dir="rtl" style="background:#000;color:#f5f5f7;font-family:'Heebo',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">
+  <img class="fz" src="assets/drone4.jpeg" alt="שיגור לילי" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%">
+  <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.9),rgba(0,0,0,.6) 55%,rgba(0,0,0,.75))"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:110px;padding:var(--pad-y) var(--pad-x);text-align:right">
+    <div style="display:flex;flex-direction:column;gap:20px;flex:0 0 640px">
+      <p class="fx" style="margin:0;font-size:var(--type-kicker);font-weight:700;letter-spacing:.16em;color:#ff8a63">הבקשה</p>
+      <span class="grad fp d2" style="font-size:190px;font-weight:800;letter-spacing:-0.04em;line-height:.95;direction:ltr;text-align:right">$250K</span>
+      <p class="fx d3" style="margin:0;font-size:38px;font-weight:600;color:#f5f5f7">SAFE · Pre-Seed</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:34px 44px;flex:1;max-width:800px">
+      <div class="fx d4" style="display:flex;flex-direction:column;gap:6px;padding-top:20px;border-top:1px solid rgba(245,245,247,.28)">
+        <span style="font-size:22px;font-weight:700;letter-spacing:.12em;color:rgba(245,245,247,.55)">מכשיר</span>
+        <span style="font-size:31px;font-weight:700">SAFE</span>
+      </div>
+      <div class="fx d4" style="display:flex;flex-direction:column;gap:6px;padding-top:20px;border-top:1px solid rgba(245,245,247,.28)">
+        <span style="font-size:22px;font-weight:700;letter-spacing:.12em;color:rgba(245,245,247,.55)">שלב</span>
+        <span style="font-size:31px;font-weight:700">Pre-Seed</span>
+      </div>
+      <div class="fx d5" style="display:flex;flex-direction:column;gap:6px;padding-top:20px;border-top:1px solid rgba(245,245,247,.28)">
+        <span style="font-size:22px;font-weight:700;letter-spacing:.12em;color:rgba(245,245,247,.55)">מסלול</span>
+        <span style="font-size:31px;font-weight:700">12 חודשים, מייסדים במשרה מלאה</span>
+      </div>
+      <div class="fx d5" style="display:flex;flex-direction:column;gap:6px;padding-top:20px;border-top:1px solid rgba(245,245,247,.28)">
+        <span style="font-size:22px;font-weight:700;letter-spacing:.12em;color:rgba(245,245,247,.55)">גיאוגרפיה</span>
+        <span style="font-size:31px;font-weight:700">ישראל, מוכן לייצוא</span>
+      </div>
+      <div class="fx d6" style="display:flex;flex-direction:column;gap:6px;padding-top:20px;border-top:1px solid rgba(245,245,247,.28);grid-column:1 / -1">
+        <span style="font-size:22px;font-weight:700;letter-spacing:.12em;color:rgba(245,245,247,.55)">שימוש בכספים</span>
+        <span style="font-size:31px;font-weight:700">שכר, והבאת לקוח מעצב ראשון</span>
+      </div>
+    </div>
+  </div>
+  <div class="conf" style="position:absolute;bottom:36px;left:var(--pad-x);font-size:19px;font-weight:400;color:rgba(245,245,247,.4);letter-spacing:.05em">SwarmOps · Swarm Industries 2026 · חסוי</div>
+</section>
+
+<section data-label="סיום" data-screen-label="10" data-speaker-notes="חומרה הופכת לסחורה. שכבת התיאום היא מה שאף אחד לא מוכר, ואנחנו בנינו אותה. תודה, נשמח לשאלות." dir="rtl" style="background:#f5f5f7;color:#1d1d1f;font-family:'Heebo',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;padding:var(--pad-y) var(--pad-x);text-align:center">
+  <img class="fx" src="assets/logo-mark.png" alt="SwarmOps" style="width:130px;height:auto">
+  <h2 class="grad fx d1" style="margin:0;font-size:130px;font-weight:800;letter-spacing:-0.03em;line-height:1">תודה</h2>
+  <p class="fx d2" style="margin:0;font-size:36px;font-weight:400;color:#6e6e73;max-width:1200px;line-height:1.4">חומרה הופכת לסחורה. שכבת התיאום היא מה שאף אחד לא מוכר.</p>
+  <p class="fx d3" style="margin:26px 0 0;font-size:26px;font-weight:500;color:#86868b;letter-spacing:.04em;direction:ltr">SwarmOps · Swarm Industries · Pre-Seed 2026</p>
+  <div class="conf" style="position:absolute;bottom:44px;left:var(--pad-x);font-size:19px;font-weight:400;color:#b6b6bc;letter-spacing:.05em">SwarmOps · Swarm Industries 2026 · חסוי</div>
+</section>
+
+</x-import>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accentStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;gradient&quot;,&quot;solid&quot;,&quot;ink&quot;],&quot;default&quot;:&quot;gradient&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Look&quot;},&quot;animations&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Look&quot;},&quot;confidential&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Look&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this.sync(); }
+  componentDidUpdate() { this.sync(); }
+  componentWillUnmount() { if (this.el) { this.el.remove(); this.el = null; } }
+  sync() {
+    if (!this.el) {
+      this.el = document.createElement('style');
+      this.el.id = 'swarmops-deck-tweaks';
+      document.head.appendChild(this.el);
+    }
+    const accent = this.props.accentStyle ?? 'gradient';
+    const animations = this.props.animations ?? true;
+    const confidential = this.props.confidential ?? true;
+    let css = '';
+    if (accent === 'solid') {
+      css += '.grad{background:none !important;-webkit-text-fill-color:#ff5f3c !important;color:#ff5f3c !important}';
+    } else if (accent === 'ink') {
+      css += '.grad{background:none !important;-webkit-text-fill-color:#1d1d1f !important;color:#1d1d1f !important}';
+      css += 'section[data-label="\u05d4\u05e8\u05e7\u05e2"] .grad,section[data-label="\u05d4\u05d1\u05e7\u05e9\u05d4"] .grad{-webkit-text-fill-color:#f5f5f7 !important;color:#f5f5f7 !important}';
+    }
+    if (!animations) {
+      css += '.fx,.fp,.fz,.bar,.barY{animation:none !important;opacity:1 !important;transform:none !important}';
+    }
+    if (!confidential) css += '.conf{display:none !important}';
+    this.el.textContent = css;
+  }
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
