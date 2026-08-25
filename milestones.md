@@ -1267,3 +1267,67 @@ still claim video does not exist, no Amir, still say "team lead".
 **Security note:** an untracked `auth` file at repo root contains an htpasswd credential
 (`admin:$apr1$...`). It was **not** committed and is now in `.gitignore`. If that hash is live
 anywhere, rotate it.
+
+---
+
+### Update 2026-08-25 (Tony) — post-capstone development restart: two planning docs added, testing rule tightened
+
+**Context:** team decided to resume development to present a **feature-fuller MVP**. Audience named
+for the resulting demo: **design partner / pilot, defense buyer, internal — not investor-first**, so
+weight operational depth and procurement gates over pitch polish. Nothing was built this session;
+two planning documents were written and one working agreement changed.
+
+**New: `algo_newfeat.md` (repo root).** The candidate list, in three explicitly-labelled buckets so
+nobody starts work on the wrong one:
+
+- **APPROVED (3):** §3.8 sensor footprint on the map · §3.9 controllable gimbal + true visible area
+  computed against real terrain, dead spots included · §3.10 real DJI airframes with published
+  specs. All three are Tony's.
+- **DECIDE LATER:** §1's ten verified algorithm gaps, §2's seven general features, §3.1–§3.7's seven
+  defense differentiators. A menu, not a backlog — no owners, nothing in `plan.md`.
+- **FURTHER DISCUSSION (§6):** account-shaped *wedges* rather than features — unilateral
+  deconfliction at company level (IDF), incident dispatch with a return guarantee (Police), battery
+  locker readiness. Plus three parked "big swings" in §6.4.
+
+**Three findings from that document the next person should know before building anything:**
+
+1. **The planner has no concept of time.** `speed_kmh` is never read by `swarmops-planning-service`
+   (zero occurrences), and `deadline` is read only in `solve_greedy`, which now runs solely as the
+   baseline metric inside `assignment_quality_vs_greedy`. **So no deadline influences any real
+   plan.** `CLAUDE.md` and the PRD describe the system as "a VRPTW variant" — there are no time
+   windows. Either build §1.1 or stop making the claim; a technical evaluator will check.
+2. **`linear_sum_assignment` gives one drone exactly one mission.** No chaining, ever. Largest
+   utilization loss in the system, and utilization is what a pilot partner measures.
+3. **`payload_capacity_kg` is never read by the planner either**, though PRD §4.2 says battery drain
+   depends on payload weight. §3.10 (real specs) forces this and the endurance-vs-`max_range_km`
+   question into the open — no manufacturer publishes range, they publish flight minutes.
+
+**Two things previously described as missing are already built** and were nearly re-planned:
+`POST /planning/simulate` (`routes/planning.py:360`) and `WhatIfSimulator.tsx`. Checked, not assumed.
+
+**New: `security_hardening.md` (repo root).** Triggered by the on-prem direction and the intent to
+present to army/police. **13 findings, all verified against the repos on 2026-08-25 with file:line**,
+severity rated for an accreditation review rather than for a capstone. Two Critical (one shared
+secret serving JWT + RabbitMQ + Erlang cookie + service accounts, committed to git; MongoDB running
+with auth disabled), four High (no NetworkPolicy; camera-feed frame injection — any authenticated
+`viewer` can push arbitrary video into the operational picture; no pod security context; no TLS in
+cluster). Phase 0 is 8 steps and **2–3 weeks, not the 1 week `onprem_deployment.md` §6 estimated**
+against three findings. §4.5 answers "should we add a new security layer" — not before Phase 0,
+then admission policy, identity federation (probably mandatory, and it changes Phase 0 step 0.1's
+design, so **ask before starting it**), and a mesh only if deployment size justifies it.
+
+**Open, and it matters before a meeting:** `onprem_deployment.md` §3.3 still states that
+`POST /telemetry/events` has no authentication. **That is stale** — the route is
+`POST /telemetry/ingest` and it is behind `verifyJwt` (`telemetry.routes.ts:25`). Recorded in
+`security_hardening.md` §6.1 but **not yet corrected in `onprem_deployment.md` itself**, along with
+its §6 item 1 sizing. Fix before anyone reads that doc ahead of a defense conversation.
+
+**Working agreement changed — `CLAUDE.md`, Tests.** Every new feature must now ship with a **smoke
+test that exercises the feature itself**; lint/typecheck/build passing is evidence it compiles, not
+that it works. Broken out per work type (endpoint / solver / UI / cross-service / bug fix), with an
+honest escape valve: if something is genuinely hard to test, say so in `STATUS.md` and say what you
+did instead. Where a repo has no test tooling, adding it is part of the feature.
+
+**Still uncommitted in this repo:** `actual_prod.md`'s §3.4 (DJI battery paths without the SDK —
+DroneID / DUML / smart-battery UART / RosettaDrone / Cloud API) from an earlier session. Complete
+work, just never committed.

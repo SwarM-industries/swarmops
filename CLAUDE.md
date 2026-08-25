@@ -183,6 +183,30 @@ integration breaks.
   a unit test if you can hit a real (containerized) instance in an integration test instead —
   divergence between mocked and real behavior is exactly the kind of bug this system is supposed
   to catch, not cause.
+- **Every new feature ships with a smoke test that exercises the feature itself.** Lint, typecheck
+  and build passing is not evidence a feature works — it is evidence it compiles. A feature is not
+  done until there is a test that drives the actual behavior end to end and would fail if the
+  feature were removed or broken. Concretely, for each kind of work:
+  - **New endpoint** — a test that calls it over HTTP with a real request and asserts the response
+    shape *and* the resulting state change, not just a 200.
+  - **New solver/algorithm behavior** — a case that produces the wrong answer without the change.
+    `swarmops-planning-service`'s `pytest` regression tests for the low-battery hand-off fix are
+    the pattern: three tests that each fail on the pre-fix code.
+  - **New UI feature** — at minimum a test that renders it with real-shaped data and asserts what
+    the operator would see. A component that only ever gets checked by `npm run build` is untested.
+  - **New cross-service behavior** — a scenario in `swarmops-local` (`seed/demo-scenarios.ts` is the
+    existing pattern) that runs against the real docker-compose stack. **This is the one that keeps
+    catching real bugs** — the naive/aware datetime crash and the patrol-replacement decoy failure
+    were both invisible to unit tests with fakes and obvious the first time the scenario ran live.
+  - **Bug fix** — a regression test that fails on the old code. No exceptions; a fix without one is
+    an assertion that the bug is gone, not evidence.
+
+  If a feature is genuinely hard to test, say so in the PR or `STATUS.md` and say what you did
+  instead — "verified manually against the live cluster, no automated coverage" is an acceptable
+  and honest state. Silently shipping untested and letting CI's green tick imply otherwise is not.
+  Where a repo has no test tooling at all, adding it is part of the feature (`swarmops-fleet-service`
+  went from zero to a working `vitest` + `supertest` + `mongodb-memory-server` setup in one pass —
+  that is the bar).
 - **Leave a status note after every push or finished chunk of work.** Whichever of us's Claude
   session (Tony's, Guy's, Valfish's) does the pushing: append a short dated note to that repo's
   own `STATUS.md` (or this repo's `milestones.md` if the work is cross-repo/milestone-level) —
